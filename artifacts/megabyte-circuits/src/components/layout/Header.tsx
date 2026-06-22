@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { 
   Menu, Phone, Mail, MapPin, CircuitBoard, ChevronDown, 
   Upload, Calculator, Globe, X
@@ -15,6 +15,10 @@ import {
 
 export function Header() {
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [location] = useLocation();
+
+  const isHome = location === "/";
+  const isTransparent = isHome && !isScrolled;
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -25,8 +29,8 @@ export function Header() {
   }, []);
 
   return (
-    <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-background/95 backdrop-blur shadow-sm border-b' : 'bg-transparent text-white'}`}>
-      <div className={`hidden md:block w-full text-xs py-1.5 transition-colors ${isScrolled ? 'bg-secondary text-secondary-foreground' : 'bg-secondary/80 text-white backdrop-blur'}`}>
+    <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${!isTransparent ? 'bg-background/95 backdrop-blur shadow-sm border-b' : 'bg-transparent text-white'}`}>
+      <div className={`hidden md:block w-full text-xs py-1.5 transition-colors ${isTransparent ? 'bg-secondary/80 text-white backdrop-blur' : 'bg-secondary text-secondary-foreground'}`}>
         <div className="container flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <span className="flex items-center"><MapPin className="w-3 h-3 mr-1" /> Ahmedabad, Gujarat, India</span>
@@ -46,16 +50,16 @@ export function Header() {
           <div className="bg-primary p-1.5 rounded-md text-white group-hover:bg-primary/90 transition-colors">
             <CircuitBoard className="w-6 h-6" />
           </div>
-          <span className={`font-display font-bold text-xl tracking-tight transition-colors ${isScrolled ? 'text-foreground' : 'text-white'}`}>
+          <span className={`font-display font-bold text-xl tracking-tight transition-colors ${isTransparent ? 'text-white' : 'text-foreground'}`}>
             MegaByte's <span className="text-primary font-bold">Circuits</span>
           </span>
         </Link>
 
         <nav className="hidden lg:flex items-center space-x-6">
-          <Link href="/" className={`text-sm font-medium hover:text-primary transition-colors ${!isScrolled && 'text-white/90 hover:text-white'}`}>Home</Link>
+          <Link href="/" className={`text-sm font-medium hover:text-primary transition-colors ${isTransparent ? 'text-white/90 hover:text-white' : 'text-foreground'}`}>Home</Link>
           
           <DropdownMenu>
-            <DropdownMenuTrigger className={`flex items-center text-sm font-medium hover:text-primary outline-none transition-colors ${!isScrolled && 'text-white/90 hover:text-white'}`}>
+            <DropdownMenuTrigger className={`flex items-center text-sm font-medium hover:text-primary outline-none transition-colors ${isTransparent ? 'text-white/90 hover:text-white' : 'text-foreground'}`}>
               Manufacturing <ChevronDown className="w-4 h-4 ml-1 opacity-50" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-48">
@@ -71,7 +75,7 @@ export function Header() {
           </DropdownMenu>
 
           <DropdownMenu>
-            <DropdownMenuTrigger className={`flex items-center text-sm font-medium hover:text-primary outline-none transition-colors ${!isScrolled && 'text-white/90 hover:text-white'}`}>
+            <DropdownMenuTrigger className={`flex items-center text-sm font-medium hover:text-primary outline-none transition-colors ${isTransparent ? 'text-white/90 hover:text-white' : 'text-foreground'}`}>
               Assembly <ChevronDown className="w-4 h-4 ml-1 opacity-50" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center">
@@ -84,12 +88,12 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="/about" className={`text-sm font-medium hover:text-primary transition-colors ${!isScrolled && 'text-white/90 hover:text-white'}`}>About Us</Link>
-          <Link href="/contact" className={`text-sm font-medium hover:text-primary transition-colors ${!isScrolled && 'text-white/90 hover:text-white'}`}>Contact Us</Link>
+          <Link href="/about" className={`text-sm font-medium hover:text-primary transition-colors ${isTransparent ? 'text-white/90 hover:text-white' : 'text-foreground'}`}>About Us</Link>
+          <Link href="/contact" className={`text-sm font-medium hover:text-primary transition-colors ${isTransparent ? 'text-white/90 hover:text-white' : 'text-foreground'}`}>Contact Us</Link>
         </nav>
 
         <div className="hidden md:flex items-center space-x-3">
-          <Button variant="outline" className={`border-primary text-primary hover:bg-primary/10 ${!isScrolled && 'border-white text-white hover:bg-white/20'}`}>
+          <Button variant="outline" className={`transition-colors ${isTransparent ? 'border-white text-white hover:bg-white/20' : 'border-primary text-primary hover:bg-primary/10'}`}>
             <Upload className="w-4 h-4 mr-2" /> Upload Gerber
           </Button>
           <Button className="bg-primary hover:bg-primary/90 text-white shadow-md">
@@ -99,7 +103,7 @@ export function Header() {
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className={`lg:hidden ${!isScrolled && 'text-white hover:bg-white/20'}`}>
+            <Button variant="ghost" size="icon" className={`lg:hidden ${isTransparent ? 'text-white hover:bg-white/20' : ''}`}>
               <Menu className="w-6 h-6" />
             </Button>
           </SheetTrigger>
