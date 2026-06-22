@@ -1,15 +1,16 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: MegaByte's Circuit Systems API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: contact
+    description: Contact and quote operations
 paths:
   /healthz:
     get:
@@ -24,6 +25,68 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit a contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "200":
+          description: Contact submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitResponse"
+        "400":
+          description: Validation error
+
+  /quote:
+    post:
+      operationId: submitQuote
+      tags: [contact]
+      summary: Submit a PCB quote request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteInput"
+      responses:
+        "200":
+          description: Quote submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitResponse"
+        "400":
+          description: Validation error
+
+  /quote/calculate:
+    post:
+      operationId: calculateQuote
+      tags: [contact]
+      summary: Calculate estimated PCB cost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteCalculationInput"
+      responses:
+        "200":
+          description: Quote calculation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteCalculation"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +97,105 @@ components:
       required:
         - status
 
+    SubmitResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        id:
+          type: string
+      required:
+        - success
+        - message
+
+    ContactInput:
+      type: object
+      required: [name, email, message]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        company:
+          type: ["string", "null"]
+        serviceType:
+          type: ["string", "null"]
+        message:
+          type: string
+
+    QuoteInput:
+      type: object
+      required: [name, email, pcbType, layers, quantity]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        company:
+          type: ["string", "null"]
+        pcbType:
+          type: string
+        layers:
+          type: integer
+        boardWidth:
+          type: ["number", "null"]
+        boardHeight:
+          type: ["number", "null"]
+        quantity:
+          type: integer
+        thickness:
+          type: ["string", "null"]
+        copperWeight:
+          type: ["string", "null"]
+        surfaceFinish:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+
+    QuoteCalculationInput:
+      type: object
+      required: [pcbType, layers, boardWidth, boardHeight, quantity]
+      properties:
+        pcbType:
+          type: string
+        layers:
+          type: integer
+        boardWidth:
+          type: number
+        boardHeight:
+          type: number
+        quantity:
+          type: integer
+        thickness:
+          type: ["string", "null"]
+        copperWeight:
+          type: ["string", "null"]
+        surfaceFinish:
+          type: ["string", "null"]
+
+    QuoteCalculation:
+      type: object
+      required: [estimatedCost, leadTime, currency]
+      properties:
+        estimatedCost:
+          type: number
+        leadTime:
+          type: string
+        currency:
+          type: string
+        breakdown:
+          type: object
+          properties:
+            baseCost:
+              type: number
+            layerSurcharge:
+              type: number
+            finishSurcharge:
+              type: number
+          required: [baseCost, layerSurcharge, finishSurcharge]
