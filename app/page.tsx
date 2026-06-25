@@ -258,7 +258,7 @@ export default function Home() {
         <div className="flex flex-col min-h-screen">
 
             {/* 1. HERO */}
-            <section className="relative min-h-screen flex items-center pt-28 pb-20 overflow-hidden bg-secondary">
+            <section className="relative min-h-screen flex items-center pt-36 sm:pt-40 md:pt-44 pb-20 overflow-hidden bg-secondary">
                 <CircuitBackground />
 
                 <div className="section-container w-full relative z-10">
