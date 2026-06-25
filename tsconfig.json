@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@workspace/api-client-react": ["./api-client-react/src"],
+      "@workspace/api-zod": ["./api-zod/src"],
+      "@workspace/db": ["./db/src"]
     }
   },
   "include": [
