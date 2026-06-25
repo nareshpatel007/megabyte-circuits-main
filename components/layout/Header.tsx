@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     Menu, Phone, Mail, MapPin, ChevronDown,
-    Upload, Calculator, Globe, X, Facebook, Twitter, Linkedin,
+    Calculator, Globe, X, Facebook, Twitter, Linkedin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -208,19 +208,6 @@ export function Header() {
                         <div className="hidden lg:flex items-center gap-3 shrink-0">
                             <Button
                                 asChild
-                                variant="outline"
-                                size="sm"
-                                className={`transition-colors font-semibold ${isTransparent
-                                    ? "border-white/30 text-white hover:bg-white/10"
-                                    : "border-primary text-primary hover:bg-primary/8"
-                                    }`}
-                            >
-                                <Link href="/contact">
-                                    <Upload className="w-3.5 h-3.5 mr-1.5" /> Upload Gerber
-                                </Link>
-                            </Button>
-                            <Button
-                                asChild
                                 size="sm"
                                 className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-md shadow-primary/20"
                             >
@@ -358,9 +345,6 @@ export function Header() {
 
                         {/* Drawer footer CTAs */}
                         <div className="px-4 py-5 border-t border-gray-100 space-y-3">
-                            <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/8 font-semibold">
-                                <Link href="/contact"><Upload className="w-4 h-4 mr-2" /> Upload Gerber Files</Link>
-                            </Button>
                             <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-md">
                                 <Link href="/contact"><Calculator className="w-4 h-4 mr-2" /> Get Instant Quote</Link>
                             </Button>

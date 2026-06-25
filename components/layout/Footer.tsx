@@ -49,13 +49,6 @@ export function Footer() {
                             <p className="text-sm text-white/50 mt-0.5">Upload Gerber files for an instant quote — no obligation.</p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                            <Button
-                                asChild
-                                variant="outline"
-                                className="border-white/20 text-white hover:bg-white/10 font-semibold text-sm"
-                            >
-                                <Link href="/contact">Upload Gerber</Link>
-                            </Button>
                             <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/20 text-sm">
                                 <Link href="/contact">Get Instant Quote <ArrowRight className="w-4 h-4 ml-1.5" /></Link>
                             </Button>
@@ -74,9 +67,9 @@ export function Footer() {
                             <Image
                                 src="/images/logo.png"
                                 alt="MegaByte's Circuits"
-                                width={180}
-                                height={48}
-                                className="h-12 w-auto object-contain"
+                                width={240}
+                                height={64}
+                                className="h-14 sm:h-16 md:h-18 lg:h-22 w-auto object-contain brightness-0 invert"
                             />
                         </Link>
 

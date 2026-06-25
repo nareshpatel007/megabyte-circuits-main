@@ -248,7 +248,7 @@ export default function Manufacturing() {
             <p className="text-muted-foreground mb-8">Upload your Gerber files and receive a detailed quote within 2 hours.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90 font-semibold shadow-md shadow-primary/20">
-                <Link href="/contact">Upload Gerber Files</Link>
+                <Link href="/contact">Get Instant Quote</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-secondary/20 text-secondary hover:bg-secondary hover:text-white font-semibold">
                 <Link href="/contact">Talk to an Engineer</Link>

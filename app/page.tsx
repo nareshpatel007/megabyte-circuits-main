@@ -286,9 +286,6 @@ export default function Home() {
                                 <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-white font-semibold h-13 px-8 text-base shadow-lg shadow-primary/25">
                                     <Link href="/contact"><Calculator className="w-4 h-4 mr-2" /> Get Instant Quote</Link>
                                 </Button>
-                                <Button size="lg" variant="outline" asChild className="border-white/20 text-white hover:bg-white/8 font-semibold h-13 px-8 text-base backdrop-blur-sm">
-                                    <Link href="/contact"><Upload className="w-4 h-4 mr-2" /> Upload Gerber Files</Link>
-                                </Button>
                             </motion.div>
 
                             {/* Stats */}
