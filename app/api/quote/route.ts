@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { SubmitQuoteBody } from "@/api-zod/src";
-import { db, quotesTable } from "@/db/src";
 
 function calculatePcbCost(params: {
   pcbType: string;
@@ -57,27 +56,7 @@ export async function POST(request: Request) {
     const data = parsed.data;
     const cost = calculatePcbCost(data);
 
-    if (db) {
-      await db.insert(quotesTable).values({
-        name: data.name,
-        email: data.email,
-        phone: data.phone ?? null,
-        company: data.company ?? null,
-        pcbType: data.pcbType,
-        layers: data.layers,
-        boardWidth: data.boardWidth ?? null,
-        boardHeight: data.boardHeight ?? null,
-        quantity: data.quantity,
-        thickness: data.thickness ?? null,
-        copperWeight: data.copperWeight ?? null,
-        surfaceFinish: data.surfaceFinish ?? null,
-        notes: data.notes ?? null,
-        estimatedCost: cost.estimatedCost,
-      });
-      console.log("Quote request successfully saved to database.");
-    } else {
-      console.warn("DATABASE_URL is not set. Mocking database insertion for quote request:", data);
-    }
+    console.log("Mock quote request received:", data);
 
     return NextResponse.json({
       success: true,

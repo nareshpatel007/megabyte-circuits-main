@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { SubmitContactBody } from "@/api-zod/src";
-import { db, contactsTable } from "@/db/src";
 
 export async function POST(request: Request) {
   try {
@@ -11,21 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid request body", details: parsed.error.format() }, { status: 400 });
     }
 
-    const { name, email, phone, company, serviceType, message } = parsed.data;
-
-    if (db) {
-      await db.insert(contactsTable).values({
-        name,
-        email,
-        phone: phone ?? null,
-        company: company ?? null,
-        serviceType: serviceType ?? null,
-        message,
-      });
-      console.log("Contact successfully saved to database.");
-    } else {
-      console.warn("DATABASE_URL is not set. Mocking database insertion for contact request:", parsed.data);
-    }
+    console.log("Mock contact request received:", parsed.data);
 
     return NextResponse.json({
       success: true,
