@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     Menu, Phone, Mail, MapPin, ChevronDown,
-    Calculator, Globe, X, Facebook, Twitter, Linkedin,
+    Calculator, Globe, X, Facebook, Instagram, Linkedin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,22 +31,31 @@ const MFG_LINKS = [
     { label: "Metal Core PCB", href: "/manufacturing" },
 ];
 
-const ASSEMBLY_LINKS = [
-    { label: "Overview", href: "/assembly" },
-    { label: "SMT Assembly", href: "/assembly" },
-    { label: "Through Hole Assembly", href: "/assembly" },
-    { label: "Prototype Assembly", href: "/assembly" },
-    { label: "Turnkey Assembly", href: "/assembly" },
-    { label: "Box Build Assembly", href: "/assembly" },
+const PRODUCTS_LINKS = [
+    { label: "Single Layer PCB", href: "/products/single-layer-pcb" },
+    { label: "Double Layer PCB", href: "/products/double-layer-pcb" },
+    { label: "Multi Layer PCB", href: "/products/multi-layer-pcb" },
+];
+
+const SERVICES_LINKS = [
+    { label: "Prototype PCB", href: "/services/prototype-pcb" },
+    { label: "PCB Design", href: "/services/pcb-design" },
+    { label: "PCB Manufacturing", href: "/services/pcb-manufacturing" },
+    { label: "PCB Developing Services", href: "/services/pcb-developing-services" },
+    { label: "PCB Fabrication", href: "/services/pcb-fabrication" },
+    { label: "DFM Support", href: "/services/design-for-manufacturability-dfm-support" },
+    { label: "Testing & Quality Assurance", href: "/services/testing-and-quality-assurance" },
 ];
 
 export function Header() {
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const [mfgOpen, setMfgOpen] = React.useState(false);
-    const [asmOpen, setAsmOpen] = React.useState(false);
+    const [productsOpen, setProductsOpen] = React.useState(false);
+    const [servicesOpen, setServicesOpen] = React.useState(false);
     const [mfgHover, setMfgHover] = React.useState(false);
-    const [asmHover, setAsmHover] = React.useState(false);
+    const [productsHover, setProductsHover] = React.useState(false);
+    const [servicesHover, setServicesHover] = React.useState(false);
     const location = usePathname();
 
     const isTransparent = false;
@@ -93,11 +102,11 @@ export function Header() {
                             </span>
                             <span className="flex items-center gap-1.5 shrink-0">
                                 <Mail className="w-3 h-3 text-primary shrink-0" />
-                                info@megabytecircuits.com
+                                quote@megabytecircuit.com
                             </span>
                             <span className="flex items-center gap-1.5 shrink-0">
                                 <Phone className="w-3 h-3 text-primary shrink-0" />
-                                +91 98765 43210
+                                +91-9898842942
                             </span>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
@@ -107,10 +116,16 @@ export function Header() {
                                 <Globe className="w-3 h-3 text-primary" /> Global Shipping
                             </span>
                             <div className="flex items-center gap-2 ml-2">
-                                {[Facebook, Twitter, Linkedin].map((Icon, i) => (
+                                {[
+                                    { Icon: Facebook, href: "https://www.facebook.com/people/Megabytes-Circuit-Systems/100090711935963/" },
+                                    { Icon: Instagram, href: "https://www.instagram.com/megabytescircuit/?hl=en" },
+                                    { Icon: Linkedin, href: "https://in.linkedin.com/in/megabytes-circuit-systems-598908237" }
+                                ].map(({ Icon, href }, i) => (
                                     <a
                                         key={i}
-                                        href="#"
+                                        href={href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="text-white/40 hover:text-primary transition-colors"
                                     >
                                         <Icon className="w-3.5 h-3.5" />
@@ -168,21 +183,43 @@ export function Header() {
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
-                            <DropdownMenu open={asmHover} onOpenChange={setAsmHover} modal={false}>
+                            <DropdownMenu open={productsHover} onOpenChange={setProductsHover} modal={false}>
                                 <DropdownMenuTrigger
-                                    onMouseEnter={() => setAsmHover(true)}
-                                    onMouseLeave={() => setAsmHover(false)}
+                                    onMouseEnter={() => setProductsHover(true)}
+                                    onMouseLeave={() => setProductsHover(false)}
                                     className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-md hover:text-primary outline-none transition-colors ${navText}`}
                                 >
-                                    Assembly <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+                                    Products <ChevronDown className="w-3.5 h-3.5 opacity-60" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
-                                    onMouseEnter={() => setAsmHover(true)}
-                                    onMouseLeave={() => setAsmHover(false)}
+                                    onMouseEnter={() => setProductsHover(true)}
+                                    onMouseLeave={() => setProductsHover(false)}
                                     align="start"
                                     className="w-52"
                                 >
-                                    {ASSEMBLY_LINKS.map((l) => (
+                                    {PRODUCTS_LINKS.map((l) => (
+                                        <Link key={l.label} href={l.href}>
+                                            <DropdownMenuItem className="cursor-pointer">{l.label}</DropdownMenuItem>
+                                        </Link>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <DropdownMenu open={servicesHover} onOpenChange={setServicesHover} modal={false}>
+                                <DropdownMenuTrigger
+                                    onMouseEnter={() => setServicesHover(true)}
+                                    onMouseLeave={() => setServicesHover(false)}
+                                    className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-md hover:text-primary outline-none transition-colors ${navText}`}
+                                >
+                                    Services <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    onMouseEnter={() => setServicesHover(true)}
+                                    onMouseLeave={() => setServicesHover(false)}
+                                    align="start"
+                                    className="w-56"
+                                >
+                                    {SERVICES_LINKS.map((l) => (
                                         <Link key={l.label} href={l.href}>
                                             <DropdownMenuItem className="cursor-pointer">{l.label}</DropdownMenuItem>
                                         </Link>
@@ -197,6 +234,12 @@ export function Header() {
                                 About Us
                             </Link>
                             <Link
+                                href="/blog"
+                                className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
+                            >
+                                Blog
+                            </Link>
+                            <Link
                                 href="/contact"
                                 className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
                             >
@@ -208,12 +251,10 @@ export function Header() {
                         <div className="hidden lg:flex items-center gap-3 shrink-0">
                             <Button
                                 asChild
-                                size="sm"
+                                size="default"
                                 className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-md shadow-primary/20"
                             >
-                                <Link href="/contact">
-                                    <Calculator className="w-3.5 h-3.5 mr-1.5" /> Get Instant Quote
-                                </Link>
+                                <Link href="/pcb-calculator">PCB Calculator</Link>
                             </Button>
                         </div>
 
@@ -224,7 +265,7 @@ export function Header() {
                                 size="sm"
                                 className="bg-primary text-white text-xs h-8 px-3 font-semibold hidden sm:flex"
                             >
-                                <Link href="/contact">Get Quote</Link>
+                                <Link href="/pcb-calculator">PCB Calculator</Link>
                             </Button>
                             <button
                                 onClick={() => setMobileOpen(true)}
@@ -277,6 +318,7 @@ export function Header() {
                             <Link
                                 href="/"
                                 className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
+                                onClick={() => setMobileOpen(false)}
                             >
                                 Home
                             </Link>
@@ -297,6 +339,7 @@ export function Header() {
                                                 key={l.label}
                                                 href={l.href}
                                                 className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                                                onClick={() => setMobileOpen(false)}
                                             >
                                                 {l.label}
                                             </Link>
@@ -305,22 +348,48 @@ export function Header() {
                                 )}
                             </div>
 
-                            {/* Assembly accordion */}
+                            {/* Products accordion */}
                             <div>
                                 <button
-                                    onClick={() => setAsmOpen((o) => !o)}
+                                    onClick={() => setProductsOpen((o) => !o)}
                                     className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
                                 >
-                                    PCB Assembly
-                                    <ChevronDown className={`w-4 h-4 transition-transform ${asmOpen ? "rotate-180" : ""}`} />
+                                    Products
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${productsOpen ? "rotate-180" : ""}`} />
                                 </button>
-                                {asmOpen && (
+                                {productsOpen && (
                                     <div className="ml-4 mt-1 space-y-1 border-l-2 border-primary/20 pl-3">
-                                        {ASSEMBLY_LINKS.map((l) => (
+                                        {PRODUCTS_LINKS.map((l) => (
                                             <Link
                                                 key={l.label}
                                                 href={l.href}
                                                 className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                                                onClick={() => setMobileOpen(false)}
+                                            >
+                                                {l.label}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Services accordion */}
+                            <div>
+                                <button
+                                    onClick={() => setServicesOpen((o) => !o)}
+                                    className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
+                                >
+                                    Services
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
+                                </button>
+                                {servicesOpen && (
+                                    <div className="ml-4 mt-1 space-y-1 border-l-2 border-primary/20 pl-3">
+                                        {SERVICES_LINKS.map((l) => (
+                                            <Link
+                                                key={l.label}
+                                                href={l.href}
+                                                className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                                                onClick={() => setMobileOpen(false)}
                                             >
                                                 {l.label}
                                             </Link>
@@ -336,6 +405,13 @@ export function Header() {
                                 About Us
                             </Link>
                             <Link
+                                href="/blog"
+                                className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
+                                onClick={() => setMobileOpen(false)}
+                            >
+                                Blog
+                            </Link>
+                            <Link
                                 href="/contact"
                                 className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
                             >
@@ -346,17 +422,17 @@ export function Header() {
                         {/* Drawer footer CTAs */}
                         <div className="px-4 py-5 border-t border-gray-100 space-y-3">
                             <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-md">
-                                <Link href="/contact"><Calculator className="w-4 h-4 mr-2" /> Get Instant Quote</Link>
+                                <Link href="/pcb-calculator">PCB Calculator</Link>
                             </Button>
                         </div>
 
                         {/* Contact info in drawer */}
                         <div className="px-4 pb-5 space-y-2">
-                            <a href="tel:+919876543210" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                                <Phone className="w-3.5 h-3.5 text-primary" /> +91 98765 43210
+                            <a href="tel:+919898842942" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+                                <Phone className="w-3.5 h-3.5 text-primary" /> +91-9898842942
                             </a>
-                            <a href="mailto:info@megabytecircuits.com" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                                <Mail className="w-3.5 h-3.5 text-primary" /> info@megabytecircuits.com
+                            <a href="mailto:quote@megabytecircuit.com" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+                                <Mail className="w-3.5 h-3.5 text-primary" /> quote@megabytecircuit.com
                             </a>
                         </div>
                     </div>

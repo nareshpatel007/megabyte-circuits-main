@@ -225,15 +225,16 @@ function PCBVisual() {
                 transition={{ delay: 1.2 }}
             >
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                ISO 9001:2015
+                Custom Design and Layout
             </motion.div>
             <motion.div
-                className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-xl px-3 py-2 text-sm font-semibold text-secondary"
+                className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-xl px-3 py-2 text-sm font-semibold text-secondary flex items-center gap-2"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.5 }}
             >
-                24hr Turnaround
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                Quality Testing
             </motion.div>
         </div>
     );
@@ -258,7 +259,7 @@ export default function Home() {
         <div className="flex flex-col min-h-screen">
 
             {/* 1. HERO */}
-            <section className="relative min-h-screen flex items-center pt-36 sm:pt-40 md:pt-44 pb-20 overflow-hidden bg-secondary">
+            <section className="relative flex items-center pt-28 sm:pt-32 md:pt-50 pb-12 md:pb-16 overflow-hidden bg-secondary">
                 <CircuitBackground />
 
                 <div className="section-container w-full relative z-10">
@@ -273,31 +274,19 @@ export default function Home() {
                             </motion.div>
 
                             <motion.h1 variants={fadeUp} className="text-5xl md:text-6xl xl:text-7xl font-display font-bold leading-[1.08] text-white mb-6">
-                                India's Trusted
-                                <span className="block text-gradient">PCB Manufacturing</span>
-                                Partner
+                                India's Biggest
+                                <span className="block text-gradient">PCB Manufacturer</span>
+                                in Ahmedabad
                             </motion.h1>
 
-                            <motion.p variants={fadeUp} className="text-lg text-white/65 mb-10 max-w-xl leading-relaxed">
-                                High-precision PCB Fabrication, Assembly, and Component Sourcing for Startups, Engineers, and Enterprises — delivered from Ahmedabad, India.
+                            <motion.p variants={fadeUp} className="text-lg text-white/65 mb-10 max-w-2xl leading-relaxed">
+                                Welcome to Megabytes Circuit Systems, Ahmedabad's trusted PCB manufacturing partner since 2021. We deliver high-quality circuit boards across India, ensuring precision, reliability, and custom solutions for your business.
                             </motion.p>
 
-                            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-14">
+                            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
                                 <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-white font-semibold h-13 px-8 text-base shadow-lg shadow-primary/25">
-                                    <Link href="/contact"><Calculator className="w-4 h-4 mr-2" /> Get Instant Quote</Link>
+                                    <Link href="/pcb-calculator"><Calculator className="w-4 h-4 mr-2" /> PCB Calculator</Link>
                                 </Button>
-                            </motion.div>
-
-                            {/* Stats */}
-                            <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-10 border-t border-white/10">
-                                {[
-                                    { value: "10K+", label: "PCBs Delivered" },
-                                    { value: "5K+", label: "Happy Customers" },
-                                    { value: "99.9%", label: "Quality Rate" },
-                                    { value: "24/7", label: "Tech Support" },
-                                ].map((s, i) => (
-                                    <StatItem key={i} value={s.value} label={s.label} />
-                                ))}
                             </motion.div>
                         </motion.div>
 
@@ -312,9 +301,6 @@ export default function Home() {
                         </motion.div>
                     </div>
                 </div>
-
-                {/* Bottom gradient fade */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
             </section>
 
             {/* ─────────────────────────────────────────────────────── */}
@@ -335,51 +321,80 @@ export default function Home() {
                     </InViewSection>
 
                     <InViewSection>
-                        <motion.div variants={stagger} className="grid md:grid-cols-3 gap-8">
+                        <motion.div variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {[
+                                {
+                                    icon: Wrench,
+                                    title: "Prototype PCB",
+                                    desc: "Quick-turn prototype PCB fabrication to test and validate your designs fast.",
+                                    link: "/services/prototype-pcb",
+                                    color: "from-green-50 to-emerald-50",
+                                },
+                                {
+                                    icon: Settings,
+                                    title: "PCB Design",
+                                    desc: "Professional schematic design and high-speed multi-layer PCB layout services.",
+                                    link: "/services/pcb-design",
+                                    color: "from-blue-50 to-sky-50",
+                                },
                                 {
                                     icon: CircuitBoard,
                                     title: "PCB Manufacturing",
-                                    desc: "Prototype, Production, Multilayer, HDI, Flexible, and Rigid-Flex boards fabricated to exact specifications.",
-                                    items: ["Prototype PCB", "Multilayer PCB", "Flexible PCB", "HDI PCB"],
-                                    link: "/manufacturing",
-                                    color: "from-green-50 to-emerald-50",
+                                    desc: "High-quality single layer, double layer, and complex multilayer PCB production.",
+                                    link: "/services/pcb-manufacturing",
+                                    color: "from-emerald-50 to-teal-50",
                                 },
                                 {
                                     icon: Cpu,
                                     title: "PCB Assembly",
-                                    desc: "SMT, Through-Hole, Mixed Technology, and complete Turnkey assembly services under one roof.",
-                                    items: ["SMT Assembly", "Through-Hole", "Turnkey Assembly", "Box Build"],
-                                    link: "/assembly",
-                                    color: "from-blue-50 to-sky-50",
+                                    desc: "Advanced SMT, through-hole, mechanical, and complete turnkey assembly services.",
+                                    link: "/services/pcb-assembly",
+                                    color: "from-sky-50 to-indigo-50",
                                 },
                                 {
-                                    icon: Package,
-                                    title: "Component Sourcing",
-                                    desc: "BOM management, global procurement from authorized distributors, and alternate component recommendations.",
-                                    items: ["BOM Management", "Global Procurement", "Supply Chain", "Alternates"],
-                                    link: "/contact",
+                                    icon: Activity,
+                                    title: "PCB Developing Services",
+                                    desc: "Comprehensive board development, firmware integration, and hardware engineering solutions.",
+                                    link: "/services/pcb-developing-services",
                                     color: "from-purple-50 to-violet-50",
+                                },
+                                {
+                                    icon: Hammer,
+                                    title: "PCB Fabrication",
+                                    desc: "Precision copper routing, micro-drilling, custom profiling, and panelization.",
+                                    link: "/services/pcb-fabrication",
+                                    color: "from-amber-50 to-orange-50",
+                                },
+                                {
+                                    icon: FileCheck,
+                                    title: "Design For Manufacturability (DFM) Support",
+                                    desc: "Thorough DFM analysis and engineering reviews to prevent production errors.",
+                                    link: "/services/design-for-manufacturability-dfm-support",
+                                    color: "from-rose-50 to-red-50",
+                                },
+                                {
+                                    icon: Shield,
+                                    title: "Testing And Quality Assurance",
+                                    desc: "100% AOI, flying probe testing, electrical checks, and visual inspections.",
+                                    link: "/services/testing-and-quality-assurance",
+                                    color: "from-teal-50 to-cyan-50",
                                 },
                             ].map((service, i) => (
                                 <motion.div key={i} variants={fadeUp}>
                                     <Link href={service.link}>
-                                        <div className="group gradient-border-card border border-gray-100 h-full p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 cursor-pointer">
-                                            <div className={`w-16 h-16 bg-gradient-to-br ${service.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                                                <service.icon className="w-8 h-8 text-primary" />
+                                        <div className="group relative bg-gradient-to-b from-white to-slate-50/50 rounded-2xl border border-slate-100 p-6 flex flex-col justify-between h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_-15px_rgba(11,122,51,0.12)] hover:border-primary/25 cursor-pointer overflow-hidden">
+                                            {/* Top right subtle glow */}
+                                            <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-primary/5 blur-xl group-hover:bg-primary/10 transition-all duration-300 pointer-events-none" />
+                                            
+                                            <div>
+                                                <div className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-5 border border-slate-100 group-hover:border-primary/10 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300`}>
+                                                    <service.icon className="w-5 h-5 text-primary group-hover:animate-pulse" />
+                                                </div>
+                                                <h3 className="text-lg font-display font-bold text-secondary mb-2 group-hover:text-primary transition-colors duration-200">{service.title}</h3>
+                                                <p className="text-sm text-slate-600 leading-relaxed mb-6">{service.desc}</p>
                                             </div>
-                                            <h3 className="text-xl font-display font-bold text-secondary mb-3">{service.title}</h3>
-                                            <p className="text-muted-foreground leading-relaxed mb-6">{service.desc}</p>
-                                            <ul className="space-y-2 mb-6">
-                                                {service.items.map((item) => (
-                                                    <li key={item} className="flex items-center gap-2 text-sm text-secondary/80">
-                                                        <ChevronRight className="w-3.5 h-3.5 text-primary shrink-0" />
-                                                        {item}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary group-hover:gap-3 transition-all">
-                                                Learn more <ArrowRight className="w-4 h-4" />
+                                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary transition-colors duration-200">
+                                                Learn more <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                                             </span>
                                         </div>
                                     </Link>
@@ -1012,7 +1027,7 @@ export default function Home() {
                             </motion.p>
                             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row justify-center gap-4">
                                 <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-white font-semibold h-14 px-10 text-base shadow-2xl shadow-primary/30">
-                                    <Link href="/contact"><Calculator className="w-5 h-5 mr-2" /> Get Instant Quote</Link>
+                                    <Link href="/pcb-calculator"><Calculator className="w-5 h-5 mr-2" /> PCB Calculator</Link>
                                 </Button>
                                 <Button asChild size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 font-semibold h-14 px-10 text-base backdrop-blur-sm">
                                     <Link href="/contact">Contact Sales Team <ArrowRight className="w-5 h-5 ml-2" /></Link>

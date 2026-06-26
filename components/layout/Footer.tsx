@@ -5,36 +5,36 @@ import Image from "next/image";
 import Link from "next/link";
 import {
     MapPin, Mail, Phone,
-    Facebook, Twitter, Linkedin, Instagram, Youtube,
+    Facebook, Linkedin, Instagram,
     ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const SERVICES = [
-    { label: "PCB Fabrication", href: "/manufacturing" },
-    { label: "PCB Assembly", href: "/assembly" },
-    { label: "Multilayer PCBs", href: "/manufacturing" },
-    { label: "HDI PCBs", href: "/manufacturing" },
-    { label: "Flexible PCBs", href: "/manufacturing" },
-    { label: "Rigid-Flex PCBs", href: "/manufacturing" },
-    { label: "Component Sourcing", href: "/assembly" },
+    { label: "Prototype PCB", href: "/services/prototype-pcb" },
+    { label: "PCB Design", href: "/services/pcb-design" },
+    { label: "PCB Manufacturing", href: "/services/pcb-manufacturing" },
+    { label: "PCB Assembly", href: "/services/pcb-assembly" },
+    { label: "PCB Developing Services", href: "/services/pcb-developing-services" },
+    { label: "PCB Fabrication", href: "/services/pcb-fabrication" },
+    { label: "DFM Support", href: "/services/design-for-manufacturability-dfm-support" },
+    { label: "Testing & Quality Assurance", href: "/services/testing-and-quality-assurance" },
 ];
 
 const QUICK_LINKS = [
     { label: "About Us", href: "/about" },
+    { label: "FAQs", href: "/faq" },
     { label: "Manufacturing Capabilities", href: "/manufacturing" },
-    { label: "Get Instant Quote", href: "/contact" },
+    { label: "PCB Calculator", href: "/pcb-calculator" },
     { label: "Contact Support", href: "/contact" },
     { label: "Privacy Policy", href: "#" },
     { label: "Terms of Service", href: "#" },
 ];
 
 const SOCIAL = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Youtube, href: "#", label: "YouTube" },
+    { icon: Facebook, href: "https://www.facebook.com/people/Megabytes-Circuit-Systems/100090711935963/", label: "Facebook" },
+    { icon: Instagram, href: "https://www.instagram.com/megabytescircuit/?hl=en", label: "Instagram" },
+    { icon: Linkedin, href: "https://in.linkedin.com/in/megabytes-circuit-systems-598908237", label: "LinkedIn" },
 ];
 
 export function Footer() {
@@ -50,7 +50,7 @@ export function Footer() {
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
                             <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/20 text-sm">
-                                <Link href="/contact">Get Instant Quote <ArrowRight className="w-4 h-4 ml-1.5" /></Link>
+                                <Link href="/pcb-calculator">PCB Calculator <ArrowRight className="w-4 h-4 ml-1.5" /></Link>
                             </Button>
                         </div>
                     </div>
@@ -150,39 +150,38 @@ export function Footer() {
                                         <MapPin className="w-4 h-4 text-primary" />
                                     </div>
                                     <span className="leading-relaxed">
-                                        GIDC Electronics Estate, Sector 25,<br />
-                                        Gandhinagar, Ahmedabad,<br />
-                                        Gujarat 382024, India
+                                        Megabytes Circuit Systems<br />
+                                        C/10, Yogeshwar Estate, B/H Madhuram Estate, Nr. Vishala Estate, Sardar Patel Ring Rd, Odhav, Ahmedabad, Gujarat - 382430, India
                                     </span>
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="tel:+919876543210"
+                                    href="tel:+919898842942"
                                     className="flex items-center gap-3 text-sm text-white/50 hover:text-primary transition-colors group"
                                 >
                                     <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center shrink-0 group-hover:bg-primary/25 transition-colors">
                                         <Phone className="w-4 h-4 text-primary" />
                                     </div>
-                                    +91 98765 43210
+                                    +91-9898842942
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="mailto:info@megabytecircuits.com"
+                                    href="mailto:quote@megabytecircuit.com"
                                     className="flex items-center gap-3 text-sm text-white/50 hover:text-primary transition-colors group"
                                 >
                                     <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center shrink-0 group-hover:bg-primary/25 transition-colors">
                                         <Mail className="w-4 h-4 text-primary" />
                                     </div>
-                                    info@megabytecircuits.com
+                                    quote@megabytecircuit.com
                                 </a>
                             </li>
                         </ul>
 
                         {/* Certifications */}
                         <div className="mt-6 flex flex-wrap gap-2">
-                            {["ISO 9001:2015", "RoHS Compliant", "ISO 14001"].map((cert) => (
+                            {["ISO 9001:2015", "RoHS Compliant"].map((cert) => (
                                 <span
                                     key={cert}
                                     className="inline-flex items-center text-xs font-semibold bg-white/6 border border-white/10 text-white/60 px-2.5 py-1 rounded-md"
