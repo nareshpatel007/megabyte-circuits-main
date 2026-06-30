@@ -17,6 +17,52 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "Best PCB Manufacturer In India - Order PCB Online In 24 Hours",
     description: "PCB Manufacturer In Ahmedabad, Gujarat, India – Fastest Delivery For Automotive & Medical. Prototype To Production. No MOQ. Get Instant Quote.",
+    keywords: [
+        "PCB Manufacturer",
+        "PCB Supplier",
+        "Printed Circuit Board",
+        "PCB Online",
+        "Prototype PCB",
+        "High-Quality PCB",
+        "Fast PCB Delivery",
+        "24-Hour PCB",
+        "Medical PCB",
+        "Automotive PCB",
+        "Shenzhen PCB",
+        "PCBs",
+        "PCB Prototype",
+        "PCB Fabrication",
+        "PCB Assembly",
+        "PCB Manufacturer China",
+    ],
+    metadataBase: new URL("https://www.megabytecircuit.com"),
+    openGraph: {
+        title: "Best PCB Manufacturer In India - Order PCB Online In 24 Hours",
+        description: "PCB Manufacturer In Ahmedabad, Gujarat, India – Fastest Delivery For Automotive & Medical. Prototype To Production. No MOQ. Get Instant Quote.",
+        url: "https://www.megabytecircuit.com",
+        siteName: "MegaByte's Circuit Systems",
+        images: [
+            {
+                url: "/images/logo.png",
+                width: 800,
+                height: 600,
+                alt: "MegaByte's Circuit Systems"
+            }
+        ],
+        locale: "en_IN",
+        type: "website"
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Best PCB Manufacturer In India - Order PCB Online In 24 Hours",
+        description: "PCB Manufacturer In Ahmedabad, Gujarat, India – Fastest Delivery For Automotive & Medical. Prototype To Production. No MOQ. Get Instant Quote.",
+        images: [
+            "/images/logo.png"
+        ]
+    },
+    icons: {
+        icon: "/images/favicon.png",
+    },
 };
 
 export default function RootLayout({
