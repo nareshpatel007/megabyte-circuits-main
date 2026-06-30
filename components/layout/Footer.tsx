@@ -23,6 +23,7 @@ const SERVICES = [
 
 const QUICK_LINKS = [
     { label: "About Us", href: "/about-us" },
+    { label: "Blog", href: "/blog" },
     { label: "FAQs", href: "/faq" },
     { label: "PCB Calculator", href: "/pcb-calculator" },
     { label: "Contact Support", href: "/contact" },

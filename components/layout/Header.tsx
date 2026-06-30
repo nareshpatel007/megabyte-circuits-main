@@ -226,6 +226,13 @@ export function Header() {
                             </DropdownMenu>
 
                             <Link
+                                href="/blog"
+                                className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
+                            >
+                                Blog
+                            </Link>
+
+                            <Link
                                 href="/contact"
                                 className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
                             >
@@ -392,6 +399,14 @@ export function Header() {
                                     </div>
                                 )}
                             </div>
+
+                            <Link
+                                href="/blog"
+                                className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
+                                onClick={() => setMobileOpen(false)}
+                            >
+                                Blog
+                            </Link>
 
                             <Link
                                 href="/contact"
