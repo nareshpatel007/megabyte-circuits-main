@@ -188,7 +188,7 @@ export default function About() {
                             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {[
                                     { year: "2021", title: "Founded", desc: "Started with a small prototype PCB lab in Ahmedabad with 5 employees." },
-                                    { year: "2022", title: "ISO 9001 Certified", desc: "Earned ISO 9001:2015 certification and expanded capabilities." },
+                                    { year: "2022", title: "UL Standards Compliance", desc: "Achieved full compliance with UL safety and manufacturing standards." },
                                     { year: "2024", title: "Global Expansion", desc: "Reached 1,000+ clients across India and started exporting to 20+ countries." },
                                     { year: "2026", title: "Industry Leader", desc: "10,000+ boards delivered, 5,000+ customers, 40+ countries served globally." },
                                 ].map((item, i) => (
@@ -219,7 +219,7 @@ export default function About() {
 
                         <motion.div variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[
-                                { icon: Award, title: "ISO 9001:2015", sub: "Quality Management System" },
+                                { icon: Award, title: "IPC-A-600 Compliant", sub: "Acceptability of Printed Boards" },
                                 { icon: CheckCircle2, title: "UL Certified", sub: "Product Safety Standards" },
                                 { icon: Globe, title: "RoHS Compliant", sub: "Lead-Free Manufacturing" },
                             ].map((cert, i) => (
@@ -247,7 +247,7 @@ export default function About() {
                                 <Link href="/pcb-calculator">PCB Calculator <ArrowRight className="w-4 h-4 ml-2" /></Link>
                             </Button>
                             <Button asChild variant="outline" className="border-secondary/20 text-secondary hover:bg-secondary hover:text-white font-semibold">
-                                <Link href="/manufacturing">View Capabilities</Link>
+                                <Link href="/why-us">View Capabilities</Link>
                             </Button>
                         </div>
                     </div>

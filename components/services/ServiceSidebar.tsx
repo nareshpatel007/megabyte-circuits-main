@@ -48,7 +48,7 @@ export function ServiceSidebar({ currentSlug }: ServiceSidebarProps) {
                         return (
                             <Link
                                 key={navItem.slug}
-                                href={`/services/${navItem.slug}`}
+                                href={((slug: string) => { const map: Record<string, string> = { "prototype-pcb": "/prototype-pcb", "pcb-design": "/pcb-design-ahmedabad", "pcb-manufacturing": "/pcb-manufacturing-ahmedabad", "pcb-assembly": "/pcb-assembly-ahmedabad", "pcb-developing-services": "/pcb-developing-services-ahmedabad", "pcb-fabrication": "/pcb-fabrication-ahmedabad", "design-for-manufacturability-dfm-support": "/design-for-manufacturability-dfm-support", "testing-and-quality-assurance": "/testing-and-quality-assurance" }; return map[slug] || `/services/${slug}`; })(navItem.slug)}
                                 className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
                                     isCurrent
                                         ? "bg-primary text-white shadow-lg shadow-primary/20"

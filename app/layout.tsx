@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "MegaByte Circuits - Premium PCB Manufacturing & Assembly",
-    description: "High-quality, reliable, and fast turnaround PCB manufacturing and assembly services.",
+    title: "Best PCB Manufacturer In India - Order PCB Online In 24 Hours",
+    description: "PCB Manufacturer In Ahmedabad, Gujarat, India – Fastest Delivery For Automotive & Medical. Prototype To Production. No MOQ. Get Instant Quote.",
 };
 
 export default function RootLayout({

@@ -16,44 +16,37 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const NAV_LINKS = [
-    { label: "Home", href: "/" },
-];
-
-const MFG_LINKS = [
-    { label: "Overview", href: "/manufacturing" },
-    { label: "Single Layer PCB", href: "/manufacturing" },
-    { label: "Double Layer PCB", href: "/manufacturing" },
-    { label: "Multilayer PCB", href: "/manufacturing" },
-    { label: "HDI PCB", href: "/manufacturing" },
-    { label: "Flexible PCB", href: "/manufacturing" },
-    { label: "Rigid-Flex PCB", href: "/manufacturing" },
-    { label: "Metal Core PCB", href: "/manufacturing" },
+const ABOUT_LINKS = [
+    { label: "About Us", href: "/about-us" },
+    { label: "Why Us", href: "/why-us" },
+    { label: "FAQs", href: "/faq" },
 ];
 
 const PRODUCTS_LINKS = [
-    { label: "Single Layer PCB", href: "/products/single-layer-pcb" },
-    { label: "Double Layer PCB", href: "/products/double-layer-pcb" },
-    { label: "Multi Layer PCB", href: "/products/multi-layer-pcb" },
+    { label: "Single Layer PCB", href: "/products/single-layer-pcb-ahmedabad" },
+    { label: "Double Layer PCB", href: "/products/double-layer-pcb-ahmedabad" },
+    { label: "Multi Layer PCB", href: "/products/multi-layer-pcb-ahmedabad" },
 ];
 
 const SERVICES_LINKS = [
-    { label: "Prototype PCB", href: "/services/prototype-pcb" },
-    { label: "PCB Design", href: "/services/pcb-design" },
-    { label: "PCB Manufacturing", href: "/services/pcb-manufacturing" },
-    { label: "PCB Developing Services", href: "/services/pcb-developing-services" },
-    { label: "PCB Fabrication", href: "/services/pcb-fabrication" },
-    { label: "DFM Support", href: "/services/design-for-manufacturability-dfm-support" },
-    { label: "Testing & Quality Assurance", href: "/services/testing-and-quality-assurance" },
+    { label: "Prototype PCB", href: "/prototype-pcb" },
+    { label: "PCB Design", href: "/pcb-design-ahmedabad" },
+    { label: "PCB Manufacturing", href: "/pcb-manufacturing-ahmedabad" },
+    { label: "PCB Developing Services", href: "/pcb-developing-services-ahmedabad" },
+    { label: "PCB Fabrication", href: "/pcb-fabrication-ahmedabad" },
+    { label: "DFM Support", href: "/design-for-manufacturability-dfm-support" },
+    { label: "Testing & Quality Assurance", href: "/testing-and-quality-assurance" },
 ];
 
 export function Header() {
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [mobileOpen, setMobileOpen] = React.useState(false);
-    const [mfgOpen, setMfgOpen] = React.useState(false);
+
+    const [aboutOpen, setAboutOpen] = React.useState(false);
     const [productsOpen, setProductsOpen] = React.useState(false);
     const [servicesOpen, setServicesOpen] = React.useState(false);
-    const [mfgHover, setMfgHover] = React.useState(false);
+
+    const [aboutHover, setAboutHover] = React.useState(false);
     const [productsHover, setProductsHover] = React.useState(false);
     const [servicesHover, setServicesHover] = React.useState(false);
     const location = usePathname();
@@ -110,8 +103,6 @@ export function Header() {
                             </span>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                            <span className="text-white/60">ISO 9001:2015 Certified</span>
-                            <span className="text-white/30">|</span>
                             <span className="flex items-center gap-1.5">
                                 <Globe className="w-3 h-3 text-primary" /> Global Shipping
                             </span>
@@ -161,27 +152,34 @@ export function Header() {
                                 Home
                             </Link>
 
-                            <DropdownMenu open={mfgHover} onOpenChange={setMfgHover} modal={false}>
+                            <DropdownMenu open={aboutHover} onOpenChange={setAboutHover} modal={false}>
                                 <DropdownMenuTrigger
-                                    onMouseEnter={() => setMfgHover(true)}
-                                    onMouseLeave={() => setMfgHover(false)}
+                                    onMouseEnter={() => setAboutHover(true)}
+                                    onMouseLeave={() => setAboutHover(false)}
                                     className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-md hover:text-primary outline-none transition-colors ${navText}`}
                                 >
-                                    Manufacturing <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+                                    About Us <ChevronDown className="w-3.5 h-3.5 opacity-60" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
-                                    onMouseEnter={() => setMfgHover(true)}
-                                    onMouseLeave={() => setMfgHover(false)}
+                                    onMouseEnter={() => setAboutHover(true)}
+                                    onMouseLeave={() => setAboutHover(false)}
                                     align="start"
-                                    className="w-52"
+                                    className="w-48"
                                 >
-                                    {MFG_LINKS.map((l) => (
+                                    {ABOUT_LINKS.map((l) => (
                                         <Link key={l.label} href={l.href}>
                                             <DropdownMenuItem className="cursor-pointer">{l.label}</DropdownMenuItem>
                                         </Link>
                                     ))}
                                 </DropdownMenuContent>
                             </DropdownMenu>
+
+                            <Link
+                                href="/pcb-calculator"
+                                className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
+                            >
+                                PCB Calculator
+                            </Link>
 
                             <DropdownMenu open={productsHover} onOpenChange={setProductsHover} modal={false}>
                                 <DropdownMenuTrigger
@@ -217,7 +215,7 @@ export function Header() {
                                     onMouseEnter={() => setServicesHover(true)}
                                     onMouseLeave={() => setServicesHover(false)}
                                     align="start"
-                                    className="w-56"
+                                    className="w-64"
                                 >
                                     {SERVICES_LINKS.map((l) => (
                                         <Link key={l.label} href={l.href}>
@@ -227,18 +225,6 @@ export function Header() {
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
-                            <Link
-                                href="/about"
-                                className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
-                            >
-                                About Us
-                            </Link>
-                            <Link
-                                href="/blog"
-                                className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
-                            >
-                                Blog
-                            </Link>
                             <Link
                                 href="/contact"
                                 className={`text-sm font-medium px-3 py-2 rounded-md hover:text-primary transition-colors ${navText}`}
@@ -323,18 +309,18 @@ export function Header() {
                                 Home
                             </Link>
 
-                            {/* Manufacturing accordion */}
+                            {/* About Us accordion */}
                             <div>
                                 <button
-                                    onClick={() => setMfgOpen((o) => !o)}
+                                    onClick={() => setAboutOpen((o) => !o)}
                                     className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
                                 >
-                                    PCB Manufacturing
-                                    <ChevronDown className={`w-4 h-4 transition-transform ${mfgOpen ? "rotate-180" : ""}`} />
+                                    About Us
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${aboutOpen ? "rotate-180" : ""}`} />
                                 </button>
-                                {mfgOpen && (
+                                {aboutOpen && (
                                     <div className="ml-4 mt-1 space-y-1 border-l-2 border-primary/20 pl-3">
-                                        {MFG_LINKS.map((l) => (
+                                        {ABOUT_LINKS.map((l) => (
                                             <Link
                                                 key={l.label}
                                                 href={l.href}
@@ -347,6 +333,15 @@ export function Header() {
                                     </div>
                                 )}
                             </div>
+
+                            {/* PCB Calculator page link */}
+                            <Link
+                                href="/pcb-calculator"
+                                className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
+                                onClick={() => setMobileOpen(false)}
+                            >
+                                PCB Calculator
+                            </Link>
 
                             {/* Products accordion */}
                             <div>
@@ -399,21 +394,9 @@ export function Header() {
                             </div>
 
                             <Link
-                                href="/about"
-                                className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
-                            >
-                                About Us
-                            </Link>
-                            <Link
-                                href="/blog"
-                                className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
-                                onClick={() => setMobileOpen(false)}
-                            >
-                                Blog
-                            </Link>
-                            <Link
                                 href="/contact"
                                 className="flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-semibold text-secondary hover:bg-primary/8 hover:text-primary transition-colors"
+                                onClick={() => setMobileOpen(false)}
                             >
                                 Contact Us
                             </Link>

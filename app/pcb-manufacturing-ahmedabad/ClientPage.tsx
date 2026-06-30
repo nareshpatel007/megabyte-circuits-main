@@ -70,7 +70,7 @@ export default function Page() {
         },
         {
             question: "What certifications do your manufacturing processes hold?",
-            answer: "Our facility complies with ISO 9001:2015 standards, RoHS regulations, and UL specifications."
+            answer: "Our facility complies with IPC-A-600 quality standards, RoHS regulations, and UL specifications."
         },
         {
             question: "Do you perform electrical testing on all boards?",

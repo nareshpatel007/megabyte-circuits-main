@@ -42,7 +42,7 @@ export function ProductSidebar({ currentSlug }: { currentSlug: string }) {
                         return (
                             <li key={link.slug}>
                                 <Link
-                                    href={`/products/${link.slug}`}
+                                    href={((slug: string) => { const map: Record<string, string> = { "single-layer-pcb": "/products/single-layer-pcb-ahmedabad", "double-layer-pcb": "/products/double-layer-pcb-ahmedabad", "multi-layer-pcb": "/products/multi-layer-pcb-ahmedabad" }; return map[slug] || `/products/${slug}`; })(link.slug)}
                                     className={`flex items-center justify-between p-3 rounded-xl text-sm font-bold transition-all ${isActive
                                             ? "bg-primary text-white shadow-md shadow-primary/20"
                                             : "text-slate-600 hover:bg-slate-50 hover:text-primary"

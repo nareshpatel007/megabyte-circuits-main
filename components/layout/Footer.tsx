@@ -11,24 +11,21 @@ import {
 import { Button } from "@/components/ui/button";
 
 const SERVICES = [
-    { label: "Prototype PCB", href: "/services/prototype-pcb" },
-    { label: "PCB Design", href: "/services/pcb-design" },
-    { label: "PCB Manufacturing", href: "/services/pcb-manufacturing" },
-    { label: "PCB Assembly", href: "/services/pcb-assembly" },
-    { label: "PCB Developing Services", href: "/services/pcb-developing-services" },
-    { label: "PCB Fabrication", href: "/services/pcb-fabrication" },
-    { label: "DFM Support", href: "/services/design-for-manufacturability-dfm-support" },
-    { label: "Testing & Quality Assurance", href: "/services/testing-and-quality-assurance" },
+    { label: "Prototype PCB", href: "/prototype-pcb" },
+    { label: "PCB Design", href: "/pcb-design-ahmedabad" },
+    { label: "PCB Manufacturing", href: "/pcb-manufacturing-ahmedabad" },
+    { label: "PCB Assembly", href: "/pcb-assembly-ahmedabad" },
+    { label: "PCB Developing Services", href: "/pcb-developing-services-ahmedabad" },
+    { label: "PCB Fabrication", href: "/pcb-fabrication-ahmedabad" },
+    { label: "DFM Support", href: "/design-for-manufacturability-dfm-support" },
+    { label: "Testing & Quality Assurance", href: "/testing-and-quality-assurance" },
 ];
 
 const QUICK_LINKS = [
-    { label: "About Us", href: "/about" },
+    { label: "About Us", href: "/about-us" },
     { label: "FAQs", href: "/faq" },
-    { label: "Manufacturing Capabilities", href: "/manufacturing" },
     { label: "PCB Calculator", href: "/pcb-calculator" },
     { label: "Contact Support", href: "/contact" },
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
 ];
 
 const SOCIAL = [
@@ -178,18 +175,6 @@ export function Footer() {
                                 </a>
                             </li>
                         </ul>
-
-                        {/* Certifications */}
-                        <div className="mt-6 flex flex-wrap gap-2">
-                            {["ISO 9001:2015", "RoHS Compliant"].map((cert) => (
-                                <span
-                                    key={cert}
-                                    className="inline-flex items-center text-xs font-semibold bg-white/6 border border-white/10 text-white/60 px-2.5 py-1 rounded-md"
-                                >
-                                    {cert}
-                                </span>
-                            ))}
-                        </div>
                     </div>
                 </div>
             </div>
@@ -198,13 +183,11 @@ export function Footer() {
             <div className="border-t border-white/8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/35">
-                        <p>Copyright © 2026 MegaByte's Circuit Systems. All Rights Reserved.</p>
+                        <p>Copyright © {new Date().getFullYear()} MegaByte's Circuit Systems. All Rights Reserved.</p>
                         <div className="flex items-center gap-4">
-                            <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
+                            <Link href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
                             <span className="text-white/15">|</span>
-                            <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
-                            <span className="text-white/15">|</span>
-                            <Link href="#" className="hover:text-primary transition-colors">Sitemap</Link>
+                            <Link href="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
                         </div>
                     </div>
                 </div>

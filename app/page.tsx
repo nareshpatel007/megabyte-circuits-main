@@ -8,8 +8,10 @@ import {
     Shield, Truck, Wrench, Package, ArrowRight, Star, Globe,
     Upload, ChevronRight, Layers, FlaskConical, Gauge, Award,
     Car, Heart, Plane, Factory, Wifi, Smartphone, Bot, Radio,
-    FileCheck, Search, Calculator, Hammer, Eye, Box
+    FileCheck, Search, Calculator, Hammer, Eye, Box, Briefcase, GraduationCap, HelpCircle, Users,
+    Calendar, Clock, Phone, Mail
 } from "lucide-react";
+import { BLOG_POSTS } from "@/lib/blog";
 import { Button } from "@/components/ui/button";
 import {
     Accordion, AccordionContent, AccordionItem, AccordionTrigger,
@@ -250,6 +252,58 @@ export default function Home() {
         defaultValues: { pcbType: "Standard Rigid", layers: 2, boardWidth: 50, boardHeight: 50, quantity: 10, thickness: "1.6mm", copperWeight: "1oz", surfaceFinish: "HASL" },
     });
 
+    const [activeTab, setActiveTab] = React.useState("prototype");
+
+    const pcbTabs = [
+        {
+            id: "prototype",
+            label: "Prototype PCB",
+            desc: "Megabytes circuit Systems is the PCB manufacturer with fast reaction. We offer quick-turn PCB prototypes to turn your prototype boards around fast while still maintaining complete adherence to your design specifications.",
+            specs: [
+                { name: "Quantity", val: "1-100 pcs" },
+                { name: "Quality Grade", val: "Standard IPC 2" },
+                { name: "Lead time", val: "1-9 days" },
+                { name: "Material", val: "FR4" }
+            ]
+        },
+        {
+            id: "design",
+            label: "PCB Design",
+            desc: "It is recommended to use Standard PCB service when your design is ready to transform from prototype phase to production phase. We have handled hundreds of thousands of PCB projects, and covered almost all kinds of substrate materials including FR4, Aluminum, Rogers, etc.",
+            specs: [
+                { name: "Quality Grade", val: "Standard IPC 2" },
+                { name: "Lead time", val: "1 days- 5 weeks" },
+                { name: "Material", val: "FR4" }
+            ]
+        },
+        {
+            id: "manufacturing",
+            label: "PCB Manufacturing",
+            points: [
+                "Schematic Capture: We convert your circuit ideas into a detailed schematic diagram.",
+                "PCB Layout Design: We design the physical layout of the PCB, optimizing for performance, reliability, and manufacturability.",
+                "Design for Manufacturing (DFM): We ensure that your design is ready for efficient and cost-effective production.",
+                "Fabrication Files: We generate manufacturing files for you, like Gerber files.",
+                "Prototype Testing: We can assist with prototype testing to verify the functionality and performance of the design.",
+                "Production Run: We also provide PCB Manufacturing and Assembly Services for your production run."
+            ]
+        },
+        {
+            id: "assembly",
+            label: "PCB Assembly",
+            points: [
+                "PCB Assembly with the Highest Quality and on-time delivery for surface mount, through hole and press-Fit technology.",
+                "Focus on Engineering prototypes, NPI, Rapid Prototyping, Low-mid Volume manufacturing with Quick turnaround time.",
+                "Supports Single-sided, Double-sided, Surface mount assembly and Through-hole PCBA Assembly.",
+                "PCBA Assembly of surface mount and through hole components on Rigid, Flexible, and Flex-Rigid PCB's.",
+                "Meticulous PCB assembly services backed by highly skilled professionals and processes.",
+                "A comprehensive multi-stage QC process ensures consistent quality and high production yield.",
+                "Production Process Includes AOI, FPT, X-ray inspection, Conformal Coating.",
+                "Press-Fit connector Assembly including Design and manufacturing of press-fit connector assembly."
+            ]
+        }
+    ];
+
     function onSubmit(values: z.infer<typeof calculatorSchema>) {
         calculateQuote.mutate({ data: values });
     }
@@ -273,10 +327,10 @@ export default function Home() {
                                 </span>
                             </motion.div>
 
-                            <motion.h1 variants={fadeUp} className="text-5xl md:text-6xl xl:text-7xl font-display font-bold leading-[1.08] text-white mb-6">
+                            <motion.h1 variants={fadeUp} className="text-4xl md:text-5xl xl:text-6xl font-display font-bold leading-[1.1] text-white mb-6">
                                 India's Biggest
                                 <span className="block text-gradient">PCB Manufacturer</span>
-                                in Ahmedabad
+                                in Ahmedabad Megabytes Circuit Systems
                             </motion.h1>
 
                             <motion.p variants={fadeUp} className="text-lg text-white/65 mb-10 max-w-2xl leading-relaxed">
@@ -300,6 +354,94 @@ export default function Home() {
                             <PCBVisual />
                         </motion.div>
                     </div>
+                </div>
+            </section>
+
+            {/* ─── Capabilities Tab Section ─── */}
+            <section className="py-24 bg-slate-50 border-y border-slate-100">
+                <div className="section-container max-w-6xl mx-auto">
+                    <InViewSection>
+                        <div className="text-center max-w-3xl mx-auto mb-12">
+                            <span className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                                Capabilities
+                            </span>
+                            <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary mb-4">
+                                Our Core PCB Capabilities
+                            </h2>
+                            <p className="text-muted-foreground text-sm leading-relaxed">
+                                Toggle through our core offerings to view turnaround times, quantity options, substrate materials, and key deliverables.
+                            </p>
+                        </div>
+                    </InViewSection>
+
+                    <InViewSection>
+                        {/* Tabs Navigation */}
+                        <div className="w-full bg-[#05141f] rounded-t-2xl flex overflow-hidden border-b-4 border-primary shadow-lg">
+                            {pcbTabs.map((tab) => {
+                                const isActive = activeTab === tab.id;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`flex-1 text-center py-5 px-3 text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 relative ${isActive
+                                            ? "bg-primary text-white"
+                                            : "bg-[#091b29] text-white/70 hover:text-white hover:bg-[#0c263a]"
+                                            }`}
+                                    >
+                                        {tab.label}
+                                        {isActive && (
+                                            <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-[8px] w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-primary z-10" />
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Tabs Content Panel */}
+                        <div className="bg-white rounded-b-2xl border-x border-b border-slate-200 p-8 md:p-12 shadow-xl shadow-slate-100/50">
+                            {pcbTabs.map((tab) => {
+                                if (tab.id !== activeTab) return null;
+                                return (
+                                    <motion.div
+                                        key={tab.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="space-y-6"
+                                    >
+                                        {tab.desc && (
+                                            <p className="text-secondary/80 text-base md:text-lg leading-relaxed mb-6 font-medium">
+                                                {tab.desc}
+                                            </p>
+                                        )}
+
+                                        {tab.specs && (
+                                            <ul className="grid sm:grid-cols-2 gap-4">
+                                                {tab.specs.map((spec, index) => (
+                                                    <li key={index} className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                                        <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                                                        <span className="text-sm font-bold text-secondary">{spec.name}:</span>
+                                                        <span className="text-sm text-secondary/80">{spec.val}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+
+                                        {tab.points && (
+                                            <ul className="space-y-4">
+                                                {tab.points.map((point, index) => (
+                                                    <li key={index} className="flex items-start gap-3 bg-slate-50/50 p-4 rounded-xl border border-slate-100/70">
+                                                        <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                                        <span className="text-sm text-secondary/80 leading-relaxed font-medium">{point}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </InViewSection>
                 </div>
             </section>
 
@@ -327,56 +469,56 @@ export default function Home() {
                                     icon: Wrench,
                                     title: "Prototype PCB",
                                     desc: "Quick-turn prototype PCB fabrication to test and validate your designs fast.",
-                                    link: "/services/prototype-pcb",
+                                    link: "/prototype-pcb",
                                     color: "from-green-50 to-emerald-50",
                                 },
                                 {
                                     icon: Settings,
                                     title: "PCB Design",
                                     desc: "Professional schematic design and high-speed multi-layer PCB layout services.",
-                                    link: "/services/pcb-design",
+                                    link: "/pcb-design-ahmedabad",
                                     color: "from-blue-50 to-sky-50",
                                 },
                                 {
                                     icon: CircuitBoard,
                                     title: "PCB Manufacturing",
                                     desc: "High-quality single layer, double layer, and complex multilayer PCB production.",
-                                    link: "/services/pcb-manufacturing",
+                                    link: "/pcb-manufacturing-ahmedabad",
                                     color: "from-emerald-50 to-teal-50",
                                 },
                                 {
                                     icon: Cpu,
                                     title: "PCB Assembly",
                                     desc: "Advanced SMT, through-hole, mechanical, and complete turnkey assembly services.",
-                                    link: "/services/pcb-assembly",
+                                    link: "/pcb-assembly-ahmedabad",
                                     color: "from-sky-50 to-indigo-50",
                                 },
                                 {
                                     icon: Activity,
                                     title: "PCB Developing Services",
                                     desc: "Comprehensive board development, firmware integration, and hardware engineering solutions.",
-                                    link: "/services/pcb-developing-services",
+                                    link: "/pcb-developing-services-ahmedabad",
                                     color: "from-purple-50 to-violet-50",
                                 },
                                 {
                                     icon: Hammer,
                                     title: "PCB Fabrication",
                                     desc: "Precision copper routing, micro-drilling, custom profiling, and panelization.",
-                                    link: "/services/pcb-fabrication",
+                                    link: "/pcb-fabrication-ahmedabad",
                                     color: "from-amber-50 to-orange-50",
                                 },
                                 {
                                     icon: FileCheck,
                                     title: "Design For Manufacturability (DFM) Support",
                                     desc: "Thorough DFM analysis and engineering reviews to prevent production errors.",
-                                    link: "/services/design-for-manufacturability-dfm-support",
+                                    link: "/design-for-manufacturability-dfm-support",
                                     color: "from-rose-50 to-red-50",
                                 },
                                 {
                                     icon: Shield,
                                     title: "Testing And Quality Assurance",
                                     desc: "100% AOI, flying probe testing, electrical checks, and visual inspections.",
-                                    link: "/services/testing-and-quality-assurance",
+                                    link: "/testing-and-quality-assurance",
                                     color: "from-teal-50 to-cyan-50",
                                 },
                             ].map((service, i) => (
@@ -385,7 +527,7 @@ export default function Home() {
                                         <div className="group relative bg-gradient-to-b from-white to-slate-50/50 rounded-2xl border border-slate-100 p-6 flex flex-col justify-between h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_-15px_rgba(11,122,51,0.12)] hover:border-primary/25 cursor-pointer overflow-hidden">
                                             {/* Top right subtle glow */}
                                             <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-primary/5 blur-xl group-hover:bg-primary/10 transition-all duration-300 pointer-events-none" />
-                                            
+
                                             <div>
                                                 <div className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mb-5 border border-slate-100 group-hover:border-primary/10 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300`}>
                                                     <service.icon className="w-5 h-5 text-primary group-hover:animate-pulse" />
@@ -401,6 +543,64 @@ export default function Home() {
                                 </motion.div>
                             ))}
                         </motion.div>
+                    </InViewSection>
+                </div>
+            </section>
+
+            {/* ─── Industries We Serve Section ─── */}
+            <section className="py-28 bg-[#0a141d] relative overflow-hidden border-y border-slate-900 text-white">
+                {/* Subtle decorative glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[125px] pointer-events-none" />
+
+                <div className="section-container max-w-7xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8">
+                    <InViewSection>
+                        <div className="text-center max-w-4xl mx-auto mb-16">
+                            <span className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                                Industries We Serve
+                            </span>
+                            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-5">
+                                Powering Critical Electronics
+                            </h2>
+                            <p className="text-white/70 text-lg leading-relaxed">
+                                We deliver innovative products and services that enhance operational efficiency and drive growth. By understanding the specific challenges faced by these industries, we are committed to offering high-quality, reliable solutions that empower our clients to achieve their goals.
+                            </p>
+                        </div>
+                    </InViewSection>
+
+                    <InViewSection>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[
+                                { label: "Aerospace and Defense", desc: "High-reliability, certified materials for critical applications.", icon: Plane, color: "from-blue-50 to-indigo-50/30" },
+                                { label: "Automotive", desc: "ADAS, EV motor controllers, and robust body electronics.", icon: Car, color: "from-amber-50 to-orange-50/30" },
+                                { label: "Commercial", desc: "Standard PCBs for smart commercial devices and controllers.", icon: Briefcase, color: "from-sky-50 to-blue-50/30" },
+                                { label: "Industrial", desc: "Heavy-duty PCBs for PLCs, motor drives, and automation.", icon: Factory, color: "from-gray-50 to-slate-50/30" },
+                                { label: "Lighting", desc: "Custom MCPCB and FR4 solutions for high-power LED systems.", icon: Zap, color: "from-yellow-50 to-amber-50/30" },
+                                { label: "Medical", desc: "High-density boards for life-critical healthcare equipment.", icon: Heart, color: "from-red-50 to-rose-50/30" },
+                                { label: "Telecom", desc: "High-frequency, low-loss substrates for infrastructure.", icon: Radio, color: "from-pink-50 to-fuchsia-50/30" },
+                                { label: "Educational Institutes", desc: "Specialized prototyping support for academic research and R&D.", icon: GraduationCap, color: "from-purple-50 to-violet-50/30" },
+                            ].map((ind, i) => (
+                                <motion.div
+                                    key={i}
+                                    variants={fadeUp}
+                                    className="group relative bg-white rounded-2xl border border-slate-100 p-6 flex flex-col justify-between h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(17,122,51,0.08)] hover:border-primary/25 cursor-pointer overflow-hidden"
+                                >
+                                    {/* Top right subtle gradient decoration */}
+                                    <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-primary/5 blur-xl group-hover:bg-primary/10 transition-all duration-300 pointer-events-none" />
+
+                                    <div>
+                                        <div className={`w-12 h-12 bg-gradient-to-br ${ind.color} rounded-xl flex items-center justify-center mb-5 border border-slate-100 group-hover:border-primary/10 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300`}>
+                                            <ind.icon className="w-5 h-5 text-primary group-hover:animate-pulse" />
+                                        </div>
+                                        <h3 className="text-base font-display font-bold text-secondary mb-2 group-hover:text-primary transition-colors duration-200">
+                                            {ind.label}
+                                        </h3>
+                                        <p className="text-xs text-slate-600 leading-relaxed">
+                                            {ind.desc}
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </InViewSection>
                 </div>
             </section>
@@ -425,17 +625,17 @@ export default function Home() {
                                     We combine cutting-edge manufacturing technology with ISO-certified processes to deliver boards that meet the most demanding specifications — on time, every time.
                                 </p>
                                 <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/25">
-                                    <Link href="/manufacturing">Explore Capabilities <ArrowRight className="ml-2 w-4 h-4" /></Link>
+                                    <Link href="/why-us">Explore Capabilities <ArrowRight className="ml-2 w-4 h-4" /></Link>
                                 </Button>
                             </motion.div>
 
-                            <motion.div variants={stagger} className="grid grid-cols-2 gap-4">
+                            <motion.div variants={stagger} className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                 {[
                                     { icon: Zap, title: "Instant Quotation", desc: "Accurate pricing in seconds online" },
                                     { icon: FlaskConical, title: "Automated DFM", desc: "Design-for-manufacture checks before production" },
                                     { icon: Truck, title: "Fast Turnaround", desc: "Prototypes ready in as little as 24 hours" },
                                     { icon: Shield, title: "Premium Quality", desc: "100% AOI + electrical testing on every board" },
-                                    { icon: Award, title: "ISO Certified", desc: "ISO 9001:2015 certified manufacturing facility" },
+                                    { icon: Award, title: "RoHS Compliant", desc: "Eco-friendly, lead-free board manufacturing" },
                                     { icon: Gauge, title: "Competitive Pricing", desc: "Best-value pricing without quality compromise" },
                                     { icon: Wrench, title: "Expert Support", desc: "Engineering assistance available 24/7" },
                                     { icon: Globe, title: "Global Shipping", desc: "Delivered worldwide via trusted logistics" },
@@ -539,7 +739,7 @@ export default function Home() {
                                         Download Capability PDF
                                     </Button>
                                     <Button variant="outline" asChild className="border-secondary/20 text-secondary hover:bg-gray-50">
-                                        <Link href="/manufacturing">View All Specs</Link>
+                                        <Link href="/why-us">View All Specs</Link>
                                     </Button>
                                 </div>
                             </motion.div>
@@ -579,54 +779,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ─────────────────────────────────────────────────────── */}
-            {/* 6. INDUSTRIES */}
-            {/* ─────────────────────────────────────────────────────── */}
-            <section className="py-28 bg-gray-50">
-                <div className="section-container">
-                    <InViewSection>
-                        <motion.div variants={stagger} className="text-center max-w-3xl mx-auto mb-16">
-                            <motion.p variants={fadeUp} className="section-eyebrow justify-center">Industries</motion.p>
-                            <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-display font-bold text-secondary mb-5">
-                                Powering Critical Industries
-                            </motion.h2>
-                            <motion.p variants={fadeUp} className="text-muted-foreground text-lg">
-                                Trusted by engineers and procurement managers in the world's most demanding sectors.
-                            </motion.p>
-                        </motion.div>
-                    </InViewSection>
 
-                    <InViewSection>
-                        <motion.div variants={staggerFast} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                            {[
-                                { icon: Car, name: "Automotive Electronics", desc: "ADAS, EV controllers, body electronics", color: "from-amber-500 to-orange-600" },
-                                { icon: Heart, name: "Medical Devices", desc: "ISO 13485 compliant, life-critical boards", color: "from-red-500 to-rose-600" },
-                                { icon: Plane, name: "Aerospace Systems", desc: "High-reliability, certified materials", color: "from-blue-500 to-indigo-600" },
-                                { icon: Factory, name: "Industrial Automation", desc: "PLCs, motor drives, industrial controls", color: "from-gray-600 to-slate-700" },
-                                { icon: Wifi, name: "IoT Devices", desc: "Miniaturized, HDI RF boards", color: "from-cyan-500 to-teal-600" },
-                                { icon: Smartphone, name: "Consumer Electronics", desc: "High-volume, cost-optimized production", color: "from-violet-500 to-purple-600" },
-                                { icon: Bot, name: "Robotics", desc: "Rigid-flex, high-density robotic PCBs", color: "from-green-500 to-emerald-600" },
-                                { icon: Radio, name: "Telecom Infrastructure", desc: "High-frequency, low-loss substrates", color: "from-pink-500 to-fuchsia-600" },
-                            ].map((ind, i) => (
-                                <motion.div
-                                    key={i}
-                                    variants={fadeUp}
-                                    className="group relative rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer hover:-translate-y-2 transition-all duration-300 hover:shadow-xl hover:border-transparent"
-                                >
-                                    <div className={`h-2 bg-gradient-to-r ${ind.color} group-hover:h-3 transition-all duration-300`} />
-                                    <div className="p-6">
-                                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${ind.color} flex items-center justify-center mb-4 shadow-md`}>
-                                            <ind.icon className="w-6 h-6 text-white" />
-                                        </div>
-                                        <h4 className="font-display font-bold text-secondary mb-2 text-sm">{ind.name}</h4>
-                                        <p className="text-xs text-muted-foreground leading-relaxed">{ind.desc}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </InViewSection>
-                </div>
-            </section>
 
             {/* ─────────────────────────────────────────────────────── */}
             {/* 7. PCB COST CALCULATOR */}
@@ -852,97 +1005,65 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ─────────────────────────────────────────────────────── */}
-            {/* 9. CASE STUDIES */}
-            {/* ─────────────────────────────────────────────────────── */}
-            <section className="py-28 bg-gray-50">
-                <div className="section-container">
-                    <InViewSection>
-                        <motion.div variants={stagger} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
-                            <motion.div variants={fadeLeft}>
-                                <p className="section-eyebrow">Case Studies</p>
-                                <h2 className="text-4xl md:text-5xl font-display font-bold text-secondary">
-                                    Real-World<br />Project Highlights
-                                </h2>
-                            </motion.div>
-                            <motion.div variants={fadeRight}>
-                                <Button variant="outline" className="border-secondary/20 text-secondary hover:bg-secondary hover:text-white transition-all">
-                                    View All Projects <ArrowRight className="ml-2 w-4 h-4" />
-                                </Button>
-                            </motion.div>
-                        </motion.div>
-                    </InViewSection>
 
-                    <InViewSection>
-                        <motion.div variants={staggerFast} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[
-                                { title: "EV Controller PCB", tag: "Automotive", desc: "Heavy copper 6oz board for EV motor drive.", color: "from-emerald-400 via-green-500 to-teal-600", icon: Car },
-                                { title: "IoT Smart Device", tag: "IoT", desc: "HDI board with 0.10mm microvias for wearable.", color: "from-blue-400 via-sky-500 to-cyan-600", icon: Wifi },
-                                { title: "Medical Monitor", tag: "Medical", desc: "ISO 13485 compliant rigid-flex PCBA.", color: "from-rose-400 via-red-500 to-pink-600", icon: Heart },
-                                { title: "Industrial PLC", tag: "Industrial", desc: "12-layer impedance-controlled board.", color: "from-orange-400 via-amber-500 to-yellow-600", icon: Factory },
-                            ].map((study, i) => (
-                                <motion.div
-                                    key={i}
-                                    variants={fadeUp}
-                                    className="group cursor-pointer"
-                                >
-                                    <div className={`h-52 rounded-2xl bg-gradient-to-br ${study.color} mb-4 relative overflow-hidden flex items-center justify-center shadow-lg`}>
-                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
-                                        <study.icon className="w-16 h-16 text-white/30 group-hover:text-white/50 transition-colors duration-300" />
-                                        <div className="absolute top-3 left-3">
-                                            <Badge className="bg-white/20 text-white border-0 text-xs backdrop-blur-sm">{study.tag}</Badge>
-                                        </div>
-                                    </div>
-                                    <h4 className="font-display font-bold text-secondary text-lg mb-1.5 group-hover:text-primary transition-colors">{study.title}</h4>
-                                    <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{study.desc}</p>
-                                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary group-hover:gap-3 transition-all">
-                                        Read Case Study <ArrowRight className="w-4 h-4" />
+
+            {/* ─── Bottom Info Cards Section ─── */}
+            <section className="relative overflow-hidden text-white border-t border-slate-900">
+                <div className="grid grid-cols-1 lg:grid-cols-3">
+                    {/* Quality Assurance Card */}
+                    <div className="bg-[#1a2332] p-12 md:p-16 flex flex-col items-center text-center justify-start min-h-[500px] hover:bg-[#1f2a3a] transition-all duration-300 relative group">
+                        {/* Decorative glow */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
+                        <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-8 shadow-xl shadow-black/20 group-hover:scale-110 transition-transform duration-300">
+                            <Star className="w-10 h-10 text-emerald-600 fill-emerald-600" />
+                        </div>
+                        <h3 className="text-2xl font-display font-extrabold tracking-wider uppercase mb-6 text-white border-b-2 border-primary/20 pb-3 w-full max-w-[200px]">
+                            Quality Assurance
+                        </h3>
+                        <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                            To become the customer-oriented organization, we are engaged in offering best quality products at reasonable prices. In order to maintain high quality standards in our range, we have hired skilled quality analysts, who keep close eye on procurement process and ensure that only flawless range is procured. We lay great emphasis on packaging of our range, so that products reach safely to the clients end.
+                        </p>
+                    </div>
+
+                    {/* Why Us Card */}
+                    <div className="bg-primary p-12 md:p-16 flex flex-col items-center text-center justify-start min-h-[500px] hover:bg-primary/95 transition-all duration-300 relative group">
+                        {/* Decorative glow */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
+                        <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-8 shadow-xl shadow-black/20 group-hover:scale-110 transition-transform duration-300">
+                            <HelpCircle className="w-10 h-10 text-primary" />
+                        </div>
+                        <h3 className="text-2xl font-display font-extrabold tracking-wider uppercase mb-6 text-white border-b-2 border-white/20 pb-3 w-full max-w-[200px]">
+                            Why Us?
+                        </h3>
+                        <p className="text-sm text-white/90 leading-relaxed font-medium mb-6">
+                            Our tremendous industrial experience and knowledge has enabled us to gain a prominent position in industry. Our friendly policies and timely deliveries have enabled us to become the first choice of the clients nationwide.
+                        </p>
+                        <div className="w-full pt-6 border-t border-white/10 mt-auto">
+                            <p className="text-xs uppercase tracking-wider text-white/70 font-bold mb-3">Following are the reasons for our success:</p>
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {["Prompt delivery", "Ethical deals", "Transparency", "Flexible payments", "Huge network"].map((reason, index) => (
+                                    <span key={index} className="text-[11px] font-bold bg-white/10 border border-white/15 px-3 py-1 rounded-full text-white">
+                                        {reason}
                                     </span>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </InViewSection>
-                </div>
-            </section>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
 
-            {/* ─────────────────────────────────────────────────────── */}
-            {/* 10. BLOG / RESOURCES */}
-            {/* ─────────────────────────────────────────────────────── */}
-            <section className="py-28 bg-white">
-                <div className="section-container">
-                    <InViewSection>
-                        <motion.div variants={stagger} className="text-center max-w-3xl mx-auto mb-16">
-                            <motion.p variants={fadeUp} className="section-eyebrow justify-center">Resources</motion.p>
-                            <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-display font-bold text-secondary mb-5">
-                                PCB Engineering Insights
-                            </motion.h2>
-                            <motion.p variants={fadeUp} className="text-muted-foreground text-lg">
-                                Technical guides and best practices from our engineering team.
-                            </motion.p>
-                        </motion.div>
-                    </InViewSection>
-
-                    <InViewSection>
-                        <motion.div variants={stagger} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[
-                                { tag: "Design", title: "PCB Design Tips for Signal Integrity", desc: "Essential trace routing, impedance matching, and ground plane strategies for high-speed designs.", color: "from-primary/10 to-emerald-50" },
-                                { tag: "Manufacturing", title: "Complete PCB Manufacturing Process Guide", desc: "From bare substrate to finished board: understanding every step of the PCB fabrication process.", color: "from-blue-50 to-sky-50/50" },
-                                { tag: "Assembly", title: "SMT Assembly Best Practices", desc: "Stencil design, paste deposition, reflow profiles, and defect prevention in surface-mount assembly.", color: "from-purple-50 to-violet-50/50" },
-                                { tag: "Components", title: "Component Selection for Harsh Environments", desc: "How to choose components rated for automotive, industrial, and military temperature ranges.", color: "from-orange-50 to-amber-50/50" },
-                            ].map((blog, i) => (
-                                <motion.div key={i} variants={fadeUp} className="group cursor-pointer">
-                                    <div className={`rounded-2xl bg-gradient-to-br ${blog.color} border border-gray-100 p-6 h-full hover:shadow-lg hover:border-primary/20 transition-all duration-300 hover:-translate-y-1 flex flex-col`}>
-                                        <Badge variant="secondary" className="self-start mb-4 bg-primary/10 text-primary border-0 hover:bg-primary/10">{blog.tag}</Badge>
-                                        <h4 className="font-display font-bold text-secondary text-base mb-3 leading-snug group-hover:text-primary transition-colors">{blog.title}</h4>
-                                        <p className="text-sm text-muted-foreground leading-relaxed flex-1 mb-4">{blog.desc}</p>
-                                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary group-hover:gap-3 transition-all mt-auto">
-                                            Read Article <ArrowRight className="w-4 h-4" />
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </InViewSection>
+                    {/* Team of Experts Card */}
+                    <div className="bg-[#151c28] p-12 md:p-16 flex flex-col items-center text-center justify-start min-h-[500px] hover:bg-[#1a2332] transition-all duration-300 relative group">
+                        {/* Decorative glow */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
+                        <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-8 shadow-xl shadow-black/20 group-hover:scale-110 transition-transform duration-300">
+                            <Users className="w-10 h-10 text-emerald-600" />
+                        </div>
+                        <h3 className="text-2xl font-display font-extrabold tracking-wider uppercase mb-6 text-white border-b-2 border-primary/20 pb-3 w-full max-w-[200px]">
+                            Team of Experts
+                        </h3>
+                        <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                            We have selected a group of experts and professionals in our team to ensure timely completion of productivity. By providing specialized training sessions for these employees, we will ensure that the professionals are always updated themselves with current market demands and customer behavior. All individuals working under the supervision of highly experienced supervisors and inspectors.
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -998,6 +1119,88 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ─── BLOG / RESOURCES ─── */}
+            <section className="py-28 bg-white">
+                <div className="section-container">
+                    <InViewSection>
+                        <motion.div variants={stagger} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
+                            <motion.div variants={fadeLeft}>
+                                <p className="section-eyebrow">Resources</p>
+                                <h2 className="text-4xl md:text-5xl font-display font-bold text-secondary">
+                                    PCB Engineering Insights
+                                </h2>
+                                <p className="text-muted-foreground text-lg mt-2">
+                                    Technical guides and best practices from our engineering team.
+                                </p>
+                            </motion.div>
+                            <motion.div variants={fadeRight}>
+                                <Button asChild variant="outline" className="border-secondary/20 text-secondary hover:bg-secondary hover:text-white transition-all">
+                                    <Link href="/services">More Insights <ArrowRight className="ml-2 w-4 h-4" /></Link>
+                                </Button>
+                            </motion.div>
+                        </motion.div>
+                    </InViewSection>
+
+                    <InViewSection>
+                        <motion.div variants={stagger} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {BLOG_POSTS.slice(0, 3).map((post) => (
+                                <motion.div
+                                    key={post.slug}
+                                    variants={fadeUp}
+                                    className="group flex flex-col bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 hover:-translate-y-1 h-full"
+                                >
+                                    {/* Card Visual Image */}
+                                    <div className="relative h-48 overflow-hidden bg-gray-100 border-b border-gray-100">
+                                        <img
+                                            src={post.image}
+                                            alt={post.title}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                        <div className="absolute top-4 left-4">
+                                            <Badge className="bg-primary text-white border-0 font-bold px-3 py-1 text-xs">
+                                                {post.tag}
+                                            </Badge>
+                                        </div>
+                                    </div>
+
+                                    {/* Card Body */}
+                                    <div className="p-6 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <div className="flex items-center gap-4 text-[11px] font-semibold text-gray-500 mb-3">
+                                                <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {post.date}</span>
+                                                <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {post.readTime}</span>
+                                            </div>
+                                            <h3 className="font-display font-bold text-secondary text-lg leading-snug group-hover:text-primary transition-colors mb-3">
+                                                {post.title}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                                                {post.desc}
+                                            </p>
+                                        </div>
+
+                                        {/* Card Footer */}
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-display font-bold text-xs text-primary">
+                                                    {post.author.avatar}
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-bold text-secondary leading-none">{post.author.name}</p>
+                                                    <p className="text-[10px] text-muted-foreground">{post.author.role}</p>
+                                                </div>
+                                            </div>
+                                            <span className="inline-flex items-center gap-1 text-xs font-bold text-primary group-hover:gap-2 transition-all">
+                                                Read Article <ArrowRight className="w-3.5 h-3.5" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </InViewSection>
+                </div>
+            </section>
+
             {/* ─────────────────────────────────────────────────────── */}
             {/* 12. CTA BANNER */}
             {/* ─────────────────────────────────────────────────────── */}
@@ -1036,7 +1239,7 @@ export default function Home() {
 
                             {/* Trust badges */}
                             <motion.div variants={fadeUp} className="mt-14 flex flex-wrap justify-center gap-8 text-white/40 text-sm">
-                                {["ISO 9001:2015 Certified", "RoHS Compliant", "100% Electrical Testing", "24hr Prototype Available", "Global Shipping"].map((badge) => (
+                                {["RoHS Compliant", "100% Electrical Testing", "24hr Prototype Available", "Global Shipping"].map((badge) => (
                                     <span key={badge} className="flex items-center gap-2">
                                         <CheckCircle2 className="w-4 h-4 text-primary" /> {badge}
                                     </span>
@@ -1046,7 +1249,6 @@ export default function Home() {
                     </InViewSection>
                 </div>
             </section>
-
         </div>
     );
 }
