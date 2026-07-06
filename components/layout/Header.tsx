@@ -80,53 +80,6 @@ export function Header() {
                     : "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100"
                     }`}
             >
-                {/* ── Top bar ─────────────────────────────────────────── */}
-                <div
-                    className={`hidden md:block w-full text-xs transition-colors ${isTransparent
-                        ? "bg-secondary/70 backdrop-blur-sm text-white/80"
-                        : "bg-secondary text-white/80"
-                        }`}
-                >
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-2 gap-4">
-                        <div className="flex items-center gap-5 flex-wrap">
-                            <span className="flex items-center gap-1.5 shrink-0">
-                                <MapPin className="w-3 h-3 text-primary shrink-0" />
-                                Ahmedabad, Gujarat, India
-                            </span>
-                            <span className="flex items-center gap-1.5 shrink-0">
-                                <Mail className="w-3 h-3 text-primary shrink-0" />
-                                quote@megabytecircuit.com
-                            </span>
-                            <span className="flex items-center gap-1.5 shrink-0">
-                                <Phone className="w-3 h-3 text-primary shrink-0" />
-                                +91-9898842942
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-3 shrink-0">
-                            <span className="flex items-center gap-1.5">
-                                <Globe className="w-3 h-3 text-primary" /> Global Shipping
-                            </span>
-                            <div className="flex items-center gap-2 ml-2">
-                                {[
-                                    { Icon: Facebook, href: "https://www.facebook.com/people/Megabytes-Circuit-Systems/100090711935963/" },
-                                    { Icon: Instagram, href: "https://www.instagram.com/megabytescircuit/?hl=en" },
-                                    { Icon: Linkedin, href: "https://in.linkedin.com/in/megabytes-circuit-systems-598908237" }
-                                ].map(({ Icon, href }, i) => (
-                                    <a
-                                        key={i}
-                                        href={href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-white/40 hover:text-primary transition-colors"
-                                    >
-                                        <Icon className="w-3.5 h-3.5" />
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {/* ── Main nav bar ────────────────────────────────────── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex h-20 sm:h-24 items-center justify-between gap-6">
