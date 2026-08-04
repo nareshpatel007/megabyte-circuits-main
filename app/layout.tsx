@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Best PCB Manufacturer In India - Order PCB Online In 24 Hours",
+    title: "Best PCB Manufacturer In India - Order PCB Online",
     description: "PCB Manufacturer In Ahmedabad, Gujarat, India – Fastest Delivery For Automotive & Medical. Prototype To Production. No MOQ. Get Instant Quote.",
     keywords: [
         "PCB Manufacturer",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     ],
     metadataBase: new URL("https://www.megabytecircuit.com"),
     openGraph: {
-        title: "Best PCB Manufacturer In India - Order PCB Online In 24 Hours",
+        title: "Best PCB Manufacturer In India - Order PCB Online",
         description: "PCB Manufacturer In Ahmedabad, Gujarat, India – Fastest Delivery For Automotive & Medical. Prototype To Production. No MOQ. Get Instant Quote.",
         url: "https://www.megabytecircuit.com",
         siteName: "MegaByte's Circuit Systems",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Best PCB Manufacturer In India - Order PCB Online In 24 Hours",
+        title: "Best PCB Manufacturer In India - Order PCB Online",
         description: "PCB Manufacturer In Ahmedabad, Gujarat, India – Fastest Delivery For Automotive & Medical. Prototype To Production. No MOQ. Get Instant Quote.",
         images: [
             "/images/logo.png"
