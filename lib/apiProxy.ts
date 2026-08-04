@@ -80,8 +80,17 @@ export async function handleApiProxy(
         }
 
         // Call backend API
-        const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";        
-        const apiRes = await fetch(`${apiUrl}${endpoint}`, fetchOptions);
+        let apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://localhost/megabyte-circuits-api/public";
+        if (apiUrl.endsWith("/")) {
+            apiUrl = apiUrl.slice(0, -1);
+        }
+
+        let path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+        if (!apiUrl.endsWith("/api") && !path.startsWith("/api/")) {
+            path = `/api${path}`;
+        }
+
+        const apiRes = await fetch(`${apiUrl}${path}`, fetchOptions);
         const text = await apiRes.text();
 
         return new NextResponse(text, {
