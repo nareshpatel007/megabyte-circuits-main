@@ -2,79 +2,33 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { DigiKeyProduct } from "@/lib/digikey";
-
-// Sample fallback items matching screenshot layout if API is loading or encounters issue
-const FALLBACK_PRODUCTS: DigiKeyProduct[] = [
-    {
-        ManufacturerProductNumber: "ATMEGA328PB-ANR",
-        Description: {
-            ProductDescription: "AVR 32KBYTES Flash, 1KBYTES EEPROM, 2KBYTES Ram, W -...",
-            DetailedDescription: "8-bit AVR Microcontroller 20MHz 32KB Flash"
-        },
-        Manufacturer: { Id: 1, Name: "Microchip Technology" },
-        UnitPrice: 176.00,
-        ProductUrl: "https://www.digikey.com",
-        PhotoUrl: "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
-    },
-    {
-        ManufacturerProductNumber: "TAS2770RJQR",
-        Description: {
-            ProductDescription: "Audio Amplifier Speaker Mono 20W Class-D 26-Pin VQFN-HR T/R",
-            DetailedDescription: "Class D Audio Amplifier 1-Channel Mono"
-        },
-        Manufacturer: { Id: 2, Name: "Texas Instruments" },
-        UnitPrice: 157.00,
-        ProductUrl: "https://www.digikey.com",
-        PhotoUrl: "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
-    },
-    {
-        ManufacturerProductNumber: "GLYPH-C3-ESP32-IOT-Dev-Board",
-        Description: {
-            ProductDescription: "Indias most affordable development board...",
-            DetailedDescription: "ESP32-C3 Wi-Fi and Bluetooth Development Board"
-        },
-        Manufacturer: { Id: 3, Name: "Espressif" },
-        UnitPrice: 434.00,
-        ProductUrl: "https://www.digikey.com",
-        PhotoUrl: "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
-    },
-    {
-        ManufacturerProductNumber: "STM32G030C8T6",
-        Description: {
-            ProductDescription: "MCU 32-Bit STM32G030 ARM Cortex-M0+ RISC 64KB Flash 2V to 3.6V 4...",
-            DetailedDescription: "32-bit ARM Cortex-M0+ Microcontroller 64KB Flash"
-        },
-        Manufacturer: { Id: 4, Name: "STMicroelectronics" },
-        UnitPrice: 100.00,
-        ProductUrl: "https://www.digikey.com",
-        PhotoUrl: "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
-    }
-];
 
 export function FeaturedProducts() {
     const [products, setProducts] = useState<DigiKeyProduct[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const router = useRouter();
 
     useEffect(() => {
         let isMounted = true;
         async function fetchFeatured() {
             try {
-                const res = await fetch("/api/digikey/products?keywords=resistor");
+                // Fetch products stored in DB table (defaults to count=4 featured items)
+                const res = await fetch("/api/digikey/products?count=4");
                 if (res.ok) {
                     const data = await res.json();
                     if (isMounted && data.Products && data.Products.length > 0) {
-                        setProducts(data.Products);
+                        setProducts(data.Products.slice(0, 4));
                         setLoading(false);
                         return;
                     }
                 }
             } catch (err) {
-                console.error("Failed to fetch featured products:", err);
+                console.error("Failed to fetch featured products from database:", err);
             }
             if (isMounted) {
-                setProducts(FALLBACK_PRODUCTS);
                 setLoading(false);
             }
         }
@@ -123,6 +77,10 @@ export function FeaturedProducts() {
                             </div>
                         ))}
                     </div>
+                ) : products.length === 0 ? (
+                    <div className="text-center py-8 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-100 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 text-sm">
+                        No featured products found in the database.
+                    </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         {products.map((product, idx) => {
@@ -135,11 +93,13 @@ export function FeaturedProducts() {
                                 ? `₹${(product.UnitPrice > 1 ? product.UnitPrice : product.UnitPrice * 80).toFixed(2)}`
                                 : "Contact for Price";
                             const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
+                            const productHref = `/parts/${encodeURIComponent(title)}`;
 
                             return (
                                 <div
                                     key={idx}
-                                    className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between relative group"
+                                    onClick={() => router.push(productHref)}
+                                    className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between relative group cursor-pointer"
                                 >
                                     <div>
                                         {/* Content row with image & details */}
@@ -159,7 +119,8 @@ export function FeaturedProducts() {
                                             {/* Info */}
                                             <div className="flex-1 min-w-0">
                                                 <Link
-                                                    href={`/parts/${encodeURIComponent(title)}`}
+                                                    href={productHref}
+                                                    onClick={(e) => e.stopPropagation()}
                                                     className="font-bold text-primary dark:text-emerald-400 hover:underline text-sm leading-tight line-clamp-1 block mb-1"
                                                 >
                                                     {title}

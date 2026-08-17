@@ -18,7 +18,7 @@ interface ServiceHeaderProps {
 
 export function ServiceHeader({ title, subtitle, badge = "Our Services", breadcrumbs }: ServiceHeaderProps) {
     return (
-        <section className="relative pt-32 pb-6 md:pt-42 md:pb-10 overflow-hidden bg-secondary">
+        <section className="relative pt-24 pb-5 md:pt-28 md:pb-7 overflow-hidden bg-secondary">
             {/* Grid pattern background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
                 <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -36,7 +36,7 @@ export function ServiceHeader({ title, subtitle, badge = "Our Services", breadcr
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center text-center">
                 {/* Breadcrumbs */}
-                <nav className="flex items-center justify-center gap-2 text-xs font-semibold text-white/50 mb-6 uppercase tracking-wider">
+                <nav className="flex items-center justify-center gap-2 text-xs font-semibold text-white/50 mb-3 uppercase tracking-wider">
                     {breadcrumbs.map((crumb, idx) => {
                         const isLast = idx === breadcrumbs.length - 1;
                         return (
@@ -57,14 +57,14 @@ export function ServiceHeader({ title, subtitle, badge = "Our Services", breadcr
                 </nav>
 
                 <div className="max-w-4xl mx-auto flex flex-col items-center">
-                    <span className="inline-flex items-center gap-2 bg-primary/15 border border-primary/25 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+                    <span className="inline-flex items-center gap-1.5 bg-primary/15 border border-primary/25 text-primary text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">
                         <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                         {badge}
                     </span>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6 leading-tight">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-white mb-2 leading-tight">
                         {title}
                     </h1>
-                    <p className="text-lg text-white/70 leading-relaxed font-medium max-w-2xl">
+                    <p className="text-sm md:text-base text-white/70 leading-relaxed font-medium max-w-xl">
                         {subtitle}
                     </p>
                 </div>

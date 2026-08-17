@@ -86,17 +86,29 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
     };
 
     // Calculate price breaks dynamically
-    const basePrice = product?.UnitPrice ? Number(product.UnitPrice) : 176.0;
+    // Calculate unit price and price tier structure
+    const basePrice = product?.UnitPrice ? Number(product.UnitPrice) : 1.70;
     const finalPriceINR = basePrice > 1 ? basePrice : basePrice * 80;
 
+    // Price Breaks (fixed static standard breakdown per unit quantity tiers)
     const priceTier = [
-        { qty: "1 - 9", unitPrice: finalPriceINR, totalPrice: finalPriceINR * Math.max(1, quantity) },
+        { qty: "1 - 9", unitPrice: finalPriceINR, totalPrice: finalPriceINR * 6 },
         { qty: "10 - 24", unitPrice: finalPriceINR * 0.92, totalPrice: finalPriceINR * 0.92 * 10 },
         { qty: "25 - 49", unitPrice: finalPriceINR * 0.85, totalPrice: finalPriceINR * 0.85 * 25 },
         { qty: "50 - 99", unitPrice: finalPriceINR * 0.78, totalPrice: finalPriceINR * 0.78 * 50 },
         { qty: "100 - 499", unitPrice: finalPriceINR * 0.70, totalPrice: finalPriceINR * 0.70 * 100 },
         { qty: "500+", unitPrice: finalPriceINR * 0.62, totalPrice: finalPriceINR * 0.62 * 500 },
     ];
+
+    // Determine tier unit price for selected quantity
+    let currentUnitPrice = finalPriceINR;
+    if (quantity >= 500) currentUnitPrice = finalPriceINR * 0.62;
+    else if (quantity >= 100) currentUnitPrice = finalPriceINR * 0.70;
+    else if (quantity >= 50) currentUnitPrice = finalPriceINR * 0.78;
+    else if (quantity >= 25) currentUnitPrice = finalPriceINR * 0.85;
+    else if (quantity >= 10) currentUnitPrice = finalPriceINR * 0.92;
+
+    const calculatedTotalPrice = currentUnitPrice * quantity;
 
     // Build specs & attributes table list
     const mfgNumber = product?.ManufacturerProductNumber || rawPartNumber;
@@ -142,7 +154,7 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                 breadcrumbs={breadcrumbs}
             />
 
-            <main className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <main className="py-6 md:py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 {loading ? (
                     /* SKELETON LOADING STATE */
                     <div className="space-y-8 animate-pulse">
@@ -184,56 +196,31 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                 ) : (
                     /* PRODUCT DETAILS CONTENT */
                     <div className="space-y-10">
-                        {/* TOP CARDS: Image, Specs Overview & Pricing Card */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                            
-                            {/* Product Image Column */}
-                            <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col items-center">
-                                <div className="w-full aspect-square max-w-[280px] bg-slate-50 rounded-xl p-4 flex items-center justify-center border border-slate-100 overflow-hidden mb-4">
-                                    <img
-                                        src={
-                                            product?.PhotoUrl ||
-                                            "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
-                                        }
-                                        alt={mfgNumber}
-                                        className="max-h-full max-w-full object-contain hover:scale-105 transition-transform"
-                                        onError={(e) => {
-                                            (e.target as HTMLElement).setAttribute(
-                                                "src",
-                                                "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
-                                            );
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex gap-2 w-full justify-center">
-                                    <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg font-medium">
-                                        <PackageCheck className="w-4 h-4 text-emerald-600" /> Original DigiKey Part
-                                    </span>
-                                </div>
-                            </div>
+                        {/* TOP CARDS: Image & Description (Left), Pricing Breakdown (Center), Add to Cart (Right) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
-                            {/* Center Product Details */}
-                            <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
+                            {/* 1. LEFT COLUMN: Product Image & Description Under Image */}
+                            <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
                                 <div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-1 rounded-md">
-                                            {product?.Category || "Electronic Part"}
-                                        </span>
-                                        <span className="text-xs text-slate-400">|</span>
-                                        <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
-                                            <CheckCircle2 className="w-3.5 h-3.5" /> In Stock ({product?.QuantityAvailable ?? "1,000"} units)
-                                        </span>
+                                    <div className="w-full aspect-square max-w-[280px] bg-slate-50 rounded-xl p-4 flex items-center justify-center border border-slate-100 overflow-hidden mb-5 mx-auto">
+                                        <img
+                                            src={
+                                                product?.PhotoUrl ||
+                                                "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
+                                            }
+                                            alt={mfgNumber}
+                                            className="max-h-full max-w-full object-contain hover:scale-105 transition-transform"
+                                            onError={(e) => {
+                                                (e.target as HTMLElement).setAttribute(
+                                                    "src",
+                                                    "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
+                                                );
+                                            }}
+                                        />
                                     </div>
 
-                                    <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-2">
-                                        {mfgNumber}
-                                    </h1>
-
-                                    <p className="text-sm font-semibold text-slate-600 mb-4">
-                                        Manufacturer: <span className="text-slate-900 font-bold">{mfgName}</span>
-                                    </p>
-
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-6">
+                                    {/* Description under the image */}
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                                         <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400 mb-1">
                                             Description
                                         </h4>
@@ -243,47 +230,70 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
+                                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
                                     {(product?.DatasheetUrl || product?.Datasheets) && (
                                         <Button
                                             asChild
                                             variant="outline"
                                             size="sm"
-                                            className="text-xs font-semibold rounded-xl border-slate-200"
+                                            className="w-full text-xs font-semibold rounded-xl border-slate-200"
                                         >
                                             <a
                                                 href={product.DatasheetUrl || "#"}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-1.5"
+                                                className="flex items-center justify-center gap-1.5"
                                             >
                                                 <FileText className="w-4 h-4 text-rose-500" /> View Datasheet
-                                            </a>
-                                        </Button>
-                                    )}
-
-                                    {product?.ProductUrl && (
-                                        <Button
-                                            asChild
-                                            variant="outline"
-                                            size="sm"
-                                            className="text-xs font-semibold rounded-xl border-slate-200"
-                                        >
-                                            <a
-                                                href={product.ProductUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center gap-1.5"
-                                            >
-                                                DigiKey Source <ExternalLink className="w-3.5 h-3.5" />
                                             </a>
                                         </Button>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Right Pricing & Purchase Box */}
-                            <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                            {/* 2. CENTER COLUMN: Header & Price Breaks Table */}
+                            <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-1 rounded-md">
+                                            {product?.Category || "Electronic Part"}
+                                        </span>
+                                    </div>
+
+                                    <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-1">
+                                        {mfgNumber}
+                                    </h1>
+
+                                    <p className="text-sm font-semibold text-slate-600 mb-5">
+                                        Manufacturer: <span className="text-slate-900 font-bold">{mfgName}</span>
+                                    </p>
+
+                                    {/* Price Breaks Breakdown Table at center */}
+                                    <div>
+                                        <h4 className="text-xs font-bold text-slate-700 mb-2">Price Breaks</h4>
+                                        <div className="border border-slate-100 rounded-xl overflow-hidden text-xs">
+                                            <div className="bg-slate-50 grid grid-cols-3 p-2.5 font-bold text-slate-600 border-b border-slate-100">
+                                                <span>Quantity</span>
+                                                <span className="text-right">Unit Price</span>
+                                                <span className="text-right">Total</span>
+                                            </div>
+                                            {priceTier.map((tier, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="grid grid-cols-3 p-2.5 border-b border-slate-50 text-slate-700 font-medium hover:bg-slate-50/50 transition-colors"
+                                                >
+                                                    <span>{tier.qty}</span>
+                                                    <span className="text-right font-semibold">₹{tier.unitPrice.toFixed(2)}</span>
+                                                    <span className="text-right text-slate-500">₹{tier.totalPrice.toFixed(2)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. RIGHT COLUMN: Add to Cart Options & Separate Total Pricing */}
+                            <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
                                 <div>
                                     <div className="flex items-baseline justify-between mb-4">
                                         <div>
@@ -317,11 +327,10 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                     {/* Add to Cart Button */}
                                     <Button
                                         onClick={handleAddToCart}
-                                        className={`w-full h-12 rounded-xl text-sm font-extrabold transition-all duration-200 shadow-md ${
-                                            isAdded
-                                                ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                                                : "bg-primary hover:bg-primary/90 text-white"
-                                        }`}
+                                        className={`w-full h-12 rounded-xl text-sm font-extrabold transition-all duration-200 shadow-md ${isAdded
+                                            ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                            : "bg-primary hover:bg-primary/90 text-white"
+                                            }`}
                                     >
                                         {isAdded ? (
                                             <span className="flex items-center justify-center gap-2">
@@ -333,27 +342,79 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                             </span>
                                         )}
                                     </Button>
-                                </div>
 
-                                {/* Price Break Table */}
-                                <div className="mt-6 pt-5 border-t border-slate-100">
-                                    <h4 className="text-xs font-bold text-slate-700 mb-2">Price Breaks</h4>
-                                    <div className="border border-slate-100 rounded-xl overflow-hidden text-xs">
-                                        <div className="bg-slate-50 grid grid-cols-3 p-2 font-semibold text-slate-500 border-b border-slate-100">
-                                            <span>Quantity</span>
-                                            <span className="text-right">Unit Price</span>
-                                            <span className="text-right">Total</span>
+                                    {/* SEPARATE TOTAL PRICING & TIER BREAKDOWN UNDER ADD TO CART BUTTON */}
+                                    <div className="mt-5 p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-3">
+                                        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                                            <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pricing Breakdown</span>
+                                            <span className="text-[11px] font-semibold text-slate-500">{quantity} {quantity === 1 ? 'unit' : 'units'}</span>
                                         </div>
-                                        {priceTier.map((tier, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="grid grid-cols-3 p-2 border-b border-slate-50 text-slate-700 font-medium"
-                                            >
-                                                <span>{tier.qty}</span>
-                                                <span className="text-right font-semibold">₹{tier.unitPrice.toFixed(2)}</span>
-                                                <span className="text-right text-slate-500">₹{tier.totalPrice.toFixed(2)}</span>
-                                            </div>
-                                        ))}
+
+                                        {/* Stepped breakdown list */}
+                                        <div className="space-y-1.5 text-xs text-slate-600">
+                                            {(() => {
+                                                const tiersList = [
+                                                    { label: "1 - 9 units", min: 1, max: 9, rate: finalPriceINR },
+                                                    { label: "10 - 24 units", min: 10, max: 24, rate: finalPriceINR * 0.92 },
+                                                    { label: "25 - 49 units", min: 25, max: 49, rate: finalPriceINR * 0.85 },
+                                                    { label: "50 - 99 units", min: 50, max: 99, rate: finalPriceINR * 0.78 },
+                                                    { label: "100 - 499 units", min: 100, max: 499, rate: finalPriceINR * 0.70 },
+                                                    { label: "500+ units", min: 500, max: Infinity, rate: finalPriceINR * 0.62 },
+                                                ];
+
+                                                let remaining = quantity;
+                                                const activeBreakdowns: Array<{ label: string; qty: number; rate: number; subtotal: number }> = [];
+
+                                                for (const t of tiersList) {
+                                                    if (remaining <= 0) break;
+                                                    const maxInTier = t.max === Infinity ? remaining : (t.max - t.min + 1);
+                                                    const qtyInTier = Math.min(remaining, maxInTier);
+                                                    if (qtyInTier > 0) {
+                                                        activeBreakdowns.push({
+                                                            label: `${qtyInTier} × ₹${t.rate.toFixed(2)} (${t.label})`,
+                                                            qty: qtyInTier,
+                                                            rate: t.rate,
+                                                            subtotal: qtyInTier * t.rate,
+                                                        });
+                                                        remaining -= qtyInTier;
+                                                    }
+                                                }
+
+                                                return activeBreakdowns.map((item, idx) => (
+                                                    <div key={idx} className="flex justify-between items-center text-[11px]">
+                                                        <span className="text-slate-600">{item.label}</span>
+                                                        <span className="font-semibold text-slate-800">₹{item.subtotal.toFixed(2)}</span>
+                                                    </div>
+                                                ));
+                                            })()}
+                                        </div>
+
+                                        {/* Final Calculated Total */}
+                                        <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                                            <span className="text-xs font-black text-slate-900">Total Calculation:</span>
+                                            <span className="text-base font-black text-primary">
+                                                ₹{(() => {
+                                                    const tiersList = [
+                                                        { min: 1, max: 9, rate: finalPriceINR },
+                                                        { min: 10, max: 24, rate: finalPriceINR * 0.92 },
+                                                        { min: 25, max: 49, rate: finalPriceINR * 0.85 },
+                                                        { min: 50, max: 99, rate: finalPriceINR * 0.78 },
+                                                        { min: 100, max: 499, rate: finalPriceINR * 0.70 },
+                                                        { min: 500, max: Infinity, rate: finalPriceINR * 0.62 },
+                                                    ];
+                                                    let rem = quantity;
+                                                    let total = 0;
+                                                    for (const t of tiersList) {
+                                                        if (rem <= 0) break;
+                                                        const maxInTier = t.max === Infinity ? rem : (t.max - t.min + 1);
+                                                        const q = Math.min(rem, maxInTier);
+                                                        total += q * t.rate;
+                                                        rem -= q;
+                                                    }
+                                                    return total.toFixed(2);
+                                                })()}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -372,9 +433,8 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                 {attributesList.map((attr, idx) => (
                                     <div
                                         key={idx}
-                                        className={`grid grid-cols-1 md:grid-cols-3 px-6 py-3 text-sm ${
-                                            idx % 2 === 0 ? "bg-white" : "bg-slate-50/40"
-                                        }`}
+                                        className={`grid grid-cols-1 md:grid-cols-3 px-6 py-3 text-sm ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/40"
+                                            }`}
                                     >
                                         <span className="font-bold text-slate-700 md:col-span-1">{attr.topic}</span>
                                         <span className="text-slate-600 md:col-span-2">{attr.description}</span>

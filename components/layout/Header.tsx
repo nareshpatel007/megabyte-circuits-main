@@ -104,14 +104,14 @@ export function Header() {
             <header
                 className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                     isScrolled
-                        ? "py-2 sm:py-3 px-3 sm:px-6"
+                        ? "py-2 sm:py-3 px-4 sm:px-6 lg:px-8"
                         : "py-0 px-0"
                 }`}
             >
                 <div
                     className={`mx-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                         isScrolled
-                            ? "max-w-6xl"
+                            ? "max-w-7xl"
                             : "w-full"
                     }`}
                 >
@@ -119,7 +119,7 @@ export function Header() {
                         className={`flex items-center justify-between gap-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                             isScrolled
                                 ? "h-12 sm:h-14 px-4 sm:px-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl border border-gray-200/80 dark:border-zinc-800 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/30 ring-1 ring-black/5 dark:ring-white/10"
-                                : "h-16 sm:h-20 px-4 sm:px-8 lg:px-12 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-zinc-800 shadow-xs rounded-none"
+                                : "h-16 sm:h-20 px-4 sm:px-6 lg:px-8 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-zinc-800 shadow-xs rounded-none"
                         }`}
                     >
                         {/* Logo */}
