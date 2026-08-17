@@ -31,8 +31,10 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { FeaturedProducts } from "@/components/FeaturedProducts";
 
 /* ─── Animation Presets ─────────────────────────────────────────────────── */
+
 const fadeUp = {
     hidden: { opacity: 0, y: 40 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
@@ -336,12 +338,6 @@ export default function Home() {
                             <motion.p variants={fadeUp} className="text-lg text-white/65 mb-10 max-w-2xl leading-relaxed">
                                 Welcome to Megabytes Circuit Systems, Ahmedabad's trusted PCB manufacturing partner since 2021. We deliver high-quality circuit boards across India, ensuring precision, reliability, and custom solutions for your business.
                             </motion.p>
-
-                            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
-                                <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-white font-semibold h-13 px-8 text-base shadow-lg shadow-primary/25">
-                                    <Link href="/pcb-calculator"><Calculator className="w-4 h-4 mr-2" /> PCB Calculator</Link>
-                                </Button>
-                            </motion.div>
                         </motion.div>
 
                         {/* Right – PCB Visual */}
@@ -356,6 +352,161 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* 1.2 INSTANT PCB QUOTE WIDGET */}
+            <section className="relative z-20 -mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/90 shadow-2xl shadow-slate-900/10">
+                    <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+                        <div>
+                            <span className="text-xs font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-md">
+                                Instant Online Quote
+                            </span>
+                            <h3 className="text-xl md:text-2xl font-black text-slate-900 mt-1">
+                                Calculate PCB Price Instantly
+                            </h3>
+                        </div>
+                    </div>
+
+                    <Form {...form}>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const vals = form.getValues();
+                                const query = new URLSearchParams({
+                                    layers: String(vals.layers || 2),
+                                    boardWidth: String(vals.boardWidth || 100),
+                                    boardHeight: String(vals.boardHeight || 100),
+                                    quantity: String(vals.quantity || 5),
+                                    pcbType: vals.pcbType || "Standard Rigid",
+                                    thickness: vals.thickness || "1.6mm",
+                                    copperWeight: vals.copperWeight || "1oz",
+                                    surfaceFinish: vals.surfaceFinish || "HASL",
+                                }).toString();
+
+                                const quoteBase = process.env.NEXT_PUBLIC_QUOTE_URL || "http://localhost:3001";
+                                window.location.href = `${quoteBase.replace(/\/$/, "")}/?${query}`;
+                            }}
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 items-end gap-3 w-full"
+                        >
+                            {/* Layers */}
+                            <FormField
+                                control={form.control}
+                                name="layers"
+                                render={({ field }) => (
+                                    <FormItem className="w-full min-w-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Layers</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={String(field.value)}>
+                                            <FormControl>
+                                                <SelectTrigger className="h-11 w-full rounded-xl bg-slate-50/60 border-slate-200 text-xs font-bold text-slate-800 focus:bg-white focus:ring-1 focus:ring-primary">
+                                                    <SelectValue placeholder="Layers" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {[1, 2, 4, 6, 8, 10].map((l) => (
+                                                    <SelectItem key={l} value={String(l)} className="text-xs font-medium cursor-pointer">
+                                                        {l} {l === 1 ? "Layer" : "Layers"}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Width */}
+                            <FormField
+                                control={form.control}
+                                name="boardWidth"
+                                render={({ field }) => (
+                                    <FormItem className="w-full min-w-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Width (mm)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                min={10}
+                                                {...field}
+                                                className="h-11 w-full rounded-xl bg-slate-50/60 border-slate-200 text-xs font-bold text-center text-slate-800 focus:bg-white focus:ring-1 focus:ring-primary"
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Height */}
+                            <FormField
+                                control={form.control}
+                                name="boardHeight"
+                                render={({ field }) => (
+                                    <FormItem className="w-full min-w-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Height (mm)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                min={10}
+                                                {...field}
+                                                className="h-11 w-full rounded-xl bg-slate-50/60 border-slate-200 text-xs font-bold text-center text-slate-800 focus:bg-white focus:ring-1 focus:ring-primary"
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Quantity */}
+                            <FormField
+                                control={form.control}
+                                name="quantity"
+                                render={({ field }) => (
+                                    <FormItem className="w-full min-w-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Quantity (pcs)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                min={1}
+                                                {...field}
+                                                className="h-11 w-full rounded-xl bg-slate-50/60 border-slate-200 text-xs font-bold text-center text-slate-800 focus:bg-white focus:ring-1 focus:ring-primary"
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* PCB Type */}
+                            <FormField
+                                control={form.control}
+                                name="pcbType"
+                                render={({ field }) => (
+                                    <FormItem className="w-full min-w-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">PCB Type</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="h-11 w-full rounded-xl bg-slate-50/60 border-slate-200 text-xs font-bold text-slate-800 focus:bg-white focus:ring-1 focus:ring-primary">
+                                                    <SelectValue placeholder="PCB Type" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Standard Rigid" className="text-xs font-medium cursor-pointer">FR4 Standard</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Get Quote Action Button */}
+                            <div className="w-full">
+                                <Button
+                                    type="submit"
+                                    className="h-11 w-full px-4 bg-primary hover:bg-primary/90 text-white font-extrabold rounded-xl text-xs shadow-md shadow-primary/20 flex items-center justify-center gap-1.5 whitespace-nowrap"
+                                >
+                                    Get Quote <ArrowRight className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </form>
+                    </Form>
+                </div>
+            </section>
+
+            {/* 1.5 FEATURED PRODUCTS */}
+            <FeaturedProducts />
 
             {/* ─── Capabilities Tab Section ─── */}
             <section className="py-24 bg-slate-50 border-y border-slate-100">

@@ -193,26 +193,8 @@ export function Header() {
                             </Link>
                         </nav>
 
-                        {/* Desktop CTAs */}
-                        <div className="hidden lg:flex items-center gap-3 shrink-0">
-                            <Button
-                                asChild
-                                size="default"
-                                className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-md shadow-primary/20"
-                            >
-                                <Link href="/pcb-calculator">PCB Calculator</Link>
-                            </Button>
-                        </div>
-
-                        {/* Mobile: compact CTA + hamburger */}
+                        {/* Mobile hamburger */}
                         <div className="flex lg:hidden items-center gap-2">
-                            <Button
-                                asChild
-                                size="sm"
-                                className="bg-primary text-white text-xs h-8 px-3 font-semibold hidden sm:flex"
-                            >
-                                <Link href="/pcb-calculator">PCB Calculator</Link>
-                            </Button>
                             <button
                                 onClick={() => setMobileOpen(true)}
                                 aria-label="Open menu"

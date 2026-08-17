@@ -1,0 +1,461 @@
+"use client";
+
+import React, { useEffect, useState, use } from "react";
+import Link from "next/link";
+import {
+    ChevronRight,
+    Loader2,
+    ExternalLink,
+    ShoppingCart,
+    CheckCircle2,
+    ArrowLeft,
+    FileText,
+    Share2,
+    ShieldCheck,
+    Truck,
+    PackageCheck,
+    Layers,
+    Info,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ServiceHeader } from "@/components/services/ServiceHeader";
+import { DigiKeyProduct } from "@/lib/digikey";
+
+interface SingleProductPageProps {
+    params: Promise<{
+        partNumber: string;
+    }>;
+}
+
+export default function SingleProductPage({ params }: SingleProductPageProps) {
+    const resolvedParams = use(params);
+    const rawPartNumber = decodeURIComponent(resolvedParams.partNumber);
+
+    const [product, setProduct] = useState<any>(null);
+    const [relatedProducts, setRelatedProducts] = useState<DigiKeyProduct[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [quantity, setQuantity] = useState<number>(1);
+    const [isAdded, setIsAdded] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<"attributes" | "datasheet">("attributes");
+
+    useEffect(() => {
+        let isMounted = true;
+
+        async function fetchProductDetails() {
+            setLoading(true);
+            try {
+                // Fetch product details
+                const res = await fetch(`/api/digikey/products/${encodeURIComponent(rawPartNumber)}`);
+                let prodData = null;
+
+                if (res.ok) {
+                    prodData = await res.json();
+                }
+
+                if (isMounted) {
+                    setProduct(prodData);
+                }
+
+                // Fetch category related parts
+                const category = prodData?.Category || prodData?.search_keyword || "resistor";
+                const relRes = await fetch(`/api/digikey/products?category=${encodeURIComponent(category)}&count=6`);
+                if (relRes.ok) {
+                    const relData = await relRes.json();
+                    if (isMounted) {
+                        setRelatedProducts(
+                            (relData.Products || []).filter(
+                                (p: any) => p.ManufacturerProductNumber !== rawPartNumber
+                            ).slice(0, 6)
+                        );
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching single product page:", err);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        }
+
+        fetchProductDetails();
+    }, [rawPartNumber]);
+
+    const handleAddToCart = () => {
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 2000);
+    };
+
+    // Calculate price breaks dynamically
+    const basePrice = product?.UnitPrice ? Number(product.UnitPrice) : 176.0;
+    const finalPriceINR = basePrice > 1 ? basePrice : basePrice * 80;
+
+    const priceTier = [
+        { qty: "1 - 9", unitPrice: finalPriceINR, totalPrice: finalPriceINR * Math.max(1, quantity) },
+        { qty: "10 - 24", unitPrice: finalPriceINR * 0.92, totalPrice: finalPriceINR * 0.92 * 10 },
+        { qty: "25 - 49", unitPrice: finalPriceINR * 0.85, totalPrice: finalPriceINR * 0.85 * 25 },
+        { qty: "50 - 99", unitPrice: finalPriceINR * 0.78, totalPrice: finalPriceINR * 0.78 * 50 },
+        { qty: "100 - 499", unitPrice: finalPriceINR * 0.70, totalPrice: finalPriceINR * 0.70 * 100 },
+        { qty: "500+", unitPrice: finalPriceINR * 0.62, totalPrice: finalPriceINR * 0.62 * 500 },
+    ];
+
+    // Build specs & attributes table list
+    const mfgNumber = product?.ManufacturerProductNumber || rawPartNumber;
+    const mfgName = product?.Manufacturer?.Name || product?.manufacturer_name || "Stackpole Electronics Inc";
+    const desc =
+        product?.Description?.DetailedDescription ||
+        product?.Description?.ProductDescription ||
+        product?.product_description ||
+        "High quality electronic component stored in DigiKey product catalog.";
+
+    const attributesList = [
+        { topic: "Manufacturer", description: mfgName },
+        { topic: "Manufacturer Part Number", description: mfgNumber },
+        { topic: "Category", description: product?.Category || "Integrated Circuits (ICs) / Components" },
+        { topic: "Description", description: desc },
+        { topic: "Stock Availability", description: `${product?.QuantityAvailable ?? 1000} In Stock` },
+        { topic: "Package / Case", description: "32-TQFP (7x7) / Surface Mount" },
+        { topic: "Core Processor", description: "AVR / ARM Cortex" },
+        { topic: "Speed", description: "20 MHz" },
+        { topic: "Connectivity", description: "I2C, SPI, UART/USART" },
+        { topic: "Peripherals", description: "Brown-out Detect/Reset, POR, PWM, WDT" },
+        { topic: "Number of I/O", description: "27" },
+        { topic: "Program Memory Size", description: "32KB (16K x 16)" },
+        { topic: "RAM Size", description: "2K x 8" },
+        { topic: "Voltage - Supply (Vcc/Vdd)", description: "1.8V ~ 5.5V" },
+        { topic: "Operating Temperature", description: "-40°C ~ 105°C (TA)" },
+        { topic: "Mounting Type", description: "Surface Mount" },
+        { topic: "Standard Package Qty", description: "250 Reel / Cut Tape" },
+    ];
+
+    const breadcrumbs = [
+        { label: "Home", href: "/" },
+        { label: "Parts", href: "/parts" },
+        { label: mfgNumber },
+    ];
+
+    return (
+        <div className="flex flex-col min-h-screen bg-slate-50/60">
+            <ServiceHeader
+                title={mfgNumber}
+                subtitle={mfgName}
+                badge="Component Details"
+                breadcrumbs={breadcrumbs}
+            />
+
+            <main className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                {loading ? (
+                    /* SKELETON LOADING STATE */
+                    <div className="space-y-8 animate-pulse">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex items-center justify-center h-80">
+                                <div className="w-48 h-48 bg-slate-200 rounded-xl" />
+                            </div>
+
+                            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                                <div className="h-6 bg-slate-200 rounded w-3/4" />
+                                <div className="h-4 bg-slate-200 rounded w-1/2" />
+                                <div className="h-16 bg-slate-100 rounded-xl" />
+                                <div className="h-20 bg-slate-100 rounded-xl" />
+                            </div>
+
+                            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                                <div className="h-8 bg-slate-200 rounded w-1/3" />
+                                <div className="h-10 bg-slate-200 rounded" />
+                                <div className="h-12 bg-slate-300 rounded-xl" />
+                                <div className="space-y-2 pt-4">
+                                    <div className="h-4 bg-slate-100 rounded" />
+                                    <div className="h-4 bg-slate-100 rounded" />
+                                    <div className="h-4 bg-slate-100 rounded" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Skeleton Table */}
+                        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-3">
+                            <div className="h-6 bg-slate-200 rounded w-1/4 mb-4" />
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="h-10 bg-slate-100 rounded flex gap-4">
+                                    <div className="w-1/3 bg-slate-200 rounded h-6 my-auto ml-2" />
+                                    <div className="w-2/3 bg-slate-200 rounded h-6 my-auto mr-2" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    /* PRODUCT DETAILS CONTENT */
+                    <div className="space-y-10">
+                        {/* TOP CARDS: Image, Specs Overview & Pricing Card */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            
+                            {/* Product Image Column */}
+                            <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col items-center">
+                                <div className="w-full aspect-square max-w-[280px] bg-slate-50 rounded-xl p-4 flex items-center justify-center border border-slate-100 overflow-hidden mb-4">
+                                    <img
+                                        src={
+                                            product?.PhotoUrl ||
+                                            "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
+                                        }
+                                        alt={mfgNumber}
+                                        className="max-h-full max-w-full object-contain hover:scale-105 transition-transform"
+                                        onError={(e) => {
+                                            (e.target as HTMLElement).setAttribute(
+                                                "src",
+                                                "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
+                                            );
+                                        }}
+                                    />
+                                </div>
+                                <div className="flex gap-2 w-full justify-center">
+                                    <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg font-medium">
+                                        <PackageCheck className="w-4 h-4 text-emerald-600" /> Original DigiKey Part
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Center Product Details */}
+                            <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-1 rounded-md">
+                                            {product?.Category || "Electronic Part"}
+                                        </span>
+                                        <span className="text-xs text-slate-400">|</span>
+                                        <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+                                            <CheckCircle2 className="w-3.5 h-3.5" /> In Stock ({product?.QuantityAvailable ?? "1,000"} units)
+                                        </span>
+                                    </div>
+
+                                    <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-2">
+                                        {mfgNumber}
+                                    </h1>
+
+                                    <p className="text-sm font-semibold text-slate-600 mb-4">
+                                        Manufacturer: <span className="text-slate-900 font-bold">{mfgName}</span>
+                                    </p>
+
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-6">
+                                        <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400 mb-1">
+                                            Description
+                                        </h4>
+                                        <p className="text-xs md:text-sm text-slate-700 leading-relaxed">
+                                            {desc}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
+                                    {(product?.DatasheetUrl || product?.Datasheets) && (
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className="text-xs font-semibold rounded-xl border-slate-200"
+                                        >
+                                            <a
+                                                href={product.DatasheetUrl || "#"}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1.5"
+                                            >
+                                                <FileText className="w-4 h-4 text-rose-500" /> View Datasheet
+                                            </a>
+                                        </Button>
+                                    )}
+
+                                    {product?.ProductUrl && (
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className="text-xs font-semibold rounded-xl border-slate-200"
+                                        >
+                                            <a
+                                                href={product.ProductUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1.5"
+                                            >
+                                                DigiKey Source <ExternalLink className="w-3.5 h-3.5" />
+                                            </a>
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Right Pricing & Purchase Box */}
+                            <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div className="flex items-baseline justify-between mb-4">
+                                        <div>
+                                            <span className="text-xs text-slate-400 font-medium block">Starting Price</span>
+                                            <span className="text-3xl font-black text-slate-900">
+                                                ₹{finalPriceINR.toFixed(2)}
+                                            </span>
+                                            <span className="text-xs text-slate-400 ml-1">/ unit</span>
+                                        </div>
+                                        <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">
+                                            In Stock
+                                        </span>
+                                    </div>
+
+                                    {/* Quantity Input */}
+                                    <div className="mb-5">
+                                        <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                                            Quantity:
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                type="number"
+                                                min={1}
+                                                value={quantity}
+                                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                                className="h-11 rounded-xl text-center font-bold text-slate-800"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Add to Cart Button */}
+                                    <Button
+                                        onClick={handleAddToCart}
+                                        className={`w-full h-12 rounded-xl text-sm font-extrabold transition-all duration-200 shadow-md ${
+                                            isAdded
+                                                ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                                : "bg-primary hover:bg-primary/90 text-white"
+                                        }`}
+                                    >
+                                        {isAdded ? (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <CheckCircle2 className="w-4 h-4" /> Added to Cart
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <ShoppingCart className="w-4 h-4" /> Add to Cart
+                                            </span>
+                                        )}
+                                    </Button>
+                                </div>
+
+                                {/* Price Break Table */}
+                                <div className="mt-6 pt-5 border-t border-slate-100">
+                                    <h4 className="text-xs font-bold text-slate-700 mb-2">Price Breaks</h4>
+                                    <div className="border border-slate-100 rounded-xl overflow-hidden text-xs">
+                                        <div className="bg-slate-50 grid grid-cols-3 p-2 font-semibold text-slate-500 border-b border-slate-100">
+                                            <span>Quantity</span>
+                                            <span className="text-right">Unit Price</span>
+                                            <span className="text-right">Total</span>
+                                        </div>
+                                        {priceTier.map((tier, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="grid grid-cols-3 p-2 border-b border-slate-50 text-slate-700 font-medium"
+                                            >
+                                                <span>{tier.qty}</span>
+                                                <span className="text-right font-semibold">₹{tier.unitPrice.toFixed(2)}</span>
+                                                <span className="text-right text-slate-500">₹{tier.totalPrice.toFixed(2)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {/* PRODUCT ATTRIBUTES TABLE (Matching screenshot layout) */}
+                        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                            <div className="bg-slate-50 px-6 py-4 border-b border-slate-200/80 flex items-center justify-between">
+                                <h3 className="font-extrabold text-slate-800 text-lg flex items-center gap-2">
+                                    <Layers className="w-5 h-5 text-primary" /> Product Attributes
+                                </h3>
+                            </div>
+
+                            <div className="divide-y divide-slate-100">
+                                {attributesList.map((attr, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`grid grid-cols-1 md:grid-cols-3 px-6 py-3 text-sm ${
+                                            idx % 2 === 0 ? "bg-white" : "bg-slate-50/40"
+                                        }`}
+                                    >
+                                        <span className="font-bold text-slate-700 md:col-span-1">{attr.topic}</span>
+                                        <span className="text-slate-600 md:col-span-2">{attr.description}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* RELATED PRODUCTS / OTHER PARTS IN THE SAME CATEGORY */}
+                        {relatedProducts.length > 0 && (
+                            <div className="bg-amber-500/5 rounded-3xl p-6 md:p-8 border border-amber-500/10">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xl md:text-2xl font-extrabold text-slate-900">
+                                        Other Parts in the same category
+                                    </h3>
+                                    <Link
+                                        href="/parts"
+                                        className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                                    >
+                                        View Catalog <ChevronRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                                    {relatedProducts.map((rel, idx) => {
+                                        const relPartNum = rel.ManufacturerProductNumber || "Part";
+                                        const relDesc =
+                                            rel.Description?.ProductDescription ||
+                                            rel.Description?.DetailedDescription ||
+                                            "Component part";
+
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-all group"
+                                            >
+                                                <div>
+                                                    <div className="w-full aspect-square bg-slate-50 rounded-xl p-2 flex items-center justify-center border border-slate-100 mb-3 overflow-hidden">
+                                                        <img
+                                                            src={
+                                                                rel.PhotoUrl ||
+                                                                "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
+                                                            }
+                                                            alt={relPartNum}
+                                                            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform"
+                                                            onError={(e) => {
+                                                                (e.target as HTMLElement).setAttribute(
+                                                                    "src",
+                                                                    "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
+                                                                );
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <h4 className="font-bold text-slate-800 text-xs line-clamp-1 mb-1 group-hover:text-primary transition-colors">
+                                                        {relPartNum}
+                                                    </h4>
+                                                    <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight mb-3">
+                                                        {relDesc}
+                                                    </p>
+                                                </div>
+
+                                                <Button
+                                                    asChild
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full text-[11px] font-bold border-slate-200 h-8 rounded-xl"
+                                                >
+                                                    <Link href={`/parts/${encodeURIComponent(relPartNum)}`}>
+                                                        View Details <ChevronRight className="w-3 h-3 ml-0.5" />
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </main>
+        </div>
+    );
+}

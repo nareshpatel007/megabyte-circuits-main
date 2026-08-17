@@ -114,8 +114,14 @@
   * {
     @apply border-border;
   }
-  body {
+  html {
+    scrollbar-gutter: stable;
+  }
+  body, body[data-scroll-locked] {
     @apply bg-background text-foreground font-sans antialiased;
+    overflow-y: auto !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
