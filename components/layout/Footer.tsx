@@ -37,7 +37,7 @@ const SOCIAL = [
 
 export function Footer() {
     return (
-        <footer className="bg-secondary text-white">
+        <footer className="bg-secondary text-white dark:bg-zinc-950 dark:border-t dark:border-zinc-800">
             {/* ── CTA strip ───────────────────────────────────────────── */}
             <div className="border-b border-white/8 bg-white/3">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

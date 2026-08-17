@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { DigiKeyProduct } from "@/lib/digikey";
 
 // Sample fallback items matching screenshot layout if API is loading or encounters issue
@@ -85,16 +85,16 @@ export function FeaturedProducts() {
     }, []);
 
     return (
-        <section className="py-10 bg-slate-50 border-y border-slate-100">
+        <section className="py-10 bg-slate-50 dark:bg-zinc-900/60 border-y border-slate-100 dark:border-zinc-800 transition-colors">
             <div className="section-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
                         Featured Products
                     </h2>
                     <Link
                         href="/parts"
-                        className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors gap-0.5"
+                        className="inline-flex items-center text-sm font-semibold text-primary dark:text-emerald-400 hover:underline transition-colors gap-0.5"
                     >
                         Explore Products <ChevronRight className="w-4 h-4" />
                     </Link>
@@ -102,9 +102,26 @@ export function FeaturedProducts() {
 
                 {/* Grid */}
                 {loading ? (
-                    <div className="flex items-center justify-center py-16">
-                        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                        <span className="ml-2 text-sm text-slate-500 font-medium">Loading featured products...</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        {[1, 2, 3, 4].map((item) => (
+                            <div
+                                key={item}
+                                className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-100 dark:border-zinc-800 shadow-sm flex flex-col justify-between animate-pulse"
+                            >
+                                <div className="flex items-start gap-3">
+                                    {/* Skeleton Thumbnail */}
+                                    <div className="w-20 h-20 shrink-0 bg-slate-200 dark:bg-zinc-800 rounded-lg" />
+
+                                    {/* Skeleton Product Details */}
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-3/4" />
+                                        <div className="h-3 bg-slate-200 dark:bg-zinc-800 rounded w-full" />
+                                        <div className="h-3 bg-slate-200 dark:bg-zinc-800 rounded w-5/6" />
+                                        <div className="h-3 bg-slate-200 dark:bg-zinc-800 rounded w-1/2 pt-1" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -122,13 +139,13 @@ export function FeaturedProducts() {
                             return (
                                 <div
                                     key={idx}
-                                    className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between relative group"
+                                    className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between relative group"
                                 >
                                     <div>
                                         {/* Content row with image & details */}
                                         <div className="flex items-start gap-3">
                                             {/* Image */}
-                                            <div className="w-20 h-20 shrink-0 bg-slate-50 rounded-lg flex items-center justify-center overflow-hidden p-1 border border-slate-100">
+                                            <div className="w-20 h-20 shrink-0 bg-slate-50 dark:bg-zinc-800 rounded-lg flex items-center justify-center overflow-hidden p-1 border border-slate-100 dark:border-zinc-700">
                                                 <img
                                                     src={imageUrl}
                                                     alt={title}
@@ -143,15 +160,15 @@ export function FeaturedProducts() {
                                             <div className="flex-1 min-w-0">
                                                 <Link
                                                     href={`/parts/${encodeURIComponent(title)}`}
-                                                    className="font-bold text-blue-600 hover:text-blue-800 text-sm leading-tight line-clamp-1 block mb-1"
+                                                    className="font-bold text-primary dark:text-emerald-400 hover:underline text-sm leading-tight line-clamp-1 block mb-1"
                                                 >
                                                     {title}
                                                 </Link>
-                                                <p className="text-xs text-slate-500 leading-snug line-clamp-3 mb-3">
+                                                <p className="text-xs text-slate-500 dark:text-zinc-400 leading-snug line-clamp-3 mb-3">
                                                     {description}
                                                 </p>
-                                                <p className="text-xs font-semibold text-slate-800">
-                                                    Price: <span className="font-bold text-slate-900">{price}</span>
+                                                <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200">
+                                                    Price: <span className="font-bold text-slate-900 dark:text-white">{price}</span>
                                                 </p>
                                             </div>
                                         </div>

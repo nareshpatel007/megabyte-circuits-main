@@ -355,13 +355,13 @@ export default function Home() {
 
             {/* 1.2 INSTANT PCB QUOTE WIDGET */}
             <section className="relative z-20 -mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/90 shadow-2xl shadow-slate-900/10">
-                    <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+                <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 border border-slate-200/90 dark:border-zinc-800 shadow-2xl shadow-slate-900/10">
+                    <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-zinc-800">
                         <div>
-                            <span className="text-xs font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-md">
+                            <span className="text-xs font-black uppercase tracking-widest text-primary dark:text-emerald-400 bg-primary/10 dark:bg-emerald-950/50 px-3 py-1 rounded-md">
                                 Instant Online Quote
                             </span>
-                            <h3 className="text-xl md:text-2xl font-black text-slate-900 mt-1">
+                            <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mt-1">
                                 Calculate PCB Price Instantly
                             </h3>
                         </div>
