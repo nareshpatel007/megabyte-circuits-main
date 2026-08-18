@@ -485,6 +485,9 @@ export default function Home() {
                                             </FormControl>
                                             <SelectContent>
                                                 <SelectItem value="Standard Rigid" className="text-xs font-medium cursor-pointer">FR4 Standard</SelectItem>
+                                                <SelectItem value="Flex" className="text-xs font-medium cursor-pointer">Flex</SelectItem>
+                                                <SelectItem value="Rogers" className="text-xs font-medium cursor-pointer">Rogers</SelectItem>
+                                                <SelectItem value="PTFE Teflon" className="text-xs font-medium cursor-pointer">PTFE Taflon</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </FormItem>
@@ -987,10 +990,10 @@ export default function Home() {
                                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                             <FormControl><SelectTrigger className="h-10"><SelectValue /></SelectTrigger></FormControl>
                                                             <SelectContent>
-                                                                <SelectItem value="Standard Rigid">Standard Rigid</SelectItem>
-                                                                <SelectItem value="Flexible PCB">Flexible PCB</SelectItem>
-                                                                <SelectItem value="Rigid-Flex PCB">Rigid-Flex PCB</SelectItem>
-                                                                <SelectItem value="Metal Core PCB">Metal Core PCB</SelectItem>
+                                                                <SelectItem value="Standard Rigid">FR4 Standard</SelectItem>
+                                                                <SelectItem value="Flex">Flex</SelectItem>
+                                                                <SelectItem value="Rogers">Rogers</SelectItem>
+                                                                <SelectItem value="PTFE Teflon">PTFE Taflon</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                         <FormMessage />
