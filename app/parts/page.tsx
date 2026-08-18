@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DigiKeyProduct } from "@/lib/digikey";
+import { saveCartToBackend } from "@/lib/cartSession";
 
 interface CategoryCount {
     name: string;
@@ -90,11 +91,85 @@ export default function PartsPage() {
         }
     };
 
-    const handleAddToCart = (productNumber: string) => {
-        setAddedCartIds((prev) => ({ ...prev, [productNumber]: true }));
-        setTimeout(() => {
-            setAddedCartIds((prev) => ({ ...prev, [productNumber]: false }));
-        }, 2000);
+    const [cartPartNumbers, setCartPartNumbers] = useState<string[]>([]);
+
+    const updateCartPartNumbers = () => {
+        try {
+            const savedCart = localStorage.getItem("megabyte_cart");
+            if (savedCart) {
+                const items: any[] = JSON.parse(savedCart);
+                const partNums = items
+                    .filter((item) => item.productType === "part" && item.partNumber)
+                    .map((item) => item.partNumber);
+                setCartPartNumbers(partNums);
+            } else {
+                setCartPartNumbers([]);
+            }
+        } catch {
+            setCartPartNumbers([]);
+        }
+    };
+
+    useEffect(() => {
+        updateCartPartNumbers();
+        const handleCartUpdate = () => updateCartPartNumbers();
+        window.addEventListener("megabyte_cart_updated", handleCartUpdate);
+        window.addEventListener("storage", handleCartUpdate);
+        return () => {
+            window.removeEventListener("megabyte_cart_updated", handleCartUpdate);
+            window.removeEventListener("storage", handleCartUpdate);
+        };
+    }, []);
+
+    const handleAddToCart = async (product: DigiKeyProduct) => {
+        const partNum = product.ManufacturerProductNumber || "Part";
+        const desc = product.Description?.DetailedDescription || product.Description?.ProductDescription || "High quality component";
+        const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
+        const rawUnitPrice = product.UnitPrice ? (product.UnitPrice > 1 ? product.UnitPrice : product.UnitPrice * 80) : 10;
+        const unitPrice = Math.round(rawUnitPrice * 100) / 100;
+
+        try {
+            const savedCart = localStorage.getItem("megabyte_cart");
+            let items: any[] = savedCart ? JSON.parse(savedCart) : [];
+
+            // Check if product already exists in cart
+            const existingIndex = items.findIndex(
+                (item) => item.productType === "part" && item.partNumber === partNum
+            );
+
+            if (existingIndex > -1) {
+                // Increment quantity by 1
+                const newQty = (items[existingIndex].qty || 1) + 1;
+                const newPrice = Math.round(unitPrice * newQty * 100) / 100;
+                items[existingIndex] = {
+                    ...items[existingIndex],
+                    qty: newQty,
+                    price: newPrice,
+                    unitPrice: unitPrice,
+                    photoUrl: imageUrl,
+                };
+            } else {
+                // Add new part item with quantity 1
+                const newItem = {
+                    id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+                    productType: "part",
+                    boardName: partNum,
+                    partNumber: partNum,
+                    description: desc,
+                    photoUrl: imageUrl,
+                    qty: 1,
+                    unitPrice: unitPrice,
+                    price: unitPrice,
+                    date: new Date().toISOString().split("T")[0],
+                };
+                items.push(newItem);
+            }
+
+            await saveCartToBackend(items);
+            updateCartPartNumbers();
+        } catch (e) {
+            console.error("Failed to add part to cart:", e);
+        }
     };
 
     return (
@@ -245,7 +320,7 @@ export default function PartsPage() {
                                             ? `₹${(product.UnitPrice > 1 ? product.UnitPrice : product.UnitPrice * 80).toFixed(2)}`
                                             : "₹10.00";
                                         const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
-                                        const isAdded = addedCartIds[partNum];
+                                        const isAdded = cartPartNumbers.includes(partNum);
 
                                         return (
                                             <div
@@ -253,15 +328,6 @@ export default function PartsPage() {
                                                 className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
                                             >
                                                 <div>
-                                                    {/* Category badge */}
-                                                    <div className="flex items-center justify-end text-xs text-slate-400 mb-3">
-                                                        {product.Category && (
-                                                            <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-md capitalize">
-                                                                {product.Category}
-                                                            </span>
-                                                        )}
-                                                    </div>
-
                                                     {/* Photo & Main Details */}
                                                     <div className="flex gap-3 mb-4">
                                                         <div className="w-20 h-20 bg-slate-50 rounded-xl p-1.5 flex items-center justify-center shrink-0 border border-slate-100 overflow-hidden">
@@ -309,25 +375,27 @@ export default function PartsPage() {
                                                         </Link>
                                                     </Button>
 
-                                                    <Button
-                                                        onClick={() => handleAddToCart(partNum)}
-                                                        size="sm"
-                                                        className={`w-full text-xs font-bold h-9 transition-colors ${
-                                                            isAdded
-                                                                ? "bg-green-600 text-white hover:bg-green-700"
-                                                                : "bg-primary text-white hover:bg-primary/90"
-                                                        }`}
-                                                    >
-                                                        {isAdded ? (
+                                                    {isAdded ? (
+                                                        <Button
+                                                            disabled
+                                                            size="sm"
+                                                            className="w-full text-xs font-bold h-9 bg-green-600/90 text-white cursor-default opacity-100"
+                                                        >
                                                             <span className="flex items-center gap-1">
                                                                 <CheckCircle2 className="w-3.5 h-3.5" /> Added
                                                             </span>
-                                                        ) : (
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            onClick={() => handleAddToCart(product)}
+                                                            size="sm"
+                                                            className="w-full text-xs font-bold h-9 bg-primary text-white hover:bg-primary/90 transition-colors"
+                                                        >
                                                             <span className="flex items-center gap-1">
                                                                 <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
                                                             </span>
-                                                        )}
-                                                    </Button>
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </div>
                                         );

@@ -265,7 +265,7 @@ export function Header() {
 
                             {/* Login / Register Button (Matching Quote Site) */}
                             <a
-                                href="https://quote.megabytecircuit.com/login"
+                                href={`${process.env.NEXT_PUBLIC_QUOTE_URL || "https://quote.megabytecircuit.com"}/login`}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs sm:text-sm font-bold shadow-md shadow-primary/20 transition-all cursor-pointer active:scale-95 shrink-0"
                             >
                                 <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

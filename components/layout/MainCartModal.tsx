@@ -3,19 +3,24 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { X, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
+import { loadCartFromBackend, removeCartItemFromBackend } from "@/lib/cartSession";
 
 interface CartItem {
     id: string;
-    productType: "pcb" | "stencil";
-    boardName: string;
-    layers: string;
-    dimensions: string;
-    qty: number;
-    buildTime: string;
-    price: number;
-    material: string;
-    thickness: string;
-    date: string;
+    productType?: "pcb" | "stencil" | "part";
+    boardName?: string;
+    partNumber?: string;
+    description?: string;
+    photoUrl?: string;
+    layers?: string;
+    dimensions?: string;
+    qty?: number;
+    buildTime?: string;
+    price?: number;
+    unitPrice?: number;
+    material?: string;
+    thickness?: string;
+    date?: string;
 }
 
 interface MainCartModalProps {
@@ -26,16 +31,12 @@ interface MainCartModalProps {
 export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-    const loadCart = () => {
+    const loadCart = async () => {
         try {
-            const savedCart = localStorage.getItem("megabyte_cart");
-            if (savedCart) {
-                setCartItems(JSON.parse(savedCart));
-            } else {
-                setCartItems([]);
-            }
+            const items = await loadCartFromBackend();
+            setCartItems(items || []);
         } catch (e) {
-            console.error("Failed to load cart from localStorage", e);
+            console.error("Failed to load cart", e);
         }
     };
 
@@ -46,7 +47,19 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
     }, [isOpen]);
 
     useEffect(() => {
-        const handleCartUpdate = () => loadCart();
+        const handleCartUpdate = () => {
+            const savedCart = localStorage.getItem("megabyte_cart");
+            if (savedCart) {
+                try {
+                    setCartItems(JSON.parse(savedCart));
+                } catch {
+                    setCartItems([]);
+                }
+            } else {
+                setCartItems([]);
+            }
+        };
+
         window.addEventListener("megabyte_cart_updated", handleCartUpdate);
         window.addEventListener("storage", handleCartUpdate);
         return () => {
@@ -55,13 +68,11 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
         };
     }, []);
 
-    const handleRemoveItem = (id: string, e: React.MouseEvent) => {
+    const handleRemoveItem = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
         try {
-            const updated = cartItems.filter((item) => item.id !== id);
-            localStorage.setItem("megabyte_cart", JSON.stringify(updated));
+            const updated = await removeCartItemFromBackend(id);
             setCartItems(updated);
-            window.dispatchEvent(new Event("megabyte_cart_updated"));
         } catch (e) {
             console.error("Failed to remove item", e);
         }
@@ -117,7 +128,7 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
                                 Your cart is empty
                             </p>
                             <p className="text-[11px] text-gray-400 dark:text-zinc-500 mt-1">
-                                Calculate your custom PCB quote to get started!
+                                Add electronic parts or PCB quotes to get started!
                             </p>
                         </div>
                     ) : (
@@ -126,23 +137,57 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
                                 key={item.id}
                                 className="p-3 hover:bg-gray-50/80 dark:hover:bg-zinc-800/50 rounded-xl transition-colors group relative flex items-start justify-between gap-3"
                             >
+                                <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/60 flex items-center justify-center shrink-0 p-1 overflow-hidden">
+                                    <img
+                                        src={item.photoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"}
+                                        alt={item.partNumber || item.boardName || "Product"}
+                                        className="w-full h-full object-contain"
+                                        onError={(e) => {
+                                            (e.target as HTMLElement).setAttribute(
+                                                "src",
+                                                "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
+                                            );
+                                        }}
+                                    />
+                                </div>
+
                                 <div className="space-y-1 flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                         <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
                                             {item.productType || "PCB"}
                                         </span>
                                         <h3 className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                                            {item.boardName || "Custom PCB"}
+                                            {item.boardName || item.partNumber || "Custom PCB"}
                                         </h3>
                                     </div>
-                                    <p className="text-[11px] text-gray-500 dark:text-zinc-400 leading-tight">
-                                        {item.layers} Layer | {item.dimensions} | Qty: {item.qty}
-                                    </p>
-                                    <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-zinc-500">
-                                        <span>{item.material}</span>
-                                        <span>•</span>
-                                        <span>{item.thickness}</span>
-                                    </div>
+                                    
+                                    {item.productType === "part" ? (
+                                        <>
+                                            {item.description && (
+                                                <p className="text-[11px] text-gray-500 dark:text-zinc-400 leading-tight line-clamp-1">
+                                                    {item.description}
+                                                </p>
+                                            )}
+                                            <p className="text-[10px] text-gray-400 dark:text-zinc-500 font-medium">
+                                                Qty: {item.qty || 1}
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="text-[11px] text-gray-500 dark:text-zinc-400 leading-tight">
+                                                {item.layers} Layer | {item.dimensions} | Qty: {item.qty}
+                                            </p>
+                                            <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-zinc-500">
+                                                <span>{item.material}</span>
+                                                {item.thickness && (
+                                                    <>
+                                                        <span>•</span>
+                                                        <span>{item.thickness}</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
                                     <p className="text-xs font-extrabold text-primary dark:text-emerald-400 pt-0.5">
                                         ₹{item.price ? item.price.toLocaleString("en-IN") : "0"}
                                     </p>
@@ -171,7 +216,7 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
                             </span>
                         </div>
                         <a
-                            href="https://quote.megabytecircuit.com/cart"
+                            href={`${process.env.NEXT_PUBLIC_QUOTE_URL || "https://quote.megabytecircuit.com"}/cart`}
                             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-md shadow-primary/20 transition-all cursor-pointer active:scale-98"
                         >
                             <span>Go to Quote Cart & Checkout</span>
