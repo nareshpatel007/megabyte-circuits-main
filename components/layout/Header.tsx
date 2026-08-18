@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { MainCartModal } from "./MainCartModal";
+import { loadCartFromBackend } from "@/lib/cartSession";
 
 const ABOUT_LINKS = [
     { label: "About Us", href: "/about-us" },
@@ -70,6 +71,7 @@ export function Header() {
     };
 
     React.useEffect(() => {
+        loadCartFromBackend().then(() => updateCartCount());
         updateCartCount();
         const handleCartUpdate = () => updateCartCount();
         const handleClickOutside = (event: MouseEvent) => {
@@ -96,6 +98,7 @@ export function Header() {
 
     React.useEffect(() => {
         setMobileOpen(false);
+        loadCartFromBackend().then(() => updateCartCount());
     }, [location]);
 
     React.useEffect(() => {
