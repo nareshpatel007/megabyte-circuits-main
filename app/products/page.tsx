@@ -6,6 +6,7 @@ import { Search, Loader2, ExternalLink, ShoppingCart, Info, CheckCircle2, Chevro
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DigiKeyProduct } from "@/lib/digikey";
+import { saveCartToBackend } from "@/lib/cartSession";
 
 interface CategoryCount {
     name: string;
@@ -53,11 +54,55 @@ export default function PartsPage() {
         setActiveQuery(searchQuery.trim());
     };
 
-    const handleAddToCart = (productNumber: string) => {
-        setAddedCartIds((prev) => ({ ...prev, [productNumber]: true }));
-        setTimeout(() => {
-            setAddedCartIds((prev) => ({ ...prev, [productNumber]: false }));
-        }, 2000);
+    const handleAddToCart = async (product: DigiKeyProduct) => {
+        const partNum = product.ManufacturerProductNumber || "Part";
+        const desc = product.Description?.DetailedDescription || product.Description?.ProductDescription || "High quality component";
+        const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
+        const rawUnitPrice = product.UnitPrice ? (product.UnitPrice > 1 ? product.UnitPrice : product.UnitPrice * 80) : 10;
+        const unitPrice = Math.round(rawUnitPrice * 100) / 100;
+
+        try {
+            const savedCart = localStorage.getItem("megabyte_cart");
+            let items: any[] = savedCart ? JSON.parse(savedCart) : [];
+
+            const existingIndex = items.findIndex(
+                (item) => item.productType === "part" && item.partNumber === partNum
+            );
+
+            if (existingIndex > -1) {
+                const newQty = (items[existingIndex].qty || 1) + 1;
+                const newPrice = Math.round(unitPrice * newQty * 100) / 100;
+                items[existingIndex] = {
+                    ...items[existingIndex],
+                    qty: newQty,
+                    price: newPrice,
+                    unitPrice: unitPrice,
+                    photoUrl: imageUrl,
+                };
+            } else {
+                const newItem = {
+                    id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+                    productType: "part",
+                    boardName: partNum,
+                    partNumber: partNum,
+                    description: desc,
+                    photoUrl: imageUrl,
+                    qty: 1,
+                    unitPrice: unitPrice,
+                    price: unitPrice,
+                    date: new Date().toISOString().split("T")[0],
+                };
+                items.push(newItem);
+            }
+
+            await saveCartToBackend(items);
+            setAddedCartIds((prev) => ({ ...prev, [partNum]: true }));
+            setTimeout(() => {
+                setAddedCartIds((prev) => ({ ...prev, [partNum]: false }));
+            }, 2000);
+        } catch (e) {
+            console.error("Failed to add part to cart:", e);
+        }
     };
 
     const totalProductCount = products.length;
@@ -246,7 +291,7 @@ export default function PartsPage() {
                                                 </Button>
 
                                                 <Button
-                                                    onClick={() => handleAddToCart(partNum)}
+                                                    onClick={() => handleAddToCart(product)}
                                                     size="sm"
                                                     className={`w-full text-xs font-bold h-9 transition-colors ${
                                                         isAdded

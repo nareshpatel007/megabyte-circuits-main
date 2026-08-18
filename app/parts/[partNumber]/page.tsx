@@ -16,11 +16,14 @@ import {
     PackageCheck,
     Layers,
     Info,
+    Plus,
+    Minus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
 import { DigiKeyProduct } from "@/lib/digikey";
+import { saveCartToBackend } from "@/lib/cartSession";
 
 interface SingleProductPageProps {
     params: Promise<{
@@ -80,9 +83,52 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
         fetchProductDetails();
     }, [rawPartNumber]);
 
-    const handleAddToCart = () => {
-        setIsAdded(true);
-        setTimeout(() => setIsAdded(false), 2000);
+    const handleAddToCart = async () => {
+        const partNum = mfgNumber;
+        const imageUrl = product?.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
+        const unitPrice = Math.round(currentUnitPrice * 100) / 100;
+        const addQty = Math.max(1, quantity);
+
+        try {
+            const savedCart = localStorage.getItem("megabyte_cart");
+            let items: any[] = savedCart ? JSON.parse(savedCart) : [];
+
+            const existingIndex = items.findIndex(
+                (item) => item.productType === "part" && item.partNumber === partNum
+            );
+
+            if (existingIndex > -1) {
+                const newQty = (items[existingIndex].qty || 1) + addQty;
+                const newPrice = Math.round(unitPrice * newQty * 100) / 100;
+                items[existingIndex] = {
+                    ...items[existingIndex],
+                    qty: newQty,
+                    price: newPrice,
+                    unitPrice: unitPrice,
+                    photoUrl: imageUrl,
+                };
+            } else {
+                const newItem = {
+                    id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+                    productType: "part",
+                    boardName: partNum,
+                    partNumber: partNum,
+                    description: desc,
+                    photoUrl: imageUrl,
+                    qty: addQty,
+                    unitPrice: unitPrice,
+                    price: Math.round(unitPrice * addQty * 100) / 100,
+                    date: new Date().toISOString().split("T")[0],
+                };
+                items.push(newItem);
+            }
+
+            await saveCartToBackend(items);
+            setIsAdded(true);
+            setTimeout(() => setIsAdded(false), 2000);
+        } catch (e) {
+            console.error("Failed to add part to cart:", e);
+        }
     };
 
     // Calculate price breaks dynamically
@@ -112,7 +158,7 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
 
     // Build specs & attributes table list
     const mfgNumber = product?.ManufacturerProductNumber || rawPartNumber;
-    const mfgName = product?.Manufacturer?.Name || product?.manufacturer_name || "Stackpole Electronics Inc";
+    const mfgName = product?.Manufacturer?.Name || product?.manufacturer_name || "";
     const desc =
         product?.Description?.DetailedDescription ||
         product?.Description?.ProductDescription ||
@@ -313,14 +359,30 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                         <label className="text-xs font-bold text-slate-700 block mb-1.5">
                                             Quantity:
                                         </label>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11">
+                                            <button
+                                                type="button"
+                                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
+                                                title="Decrease quantity"
+                                            >
+                                                <Minus className="w-4 h-4" />
+                                            </button>
                                             <Input
                                                 type="number"
                                                 min={1}
                                                 value={quantity}
                                                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                                className="h-11 rounded-xl text-center font-bold text-slate-800"
+                                                className="h-full border-0 focus-visible:ring-0 rounded-none text-center font-extrabold text-slate-800 bg-transparent text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={() => setQuantity(quantity + 1)}
+                                                className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
+                                                title="Increase quantity"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </div>
 

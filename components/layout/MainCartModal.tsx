@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { X, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
-import { loadCartFromBackend, removeCartItemFromBackend } from "@/lib/cartSession";
+import { loadCartFromBackend, removeCartItemFromBackend, getOrCreateCartSessionId } from "@/lib/cartSession";
 
 interface CartItem {
     id: string;
@@ -216,7 +216,7 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
                             </span>
                         </div>
                         <a
-                            href={`${process.env.NEXT_PUBLIC_QUOTE_URL || "https://quote.megabytecircuit.com"}/cart`}
+                            href={`${process.env.NEXT_PUBLIC_QUOTE_URL || "https://quote.megabytecircuit.com"}/cart?session_id=${encodeURIComponent(getOrCreateCartSessionId())}`}
                             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-md shadow-primary/20 transition-all cursor-pointer active:scale-98"
                         >
                             <span>Go to Quote Cart & Checkout</span>
