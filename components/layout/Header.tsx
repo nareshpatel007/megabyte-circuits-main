@@ -51,6 +51,7 @@ export function Header() {
     const [servicesHover, setServicesHover] = React.useState(false);
     const [isCartOpen, setIsCartOpen] = React.useState(false);
     const [cartCount, setCartCount] = React.useState(0);
+    const cartRef = React.useRef<HTMLDivElement>(null);
 
     const location = usePathname();
 
@@ -71,11 +72,19 @@ export function Header() {
     React.useEffect(() => {
         updateCartCount();
         const handleCartUpdate = () => updateCartCount();
+        const handleClickOutside = (event: MouseEvent) => {
+            if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
+                setIsCartOpen(false);
+            }
+        };
+
         window.addEventListener("megabyte_cart_updated", handleCartUpdate);
         window.addEventListener("storage", handleCartUpdate);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
             window.removeEventListener("megabyte_cart_updated", handleCartUpdate);
             window.removeEventListener("storage", handleCartUpdate);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
 
@@ -245,7 +254,7 @@ export function Header() {
                             <ThemeToggle />
 
                             {/* Cart Icon & Modal */}
-                            <div className="relative">
+                            <div ref={cartRef} className="relative">
                                 <button
                                     type="button"
                                     onClick={() => setIsCartOpen(!isCartOpen)}

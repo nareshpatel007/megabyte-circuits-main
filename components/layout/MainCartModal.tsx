@@ -78,6 +78,28 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
         }
     };
 
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+            const target = e.target as HTMLElement;
+            if (target && !target.closest('.cart-modal-container') && !target.closest('button[title="Shopping Cart"]')) {
+                onClose();
+            }
+        };
+
+        const timer = setTimeout(() => {
+            document.addEventListener("mousedown", handleOutsideClick);
+            document.addEventListener("touchstart", handleOutsideClick);
+        }, 0);
+
+        return () => {
+            clearTimeout(timer);
+            document.removeEventListener("mousedown", handleOutsideClick);
+            document.removeEventListener("touchstart", handleOutsideClick);
+        };
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     const merchandiseTotal = cartItems.reduce((acc, item) => acc + (item.price || 0), 0);
@@ -88,7 +110,7 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
             <div className="fixed inset-0 z-40" onClick={onClose} />
 
             {/* Cart Dropdown Modal */}
-            <div className="absolute right-0 top-full mt-2.5 z-50 w-80 sm:w-96 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200/90 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="cart-modal-container absolute right-0 top-full mt-2.5 z-50 w-80 sm:w-96 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200/90 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in slide-in-from-top-2 duration-200">
                 {/* Triangle indicator */}
                 <div className="absolute top-0 right-4 -mt-1.5 w-3 h-3 bg-white dark:bg-zinc-900 border-t border-l border-gray-200/90 dark:border-zinc-800 rotate-45 z-10" />
 
@@ -153,14 +175,11 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
 
                                 <div className="space-y-1 flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
-                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
-                                            {item.productType || "PCB"}
-                                        </span>
                                         <h3 className="text-xs font-bold text-gray-900 dark:text-white truncate">
                                             {item.boardName || item.partNumber || "Custom PCB"}
                                         </h3>
                                     </div>
-                                    
+
                                     {item.productType === "part" ? (
                                         <>
                                             {item.description && (
@@ -219,7 +238,7 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
                             href={`${process.env.NEXT_PUBLIC_QUOTE_URL || "https://quote.megabytecircuit.com"}/cart?session_id=${encodeURIComponent(getOrCreateCartSessionId())}`}
                             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-md shadow-primary/20 transition-all cursor-pointer active:scale-98"
                         >
-                            <span>Go to Quote Cart & Checkout</span>
+                            <span>Go to Cart & Checkout</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                         </a>
                     </div>
