@@ -398,15 +398,15 @@ export default function Home() {
                                 const quoteBase = process.env.NEXT_PUBLIC_QUOTE_URL || "http://localhost:3001";
                                 window.location.href = `${quoteBase.replace(/\/$/, "")}/?${query}`;
                             }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 items-end gap-3 w-full"
+                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 items-end gap-3 w-full"
                         >
                             {/* Layers */}
                             <FormField
                                 control={form.control}
                                 name="layers"
                                 render={({ field }) => (
-                                    <FormItem className="w-full min-w-0">
-                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Layers</FormLabel>
+                                    <FormItem className="w-full min-w-0 space-y-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1.5 h-4 leading-4 whitespace-nowrap">Layers</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={String(field.value)}>
                                             <FormControl>
                                                 <SelectTrigger className="h-11 w-full rounded-xl bg-slate-50/60 border-slate-200 text-xs font-bold text-slate-800 focus:bg-white focus:ring-1 focus:ring-primary">
@@ -430,8 +430,8 @@ export default function Home() {
                                 control={form.control}
                                 name="boardWidth"
                                 render={({ field }) => (
-                                    <FormItem className="w-full min-w-0">
-                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Width (mm)</FormLabel>
+                                    <FormItem className="w-full min-w-0 space-y-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1.5 h-4 leading-4 whitespace-nowrap">Width (mm)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -449,8 +449,8 @@ export default function Home() {
                                 control={form.control}
                                 name="boardHeight"
                                 render={({ field }) => (
-                                    <FormItem className="w-full min-w-0">
-                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Height (mm)</FormLabel>
+                                    <FormItem className="w-full min-w-0 space-y-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1.5 h-4 leading-4 whitespace-nowrap">Height (mm)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -468,8 +468,8 @@ export default function Home() {
                                 control={form.control}
                                 name="quantity"
                                 render={({ field }) => (
-                                    <FormItem className="w-full min-w-0">
-                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">Quantity (pcs)</FormLabel>
+                                    <FormItem className="w-full min-w-0 space-y-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1.5 h-4 leading-4 whitespace-nowrap">Quantity (pcs)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -487,8 +487,8 @@ export default function Home() {
                                 control={form.control}
                                 name="pcbType"
                                 render={({ field }) => (
-                                    <FormItem className="w-full min-w-0">
-                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1">PCB Type</FormLabel>
+                                    <FormItem className="w-full min-w-0 space-y-0">
+                                        <FormLabel className="text-xs font-bold text-slate-700 block mb-1.5 h-4 leading-4 whitespace-nowrap">PCB Type</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
                                                 <SelectTrigger className="h-11 w-full rounded-xl bg-slate-50/60 border-slate-200 text-xs font-bold text-slate-800 focus:bg-white focus:ring-1 focus:ring-primary">
@@ -507,7 +507,8 @@ export default function Home() {
                             />
 
                             {/* Get Quote Action Button */}
-                            <div className="w-full">
+                            <div className="w-full space-y-0">
+                                <span className="text-xs font-bold block mb-1.5 h-4 leading-4 invisible select-none" aria-hidden="true">&nbsp;</span>
                                 <Button
                                     type="submit"
                                     className="h-11 w-full px-4 bg-primary hover:bg-primary/90 text-white font-extrabold rounded-xl text-xs shadow-md shadow-primary/20 flex items-center justify-center gap-1.5 whitespace-nowrap"
@@ -900,14 +901,7 @@ export default function Home() {
                                 <p className="text-muted-foreground leading-relaxed mb-8">
                                     Our state-of-the-art facility manufactures boards that meet the strictest aerospace, medical, and automotive standards — from single-layer prototypes to 32-layer HDI production boards.
                                 </p>
-                                <div className="flex gap-4 flex-wrap">
-                                    <Button className="bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20">
-                                        Download Capability PDF
-                                    </Button>
-                                    <Button variant="outline" asChild className="border-secondary/20 text-secondary hover:bg-gray-50">
-                                        <Link href="/why-us">View All Specs</Link>
-                                    </Button>
-                                </div>
+
                             </motion.div>
 
                             {/* Right – capability table */}

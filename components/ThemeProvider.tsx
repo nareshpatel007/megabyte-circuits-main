@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import { Sun, Moon, Monitor, Check } from "lucide-react";
 import {
     DropdownMenu,
@@ -10,12 +9,113 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+type Theme = "dark" | "light" | "system";
+
+interface ThemeProviderProps {
+    children: React.ReactNode;
+    defaultTheme?: Theme;
+    storageKey?: string;
+    attribute?: string;
+    enableSystem?: boolean;
+}
+
+interface ThemeProviderState {
+    theme: Theme;
+    setTheme: (theme: Theme) => void;
+    resolvedTheme: "dark" | "light";
+    systemTheme?: "dark" | "light";
+    themes: string[];
+}
+
+const initialState: ThemeProviderState = {
+    theme: "light",
+    setTheme: () => null,
+    resolvedTheme: "light",
+    systemTheme: "light",
+    themes: ["light", "dark", "system"],
+};
+
+const ThemeProviderContext = React.createContext<ThemeProviderState>(initialState);
+
 export function ThemeProvider({
     children,
-    ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
-    return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+    defaultTheme = "light",
+    storageKey = "theme",
+    enableSystem = true,
+}: ThemeProviderProps) {
+    const [theme, setThemeState] = React.useState<Theme>(defaultTheme);
+    const [resolvedTheme, setResolvedTheme] = React.useState<"dark" | "light">("light");
+
+    React.useEffect(() => {
+        const savedTheme = (localStorage.getItem(storageKey) as Theme) || defaultTheme;
+        setThemeState(savedTheme);
+    }, [defaultTheme, storageKey]);
+
+    React.useEffect(() => {
+        const root = document.documentElement;
+
+        const updateTheme = () => {
+            let currentResolved: "dark" | "light" = "light";
+            if (theme === "system" && enableSystem) {
+                currentResolved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            } else if (theme === "dark") {
+                currentResolved = "dark";
+            } else {
+                currentResolved = "light";
+            }
+
+            setResolvedTheme(currentResolved);
+
+            root.classList.remove("light", "dark");
+            root.classList.add(currentResolved);
+            root.style.colorScheme = currentResolved;
+        };
+
+        updateTheme();
+
+        if (theme === "system" && enableSystem) {
+            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+            const handleChange = () => updateTheme();
+            mediaQuery.addEventListener("change", handleChange);
+            return () => mediaQuery.removeEventListener("change", handleChange);
+        }
+    }, [theme, enableSystem]);
+
+    const setTheme = React.useCallback(
+        (newTheme: Theme) => {
+            try {
+                localStorage.setItem(storageKey, newTheme);
+            } catch (e) {}
+            setThemeState(newTheme);
+        },
+        [storageKey]
+    );
+
+    const value = React.useMemo(
+        () => ({
+            theme,
+            setTheme,
+            resolvedTheme,
+            systemTheme: resolvedTheme,
+            themes: ["light", "dark", "system"],
+        }),
+        [theme, setTheme, resolvedTheme]
+    );
+
+    return (
+        <ThemeProviderContext.Provider value={value}>
+            {children}
+        </ThemeProviderContext.Provider>
+    );
 }
+
+export const useTheme = () => {
+    const context = React.useContext(ThemeProviderContext);
+    if (!context) {
+        throw new Error("useTheme must be used within a ThemeProvider");
+    }
+    return context;
+};
 
 export function ThemeToggle() {
     const { theme, setTheme, resolvedTheme } = useTheme();
