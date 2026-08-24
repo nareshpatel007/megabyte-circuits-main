@@ -118,3 +118,34 @@ export async function loadCartFromBackend(): Promise<any[]> {
         return savedCart ? JSON.parse(savedCart) : [];
     }
 }
+
+
+/**
+ * Gets the minimum product quantity configured in .env (default 5000)
+ */
+export function getMinCartQuantity(): number {
+    const envVal = process.env.NEXT_PUBLIC_MIN_CART_QUANTITY;
+    if (envVal && !isNaN(Number(envVal))) {
+        const parsed = Number(envVal);
+        if (parsed > 0) return parsed;
+    }
+    return 5000;
+}
+
+/**
+ * Helper to calculate tiered unit price and total price for electronic parts
+ */
+export function calculatePartPrice(baseUnitPrice: number, qty: number) {
+    const finalPriceINR = baseUnitPrice > 1 ? baseUnitPrice : baseUnitPrice * 80;
+    let multiplier = 1;
+    if (qty >= 500) multiplier = 0.62;
+    else if (qty >= 100) multiplier = 0.70;
+    else if (qty >= 50) multiplier = 0.78;
+    else if (qty >= 25) multiplier = 0.85;
+    else if (qty >= 10) multiplier = 0.92;
+
+    const unitPrice = Math.round(finalPriceINR * multiplier * 100) / 100;
+    const price = Math.round(unitPrice * qty * 100) / 100;
+    return { unitPrice, price, baseUnitPrice: finalPriceINR };
+}
+

@@ -23,7 +23,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
 import { DigiKeyProduct } from "@/lib/digikey";
-import { saveCartToBackend } from "@/lib/cartSession";
+import { saveCartToBackend, getMinCartQuantity, calculatePartPrice } from "@/lib/cartSession";
+
 
 interface SingleProductPageProps {
     params: Promise<{
@@ -38,9 +39,13 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
     const [product, setProduct] = useState<any>(null);
     const [relatedProducts, setRelatedProducts] = useState<DigiKeyProduct[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [quantity, setQuantity] = useState<number>(1);
+    const [quantity, setQuantity] = useState<number>(5000);
     const [isAdded, setIsAdded] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<"attributes" | "datasheet">("attributes");
+
+    useEffect(() => {
+        setQuantity(getMinCartQuantity());
+    }, []);
 
     useEffect(() => {
         let isMounted = true;
@@ -86,8 +91,9 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
     const handleAddToCart = async () => {
         const partNum = mfgNumber;
         const imageUrl = product?.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
-        const unitPrice = Math.round(currentUnitPrice * 100) / 100;
-        const addQty = Math.max(1, quantity);
+        const minQty = getMinCartQuantity();
+        const addQty = Math.max(minQty, quantity);
+        const rawUnitPrice = product?.UnitPrice ? (Number(product.UnitPrice) > 1 ? Number(product.UnitPrice) : Number(product.UnitPrice) * 80) : 1.70;
 
         try {
             const savedCart = localStorage.getItem("megabyte_cart");
@@ -98,16 +104,18 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
             );
 
             if (existingIndex > -1) {
-                const newQty = (items[existingIndex].qty || 1) + addQty;
-                const newPrice = Math.round(unitPrice * newQty * 100) / 100;
+                const newQty = (items[existingIndex].qty || 0) + addQty;
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, newQty);
                 items[existingIndex] = {
                     ...items[existingIndex],
                     qty: newQty,
-                    price: newPrice,
-                    unitPrice: unitPrice,
+                    price: calcTotalPrice,
+                    unitPrice: calcUnitPrice,
+                    baseUnitPrice: rawUnitPrice,
                     photoUrl: imageUrl,
                 };
             } else {
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, addQty);
                 const newItem = {
                     id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
                     productType: "part",
@@ -116,8 +124,9 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                     description: desc,
                     photoUrl: imageUrl,
                     qty: addQty,
-                    unitPrice: unitPrice,
-                    price: Math.round(unitPrice * addQty * 100) / 100,
+                    unitPrice: calcUnitPrice,
+                    price: calcTotalPrice,
+                    baseUnitPrice: rawUnitPrice,
                     date: new Date().toISOString().split("T")[0],
                 };
                 items.push(newItem);
@@ -130,6 +139,7 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
             console.error("Failed to add part to cart:", e);
         }
     };
+
 
     // Calculate price breaks dynamically
     // Calculate unit price and price tier structure
@@ -362,7 +372,7 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                         <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11">
                                             <button
                                                 type="button"
-                                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                onClick={() => setQuantity(Math.max(getMinCartQuantity(), quantity - 100))}
                                                 className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
                                                 title="Decrease quantity"
                                             >
@@ -370,11 +380,12 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                             </button>
                                             <Input
                                                 type="number"
-                                                min={1}
+                                                min={getMinCartQuantity()}
                                                 value={quantity}
-                                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                                onChange={(e) => setQuantity(Math.max(getMinCartQuantity(), parseInt(e.target.value) || getMinCartQuantity()))}
                                                 className="h-full border-0 focus-visible:ring-0 rounded-none text-center font-extrabold text-slate-800 bg-transparent text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                             />
+
                                             <button
                                                 type="button"
                                                 onClick={() => setQuantity(quantity + 1)}

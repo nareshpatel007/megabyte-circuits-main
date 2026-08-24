@@ -6,7 +6,8 @@ import { Search, Loader2, ExternalLink, ShoppingCart, Info, CheckCircle2, Chevro
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DigiKeyProduct } from "@/lib/digikey";
-import { saveCartToBackend } from "@/lib/cartSession";
+import { saveCartToBackend, getMinCartQuantity, calculatePartPrice } from "@/lib/cartSession";
+
 
 interface CategoryCount {
     name: string;
@@ -59,7 +60,7 @@ export default function PartsPage() {
         const desc = product.Description?.DetailedDescription || product.Description?.ProductDescription || "High quality component";
         const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
         const rawUnitPrice = product.UnitPrice ? (product.UnitPrice > 1 ? product.UnitPrice : product.UnitPrice * 80) : 10;
-        const unitPrice = Math.round(rawUnitPrice * 100) / 100;
+        const minQty = getMinCartQuantity();
 
         try {
             const savedCart = localStorage.getItem("megabyte_cart");
@@ -70,16 +71,18 @@ export default function PartsPage() {
             );
 
             if (existingIndex > -1) {
-                const newQty = (items[existingIndex].qty || 1) + 1;
-                const newPrice = Math.round(unitPrice * newQty * 100) / 100;
+                const newQty = (items[existingIndex].qty || 0) + minQty;
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, newQty);
                 items[existingIndex] = {
                     ...items[existingIndex],
                     qty: newQty,
-                    price: newPrice,
-                    unitPrice: unitPrice,
+                    price: calcTotalPrice,
+                    unitPrice: calcUnitPrice,
+                    baseUnitPrice: rawUnitPrice,
                     photoUrl: imageUrl,
                 };
             } else {
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, minQty);
                 const newItem = {
                     id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
                     productType: "part",
@@ -87,9 +90,10 @@ export default function PartsPage() {
                     partNumber: partNum,
                     description: desc,
                     photoUrl: imageUrl,
-                    qty: 1,
-                    unitPrice: unitPrice,
-                    price: unitPrice,
+                    qty: minQty,
+                    unitPrice: calcUnitPrice,
+                    price: calcTotalPrice,
+                    baseUnitPrice: rawUnitPrice,
                     date: new Date().toISOString().split("T")[0],
                 };
                 items.push(newItem);
@@ -104,6 +108,7 @@ export default function PartsPage() {
             console.error("Failed to add part to cart:", e);
         }
     };
+
 
     const totalProductCount = products.length;
 
