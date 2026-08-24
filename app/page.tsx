@@ -307,7 +307,19 @@ export default function Home() {
     ];
 
     function onSubmit(values: z.infer<typeof calculatorSchema>) {
-        calculateQuote.mutate({ data: values });
+        const query = new URLSearchParams({
+            layers: String(values.layers || 2),
+            boardWidth: String(values.boardWidth || 50),
+            boardHeight: String(values.boardHeight || 50),
+            quantity: String(values.quantity || 10),
+            pcbType: values.pcbType || "Standard Rigid",
+            thickness: values.thickness || "1.6mm",
+            copperWeight: values.copperWeight || "1oz",
+            surfaceFinish: values.surfaceFinish || "HASL",
+        }).toString();
+
+        const quoteBase = process.env.NEXT_PUBLIC_QUOTE_URL || "http://localhost:3001";
+        window.location.href = `${quoteBase.replace(/\/$/, "")}/?${query}`;
     }
 
     /* ── HERO ─────────────────────────────────────────────────────────────── */

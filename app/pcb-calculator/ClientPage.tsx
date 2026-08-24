@@ -42,7 +42,19 @@ export default function ClientPage() {
     });
 
     function onSubmit(values: z.infer<typeof calculatorSchema>) {
-        calculateQuote.mutate({ data: values });
+        const query = new URLSearchParams({
+            layers: String(values.layers || 2),
+            boardWidth: String(values.boardWidth || 50),
+            boardHeight: String(values.boardHeight || 50),
+            quantity: String(values.quantity || 10),
+            pcbType: values.pcbType || "Standard Rigid",
+            thickness: values.thickness || "1.6mm",
+            copperWeight: values.copperWeight || "1oz",
+            surfaceFinish: values.surfaceFinish || "HASL",
+        }).toString();
+
+        const quoteBase = process.env.NEXT_PUBLIC_QUOTE_URL || "http://localhost:3001";
+        window.location.href = `${quoteBase.replace(/\/$/, "")}/?${query}`;
     }
 
     const breadcrumbs = [
@@ -81,10 +93,10 @@ export default function ClientPage() {
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl><SelectTrigger className="h-11"><SelectValue /></SelectTrigger></FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="Standard Rigid">Standard Rigid</SelectItem>
-                                                    <SelectItem value="Flexible PCB">Flexible PCB</SelectItem>
-                                                    <SelectItem value="Rigid-Flex PCB">Rigid-Flex PCB</SelectItem>
-                                                    <SelectItem value="Metal Core PCB">Metal Core PCB</SelectItem>
+                                                    <SelectItem value="Standard Rigid">FR4 Standard</SelectItem>
+                                                    <SelectItem value="Flex">Flex</SelectItem>
+                                                    <SelectItem value="Rogers">Rogers</SelectItem>
+                                                    <SelectItem value="PTFE Teflon">PTFE Taflon</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
