@@ -98,7 +98,6 @@ export function Header() {
 
     React.useEffect(() => {
         setMobileOpen(false);
-        loadCartFromBackend().then(() => updateCartCount());
     }, [location]);
 
     React.useEffect(() => {
@@ -186,6 +185,13 @@ export function Header() {
                                 className={`text-xs xl:text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-zinc-800 ${navText}`}
                             >
                                 PCB Calculator
+                            </Link>
+
+                            <Link
+                                href="/parts"
+                                className={`text-xs xl:text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-zinc-800 ${navText}`}
+                            >
+                                Components
                             </Link>
 
                             <DropdownMenu open={productsHover} onOpenChange={setProductsHover} modal={false}>
@@ -372,6 +378,15 @@ export function Header() {
                                 onClick={() => setMobileOpen(false)}
                             >
                                 PCB Calculator
+                            </Link>
+
+                            {/* Components page link */}
+                            <Link
+                                href="/parts"
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+                                onClick={() => setMobileOpen(false)}
+                            >
+                                Components
                             </Link>
 
                             {/* Products accordion */}

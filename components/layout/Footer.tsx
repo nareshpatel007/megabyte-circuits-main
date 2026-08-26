@@ -26,6 +26,7 @@ const QUICK_LINKS = [
     { label: "Blog", href: "/blog" },
     { label: "FAQs", href: "/faq" },
     { label: "PCB Calculator", href: "/pcb-calculator" },
+    { label: "Components", href: "/parts" },
     { label: "Contact Support", href: "/contact" },
 ];
 
