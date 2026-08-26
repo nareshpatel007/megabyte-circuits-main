@@ -18,6 +18,8 @@ import {
     Info,
     Plus,
     Minus,
+    Copy,
+    Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,9 +41,18 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
     const [product, setProduct] = useState<any>(null);
     const [relatedProducts, setRelatedProducts] = useState<DigiKeyProduct[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [quantity, setQuantity] = useState<number>(5000);
+    const [quantity, setQuantity] = useState<number>(getMinCartQuantity());
     const [isAdded, setIsAdded] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<"attributes" | "datasheet">("attributes");
+    const [copiedName, setCopiedName] = useState<boolean>(false);
+
+    const handleCopyName = (textToCopy: string) => {
+        if (textToCopy) {
+            navigator.clipboard.writeText(textToCopy);
+            setCopiedName(true);
+            setTimeout(() => setCopiedName(false), 2000);
+        }
+    };
 
     useEffect(() => {
         setQuantity(getMinCartQuantity());
@@ -316,9 +327,28 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                         </span>
                                     </div>
 
-                                    <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-1">
-                                        {mfgNumber}
-                                    </h1>
+                                    <div className="flex items-center gap-2.5 mb-1">
+                                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                                            {mfgNumber}
+                                        </h1>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleCopyName(mfgNumber)}
+                                            className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-primary hover:border-primary/40 hover:bg-slate-50 transition-all cursor-pointer flex items-center gap-1 text-xs font-semibold"
+                                            title="Copy product name to clipboard"
+                                        >
+                                            {copiedName ? (
+                                                <>
+                                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                                    <span className="text-emerald-600 font-bold text-xs">Copied!</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Copy className="w-3.5 h-3.5" />
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
 
                                     <p className="text-sm font-semibold text-slate-600 mb-5">
                                         Manufacturer: <span className="text-slate-900 font-bold">{mfgName}</span>
@@ -372,7 +402,7 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                         <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11">
                                             <button
                                                 type="button"
-                                                onClick={() => setQuantity(Math.max(getMinCartQuantity(), quantity - 100))}
+                                                onClick={() => setQuantity(Math.max(1, quantity > 100 ? quantity - 100 : quantity > 10 ? quantity - 10 : quantity - 1))}
                                                 className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
                                                 title="Decrease quantity"
                                             >
@@ -380,9 +410,9 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                             </button>
                                             <Input
                                                 type="number"
-                                                min={getMinCartQuantity()}
+                                                min={1}
                                                 value={quantity}
-                                                onChange={(e) => setQuantity(Math.max(getMinCartQuantity(), parseInt(e.target.value) || getMinCartQuantity()))}
+                                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                                                 className="h-full border-0 focus-visible:ring-0 rounded-none text-center font-extrabold text-slate-800 bg-transparent text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                             />
 

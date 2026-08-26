@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
-import { Search, Loader2, ExternalLink, ShoppingCart, Info, CheckCircle2, ChevronRight, Layers } from "lucide-react";
+import { Search, Loader2, ExternalLink, ShoppingCart, Info, CheckCircle2, ChevronRight, Layers, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DigiKeyProduct } from "@/lib/digikey";
@@ -22,11 +22,33 @@ export default function PartsPage() {
 
     const [products, setProducts] = useState<DigiKeyProduct[]>([]);
     const [categories, setCategories] = useState<CategoryCount[]>([]);
+    const [categorySearch, setCategorySearch] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [loading, setLoading] = useState<boolean>(true);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [activeQuery, setActiveQuery] = useState<string>("");
     const [addedCartIds, setAddedCartIds] = useState<Record<string, boolean>>({});
+
+    useEffect(() => {
+        let isMounted = true;
+        async function loadCategories() {
+            try {
+                const res = await fetch("/api/digikey/categories");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (isMounted && data.Categories && data.Categories.length > 0) {
+                        setCategories(data.Categories);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load categories:", err);
+            }
+        }
+        loadCategories();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     async function loadData(keyword: string, category: string) {
         setLoading(true);
@@ -36,9 +58,6 @@ export default function PartsPage() {
             if (res.ok) {
                 const data = await res.json();
                 setProducts(data.Products || []);
-                if (data.Categories && data.Categories.length > 0) {
-                    setCategories(data.Categories);
-                }
             }
         } catch (err) {
             console.error("Error loading parts:", err);
@@ -50,10 +69,16 @@ export default function PartsPage() {
         loadData(activeQuery, selectedCategory);
     }, [activeQuery, selectedCategory]);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        setActiveQuery(searchQuery.trim());
-    };
+    // Live search debounce effect as user types
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setActiveQuery(searchQuery.trim());
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     const handleAddToCart = async (product: DigiKeyProduct) => {
         const partNum = product.ManufacturerProductNumber || "Part";
@@ -116,37 +141,50 @@ export default function PartsPage() {
         <div className="flex flex-col min-h-screen bg-slate-50/60">
             <ServiceHeader
                 title="Parts & Electronics Components Catalog"
-                subtitle="Browse through real-time stored DigiKey electronic parts, microcontrollers, resistors, and hardware components."
+                subtitle="Browse through electronic parts, microcontrollers, resistors, and hardware components."
                 badge="Parts Catalog"
                 breadcrumbs={breadcrumbs}
             />
 
             <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                {/* Top Search & Filter Header */}
-                <div className="bg-white rounded-2xl p-4 md:p-6 border border-slate-200/80 shadow-sm mb-8">
-                    <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-3">
-                        <div className="relative flex-1">
-                            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                            <Input
-                                type="text"
-                                placeholder="Search by part number, description, keyword..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-11 h-12 bg-slate-50/50 rounded-xl border-slate-200 text-sm focus:bg-white"
-                            />
+                {/* Top Search Header */}
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-3 sm:p-4 border border-slate-200/80 dark:border-zinc-800 shadow-sm mb-8 transition-all">
+                    <div className="relative flex items-center w-full group">
+                        <Search className="w-5 h-5 text-slate-400 dark:text-zinc-500 absolute left-4 pointer-events-none group-focus-within:text-primary transition-colors" />
+                        <input
+                            type="text"
+                            placeholder="Type to search by part number, description, manufacturer, keyword..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-12 h-12 bg-slate-50/70 dark:bg-zinc-800/50 rounded-xl border border-slate-200/90 dark:border-zinc-700 text-sm font-medium text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:bg-white dark:focus:bg-zinc-900 focus:border-primary/60 focus:ring-4 focus:ring-primary/10 transition-all"
+                        />
+                        <div className="absolute right-3.5 flex items-center gap-2">
+                            {loading && (
+                                <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                            )}
+                            {searchQuery && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setActiveQuery("");
+                                    }}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                    title="Clear search"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
                         </div>
-                        <Button type="submit" className="h-12 bg-primary hover:bg-primary/90 text-white font-bold px-8 rounded-xl shrink-0">
-                            Search Parts
-                        </Button>
-                    </form>
+                    </div>
                 </div>
 
                 {/* Main Content Layout: Left Sidebar Categories & Right Center Parts Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
-                    
+
                     {/* LEFT SIDEBAR: Categories */}
                     <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm lg:sticky lg:top-28">
-                        <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                        <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
                             <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
                                 <Layers className="w-4 h-4 text-primary" /> Categories
                             </h3>
@@ -155,40 +193,53 @@ export default function PartsPage() {
                             </span>
                         </div>
 
+                        {/* Search Input inside Categories Sidebar */}
+                        <div className="relative mb-3">
+                            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input
+                                type="text"
+                                placeholder="Search categories..."
+                                value={categorySearch}
+                                onChange={(e) => setCategorySearch(e.target.value)}
+                                className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary"
+                            />
+                        </div>
+
                         <div className="space-y-1 max-h-[600px] overflow-y-auto pr-1">
                             <button
                                 onClick={() => setSelectedCategory("All")}
-                                className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all flex items-center justify-between ${
-                                    selectedCategory === "All"
-                                        ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
-                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                }`}
+                                className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all flex items-center justify-between ${selectedCategory === "All"
+                                    ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
+                                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                    }`}
                             >
                                 <span>All Categories</span>
                                 <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                             </button>
 
-                            {categories.map((cat, idx) => {
-                                const isActive = selectedCategory === cat.name;
-                                return (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setSelectedCategory(cat.name)}
-                                        className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm transition-all flex items-center justify-between capitalize ${
-                                            isActive
+                            {categories
+                                .filter((cat) =>
+                                    cat.name.toLowerCase().includes(categorySearch.toLowerCase().trim())
+                                )
+                                .map((cat, idx) => {
+                                    const isActive = selectedCategory === cat.name;
+                                    return (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setSelectedCategory(cat.name)}
+                                            className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm transition-all flex items-center justify-between capitalize ${isActive
                                                 ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
                                                 : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                        }`}
-                                    >
-                                        <span className="truncate pr-2">{cat.name}</span>
-                                        <span className={`text-[11px] px-2 py-0.5 rounded-full shrink-0 ${
-                                            isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                                        }`}>
-                                            {cat.count}
-                                        </span>
-                                    </button>
-                                );
-                            })}
+                                                }`}
+                                        >
+                                            <span className="truncate pr-2">{cat.name}</span>
+                                            <span className={`text-[11px] px-2 py-0.5 rounded-full shrink-0 ${isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+                                                }`}>
+                                                {cat.count}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
                         </div>
                     </div>
 
@@ -298,11 +349,10 @@ export default function PartsPage() {
                                                 <Button
                                                     onClick={() => handleAddToCart(product)}
                                                     size="sm"
-                                                    className={`w-full text-xs font-bold h-9 transition-colors ${
-                                                        isAdded
-                                                            ? "bg-green-600 text-white hover:bg-green-700"
-                                                            : "bg-primary text-white hover:bg-primary/90"
-                                                    }`}
+                                                    className={`w-full text-xs font-bold h-9 transition-colors ${isAdded
+                                                        ? "bg-green-600 text-white hover:bg-green-700"
+                                                        : "bg-primary text-white hover:bg-primary/90"
+                                                        }`}
                                                 >
                                                     {isAdded ? (
                                                         <span className="flex items-center gap-1">
