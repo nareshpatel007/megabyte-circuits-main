@@ -35,6 +35,7 @@ export default function PartsPage() {
 
     const [products, setProducts] = useState<DigiKeyProduct[]>([]);
     const [categories, setCategories] = useState<CategoryCount[]>([]);
+    const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
     const [categorySearch, setCategorySearch] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [loading, setLoading] = useState<boolean>(true);
@@ -51,6 +52,7 @@ export default function PartsPage() {
     useEffect(() => {
         let isMounted = true;
         async function loadCategories() {
+            setCategoriesLoading(true);
             try {
                 const res = await fetch("/api/digikey/categories");
                 if (res.ok) {
@@ -61,6 +63,8 @@ export default function PartsPage() {
                 }
             } catch (err) {
                 console.error("Failed to load categories:", err);
+            } finally {
+                if (isMounted) setCategoriesLoading(false);
             }
         }
         loadCategories();
@@ -253,9 +257,13 @@ export default function PartsPage() {
                             <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
                                 <Layers className="w-4 h-4 text-primary" /> Categories
                             </h3>
-                            <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
-                                {categories.length}
-                            </span>
+                            {categoriesLoading ? (
+                                <div className="w-8 h-5 bg-slate-200 rounded-full animate-pulse" />
+                            ) : (
+                                <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                                    {categories.length}
+                                </span>
+                            )}
                         </div>
 
                         {/* Search Input inside Categories Sidebar */}
@@ -270,42 +278,56 @@ export default function PartsPage() {
                             />
                         </div>
 
-                        <div className="space-y-1 max-h-[600px] overflow-y-auto pr-1">
-                            <button
-                                onClick={() => handleCategorySelect("All")}
-                                className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all flex items-center justify-between ${selectedCategory === "All"
-                                    ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
-                                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                    }`}
-                            >
-                                <span>All Categories</span>
-                                <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-                            </button>
+                        {categoriesLoading ? (
+                            <div className="space-y-2 animate-pulse pt-1">
+                                {[...Array(8)].map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="w-full px-3.5 py-2.5 rounded-xl flex items-center justify-between bg-slate-100/70"
+                                    >
+                                        <div className="h-4 bg-slate-200 rounded w-2/3" />
+                                        <div className="h-4 bg-slate-200 rounded-full w-8 shrink-0" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="space-y-1 max-h-[600px] overflow-y-auto pr-1">
+                                <button
+                                    onClick={() => handleCategorySelect("All")}
+                                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all flex items-center justify-between ${selectedCategory === "All"
+                                        ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                        }`}
+                                >
+                                    <span>All Categories</span>
+                                    <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                                </button>
 
-                            {categories
-                                .filter((cat) =>
-                                    cat.name.toLowerCase().includes(categorySearch.toLowerCase().trim())
-                                )
-                                .map((cat, idx) => {
-                                    const isActive = selectedCategory === cat.name;
-                                    return (
-                                        <button
-                                            key={idx}
-                                            onClick={() => handleCategorySelect(cat.name)}
-                                            className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm transition-all flex items-center justify-between capitalize ${isActive
-                                                ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
-                                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                                }`}
-                                        >
-                                            <span className="truncate pr-2">{cat.name}</span>
-                                            <span className={`text-[11px] px-2 py-0.5 rounded-full shrink-0 ${isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                                                }`}>
-                                                {cat.count}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                        </div>
+                                {categories
+                                    .filter((cat) =>
+                                        cat.name.toLowerCase().includes(categorySearch.toLowerCase().trim())
+                                    )
+                                    .map((cat, idx) => {
+                                        const isActive = selectedCategory === cat.name;
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleCategorySelect(cat.name)}
+                                                className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm transition-all flex items-center justify-between capitalize ${isActive
+                                                    ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
+                                                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                                    }`}
+                                            >
+                                                <span className="truncate pr-2">{cat.name}</span>
+                                                <span className={`text-[11px] px-2 py-0.5 rounded-full shrink-0 ${isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+                                                    }`}>
+                                                    {cat.count}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                            </div>
+                        )}
                     </div>
 
                     {/* RIGHT CENTER: Parts List Grid */}
@@ -386,11 +408,11 @@ export default function PartsPage() {
                                                 <div>
                                                     {/* Photo & Main Details */}
                                                     <div className="flex gap-3 mb-4">
-                                                        <div className="w-20 h-20 bg-slate-50 rounded-xl p-1.5 flex items-center justify-center shrink-0 border border-slate-100 overflow-hidden">
+                                                        <div className="w-20 h-20 flex items-center justify-center shrink-0 overflow-hidden">
                                                             <img
                                                                 src={imageUrl}
                                                                 alt={partNum}
-                                                                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform"
+                                                                className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                                                                 onError={(e) => {
                                                                     (e.target as HTMLElement).setAttribute("src", "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg");
                                                                 }}

@@ -159,7 +159,7 @@ export function MainCartModal({ isOpen, onClose }: MainCartModalProps) {
                                 key={item.id}
                                 className="p-3 hover:bg-gray-50/80 dark:hover:bg-zinc-800/50 rounded-xl transition-colors group relative flex items-start justify-between gap-3"
                             >
-                                <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/60 flex items-center justify-center shrink-0 p-1 overflow-hidden">
+                                <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden">
                                     <img
                                         src={item.photoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"}
                                         alt={item.partNumber || item.boardName || "Product"}

@@ -269,14 +269,14 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                             {/* 1. LEFT COLUMN: Product Image & Description Under Image */}
                             <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
                                 <div>
-                                    <div className="w-full aspect-square max-w-[280px] bg-slate-50 rounded-xl p-4 flex items-center justify-center border border-slate-100 overflow-hidden mb-5 mx-auto">
+                                    <div className="w-full aspect-square max-w-[280px] flex items-center justify-center overflow-hidden mb-5 mx-auto">
                                         <img
                                             src={
                                                 product?.PhotoUrl ||
                                                 "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
                                             }
                                             alt={mfgNumber}
-                                            className="max-h-full max-w-full object-contain hover:scale-105 transition-transform"
+                                            className="w-full h-full object-contain hover:scale-105 transition-transform"
                                             onError={(e) => {
                                                 (e.target as HTMLElement).setAttribute(
                                                     "src",
@@ -575,14 +575,14 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                                 className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-all group"
                                             >
                                                 <div>
-                                                    <div className="w-full aspect-square bg-slate-50 rounded-xl p-2 flex items-center justify-center border border-slate-100 mb-3 overflow-hidden">
+                                                    <div className="w-full aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                                         <img
                                                             src={
                                                                 rel.PhotoUrl ||
                                                                 "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg"
                                                             }
                                                             alt={relPartNum}
-                                                            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform"
+                                                            className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                                                             onError={(e) => {
                                                                 (e.target as HTMLElement).setAttribute(
                                                                     "src",

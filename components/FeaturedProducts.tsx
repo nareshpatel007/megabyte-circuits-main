@@ -105,11 +105,11 @@ export function FeaturedProducts() {
                                         {/* Content row with image & details */}
                                         <div className="flex items-start gap-3">
                                             {/* Image */}
-                                            <div className="w-20 h-20 shrink-0 bg-slate-50 dark:bg-zinc-800 rounded-lg flex items-center justify-center overflow-hidden p-1 border border-slate-100 dark:border-zinc-700">
+                                            <div className="w-20 h-20 shrink-0 flex items-center justify-center overflow-hidden">
                                                 <img
                                                     src={imageUrl}
                                                     alt={title}
-                                                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-200"
+                                                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
                                                     onError={(e) => {
                                                         (e.target as HTMLElement).setAttribute("src", "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg");
                                                     }}
