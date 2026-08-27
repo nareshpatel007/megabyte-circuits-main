@@ -22,7 +22,12 @@ export interface DigiKeyProduct {
     PhotoUrl?: string;
     QuantityAvailable?: number;
     Category?: string;
+    ProductStatus?: {
+        Status: string;
+    } | string;
     ProductVariations?: DigiKeyProductVariation[];
+    StandardPricing?: Array<{ BreakQuantity: number; UnitPrice: number; TotalPrice?: number }>;
+    MinimumOrderQuantity?: number;
 }
 
 export interface DigiKeySearchResponse {
@@ -95,6 +100,8 @@ export async function searchDigiKeyProducts(
         headers: {
             "X-DIGIKEY-Client-Id": clientId,
             "Authorization": `Bearer ${token}`,
+            "X-DIGIKEY-Locale-Site": "IN",
+            "X-DIGIKEY-Locale-Currency": "INR",
             "Content-Type": "application/json",
         },
         body: JSON.stringify({

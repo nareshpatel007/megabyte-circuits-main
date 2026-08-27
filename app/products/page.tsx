@@ -85,7 +85,10 @@ export default function PartsPage() {
         const desc = product.Description?.DetailedDescription || product.Description?.ProductDescription || "High quality component";
         const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
         const rawUnitPrice = product.UnitPrice ? (product.UnitPrice > 1 ? product.UnitPrice : product.UnitPrice * 80) : 10;
-        const minQty = getMinCartQuantity();
+        
+        // Respect minimum required order quantity
+        const minQty = product.MinimumOrderQuantity || product.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
+        const standardPricing = product.StandardPricing || product.ProductVariations?.[0]?.StandardPricing;
 
         try {
             const savedCart = localStorage.getItem("megabyte_cart");
@@ -97,7 +100,7 @@ export default function PartsPage() {
 
             if (existingIndex > -1) {
                 const newQty = (items[existingIndex].qty || 0) + minQty;
-                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, newQty);
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, newQty, standardPricing);
                 items[existingIndex] = {
                     ...items[existingIndex],
                     qty: newQty,
@@ -107,7 +110,7 @@ export default function PartsPage() {
                     photoUrl: imageUrl,
                 };
             } else {
-                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, minQty);
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, minQty, standardPricing);
                 const newItem = {
                     id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
                     productType: "part",

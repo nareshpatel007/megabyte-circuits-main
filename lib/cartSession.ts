@@ -147,17 +147,38 @@ export function getMinCartQuantity(): number {
 /**
  * Helper to calculate tiered unit price and total price for electronic parts
  */
-export function calculatePartPrice(baseUnitPrice: number, qty: number) {
-    const finalPriceINR = baseUnitPrice > 1 ? baseUnitPrice : baseUnitPrice * 80;
-    let multiplier = 1;
-    if (qty >= 500) multiplier = 0.62;
-    else if (qty >= 100) multiplier = 0.70;
-    else if (qty >= 50) multiplier = 0.78;
-    else if (qty >= 25) multiplier = 0.85;
-    else if (qty >= 10) multiplier = 0.92;
+export function calculatePartPrice(
+    baseUnitPrice: number,
+    qty: number,
+    standardPricing?: Array<{ BreakQuantity: number; UnitPrice: number; TotalPrice?: number }>
+) {
+    let unitPrice = baseUnitPrice;
 
-    const unitPrice = Math.round(finalPriceINR * multiplier * 100) / 100;
+    // Use actual DigiKey StandardPricing break quantities if available
+    if (standardPricing && standardPricing.length > 0) {
+        const sortedPricing = [...standardPricing].sort((a, b) => b.BreakQuantity - a.BreakQuantity);
+        const applicableTier = sortedPricing.find((tier) => qty >= tier.BreakQuantity);
+        if (applicableTier) {
+            unitPrice = applicableTier.UnitPrice;
+        }
+    } else {
+        // Fallback proportional tier discount if no StandardPricing array present
+        let multiplier = 1;
+        if (qty >= 500) multiplier = 0.62;
+        else if (qty >= 100) multiplier = 0.70;
+        else if (qty >= 50) multiplier = 0.78;
+        else if (qty >= 25) multiplier = 0.85;
+        else if (qty >= 10) multiplier = 0.92;
+        unitPrice = baseUnitPrice * multiplier;
+    }
+
     const price = Math.round(unitPrice * qty * 100) / 100;
-    return { unitPrice, price, baseUnitPrice: finalPriceINR };
+
+    return {
+        unitPrice: Math.round(unitPrice * 100) / 100,
+        price,
+        baseUnitPrice,
+    };
 }
+
 

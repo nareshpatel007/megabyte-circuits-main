@@ -74,6 +74,10 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
 
                 if (isMounted) {
                     setProduct(prodData);
+                    if (prodData) {
+                        const minOrder = prodData.MinimumOrderQuantity || prodData.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
+                        setQuantity(minOrder);
+                    }
                 }
 
                 // Fetch category related parts
@@ -100,11 +104,23 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
     }, [rawPartNumber]);
 
     const handleAddToCart = async () => {
+        // Product Status Check
+        const status = typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status;
+        if (status && status.toLowerCase() !== "active") {
+            alert("This item is currently not active and cannot be added to cart.");
+            return;
+        }
+
         const partNum = mfgNumber;
         const imageUrl = product?.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
-        const minQty = getMinCartQuantity();
-        const addQty = Math.max(minQty, quantity);
-        const rawUnitPrice = product?.UnitPrice ? (Number(product.UnitPrice) > 1 ? Number(product.UnitPrice) : Number(product.UnitPrice) * 80) : 1.70;
+        const minOrderQty = product?.MinimumOrderQuantity || product?.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
+        const maxStock = (product?.QuantityAvailable ?? product?.quantity_available) ? Number(product?.QuantityAvailable ?? product?.quantity_available) : undefined;
+        let addQty = Math.max(minOrderQty, quantity);
+        if (maxStock !== undefined && addQty > maxStock) {
+            addQty = maxStock;
+        }
+        const baseUnitPrice = product?.UnitPrice ? Number(product.UnitPrice) : 10;
+        const standardPricing = product?.StandardPricing || product?.ProductVariations?.[0]?.StandardPricing;
 
         try {
             const savedCart = localStorage.getItem("megabyte_cart");
@@ -115,18 +131,21 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
             );
 
             if (existingIndex > -1) {
-                const newQty = (items[existingIndex].qty || 0) + addQty;
-                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, newQty);
+                let newQty = (items[existingIndex].qty || 0) + addQty;
+                if (maxStock !== undefined && newQty > maxStock) {
+                    newQty = maxStock;
+                }
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(baseUnitPrice, newQty, standardPricing);
                 items[existingIndex] = {
                     ...items[existingIndex],
                     qty: newQty,
                     price: calcTotalPrice,
                     unitPrice: calcUnitPrice,
-                    baseUnitPrice: rawUnitPrice,
+                    baseUnitPrice: baseUnitPrice,
                     photoUrl: imageUrl,
                 };
             } else {
-                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(rawUnitPrice, addQty);
+                const { unitPrice: calcUnitPrice, price: calcTotalPrice } = calculatePartPrice(baseUnitPrice, addQty, standardPricing);
                 const newItem = {
                     id: `part_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
                     productType: "part",
@@ -137,7 +156,7 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                     qty: addQty,
                     unitPrice: calcUnitPrice,
                     price: calcTotalPrice,
-                    baseUnitPrice: rawUnitPrice,
+                    baseUnitPrice: baseUnitPrice,
                     date: new Date().toISOString().split("T")[0],
                 };
                 items.push(newItem);
@@ -151,31 +170,33 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
         }
     };
 
+    // Standard Pricing & Price Breaks Structure
+    const finalPriceINR = product?.UnitPrice ? Number(product.UnitPrice) : 10;
 
-    // Calculate price breaks dynamically
-    // Calculate unit price and price tier structure
-    const basePrice = product?.UnitPrice ? Number(product.UnitPrice) : 1.70;
-    const finalPriceINR = basePrice > 1 ? basePrice : basePrice * 80;
+    // Get StandardPricing price break tiers from API response if available
+    const rawStandardPricing: Array<{ BreakQuantity: number; UnitPrice: number; TotalPrice?: number }> =
+        product?.StandardPricing || product?.ProductVariations?.[0]?.StandardPricing || [];
 
-    // Price Breaks (fixed static standard breakdown per unit quantity tiers)
-    const priceTier = [
-        { qty: "1 - 9", unitPrice: finalPriceINR, totalPrice: finalPriceINR * 6 },
-        { qty: "10 - 24", unitPrice: finalPriceINR * 0.92, totalPrice: finalPriceINR * 0.92 * 10 },
-        { qty: "25 - 49", unitPrice: finalPriceINR * 0.85, totalPrice: finalPriceINR * 0.85 * 25 },
-        { qty: "50 - 99", unitPrice: finalPriceINR * 0.78, totalPrice: finalPriceINR * 0.78 * 50 },
-        { qty: "100 - 499", unitPrice: finalPriceINR * 0.70, totalPrice: finalPriceINR * 0.70 * 100 },
-        { qty: "500+", unitPrice: finalPriceINR * 0.62, totalPrice: finalPriceINR * 0.62 * 500 },
-    ];
+    const priceTier = rawStandardPricing.length > 0
+        ? rawStandardPricing.map((st) => ({
+            qty: `${st.BreakQuantity}+`,
+            unitPrice: Number(st.UnitPrice),
+            totalPrice: Number(st.TotalPrice || (st.UnitPrice * st.BreakQuantity)),
+        }))
+        : [
+            { qty: "1 - 9", unitPrice: finalPriceINR, totalPrice: finalPriceINR * 1 },
+            { qty: "10 - 24", unitPrice: finalPriceINR * 0.92, totalPrice: finalPriceINR * 0.92 * 10 },
+            { qty: "25 - 49", unitPrice: finalPriceINR * 0.85, totalPrice: finalPriceINR * 0.85 * 25 },
+            { qty: "50 - 99", unitPrice: finalPriceINR * 0.78, totalPrice: finalPriceINR * 0.78 * 50 },
+            { qty: "100 - 499", unitPrice: finalPriceINR * 0.70, totalPrice: finalPriceINR * 0.70 * 100 },
+            { qty: "500+", unitPrice: finalPriceINR * 0.62, totalPrice: finalPriceINR * 0.62 * 500 },
+        ];
 
-    // Determine tier unit price for selected quantity
-    let currentUnitPrice = finalPriceINR;
-    if (quantity >= 500) currentUnitPrice = finalPriceINR * 0.62;
-    else if (quantity >= 100) currentUnitPrice = finalPriceINR * 0.70;
-    else if (quantity >= 50) currentUnitPrice = finalPriceINR * 0.78;
-    else if (quantity >= 25) currentUnitPrice = finalPriceINR * 0.85;
-    else if (quantity >= 10) currentUnitPrice = finalPriceINR * 0.92;
-
-    const calculatedTotalPrice = currentUnitPrice * quantity;
+    const { unitPrice: currentUnitPrice, price: calculatedTotalPrice } = calculatePartPrice(
+        finalPriceINR,
+        quantity,
+        rawStandardPricing
+    );
 
     // Build specs & attributes table list
     const mfgNumber = product?.ManufacturerProductNumber || rawPartNumber;
@@ -356,21 +377,21 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
 
                                     {/* Price Breaks Breakdown Table at center */}
                                     <div>
-                                        <h4 className="text-xs font-bold text-slate-700 mb-2">Price Breaks</h4>
-                                        <div className="border border-slate-100 rounded-xl overflow-hidden text-xs">
-                                            <div className="bg-slate-50 grid grid-cols-3 p-2.5 font-bold text-slate-600 border-b border-slate-100">
+                                        <h4 className="text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Price Breaks</h4>
+                                        <div className="border border-slate-200/80 rounded-xl overflow-hidden text-xs shadow-xs">
+                                            <div className="bg-slate-50/80 grid grid-cols-3 px-3.5 py-2 font-bold text-slate-600 border-b border-slate-200/80">
                                                 <span>Quantity</span>
                                                 <span className="text-right">Unit Price</span>
-                                                <span className="text-right">Total</span>
+                                                <span className="text-right">Exit Price</span>
                                             </div>
                                             {priceTier.map((tier, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="grid grid-cols-3 p-2.5 border-b border-slate-50 text-slate-700 font-medium hover:bg-slate-50/50 transition-colors"
+                                                    className="grid grid-cols-3 px-3.5 py-2 border-b border-slate-100 last:border-0 text-slate-700 font-medium hover:bg-primary/5 transition-colors items-center"
                                                 >
-                                                    <span>{tier.qty}</span>
-                                                    <span className="text-right font-semibold">₹{tier.unitPrice.toFixed(2)}</span>
-                                                    <span className="text-right text-slate-500">₹{tier.totalPrice.toFixed(2)}</span>
+                                                    <span className="font-medium text-slate-800">{tier.qty}</span>
+                                                    <span className="text-right font-bold text-slate-900">₹{tier.unitPrice.toFixed(2)}</span>
+                                                    <span className="text-right text-slate-600 font-semibold">₹{tier.totalPrice.toFixed(2)}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -381,50 +402,80 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                             {/* 3. RIGHT COLUMN: Add to Cart Options & Separate Total Pricing */}
                             <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
                                 <div>
-                                    <div className="flex items-baseline justify-between mb-4">
-                                        <div>
-                                            <span className="text-xs text-slate-400 font-medium block">Starting Price</span>
-                                            <span className="text-3xl font-black text-slate-900">
-                                                ₹{finalPriceINR.toFixed(2)}
-                                            </span>
-                                            <span className="text-xs text-slate-400 ml-1">/ unit</span>
-                                        </div>
-                                        <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">
-                                            In Stock
-                                        </span>
-                                    </div>
+                                     {/* Starting Price & Stock Badge Header Block */}
+                                     <div className="mb-5 border-b border-slate-100 pb-4">
+                                         <div className="flex items-center justify-between gap-2 mb-1.5">
+                                             <span className="text-xs text-slate-500 font-semibold tracking-wide">Starting Price</span>
+                                             {(() => {
+                                                 const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString();
+                                                 const isActive = statusStr.toLowerCase() === "active";
+                                                 const qtyAvailable = product?.QuantityAvailable ?? product?.quantity_available ?? 0;
+                                                 return (
+                                                     <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${isActive ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : "bg-rose-50 text-rose-700 border border-rose-200/60"}`}>
+                                                         {isActive ? `In-Stock: ${qtyAvailable}` : `Status: ${statusStr}`}
+                                                     </span>
+                                                 );
+                                             })()}
+                                         </div>
+                                         <div className="flex items-baseline gap-1">
+                                             <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                                                 ₹{finalPriceINR.toFixed(2)}
+                                             </span>
+                                             <span className="text-xs text-slate-500 font-medium">/ unit</span>
+                                         </div>
+                                     </div>
 
                                     {/* Quantity Input */}
                                     <div className="mb-5">
                                         <label className="text-xs font-bold text-slate-700 block mb-1.5">
                                             Quantity:
                                         </label>
-                                        <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11">
-                                            <button
-                                                type="button"
-                                                onClick={() => setQuantity(Math.max(1, quantity > 100 ? quantity - 100 : quantity > 10 ? quantity - 10 : quantity - 1))}
-                                                className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
-                                                title="Decrease quantity"
-                                            >
-                                                <Minus className="w-4 h-4" />
-                                            </button>
-                                            <Input
-                                                type="number"
-                                                min={1}
-                                                value={quantity}
-                                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                                className="h-full border-0 focus-visible:ring-0 rounded-none text-center font-extrabold text-slate-800 bg-transparent text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                            />
+                                        {(() => {
+                                            const minOrderQty = product?.MinimumOrderQuantity || product?.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
+                                            const maxStock = (product?.QuantityAvailable ?? product?.quantity_available) ? Number(product?.QuantityAvailable ?? product?.quantity_available) : undefined;
+                                            return (
+                                                <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setQuantity(Math.max(minOrderQty, quantity - 1))}
+                                                        className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
+                                                        title="Decrease quantity"
+                                                    >
+                                                        <Minus className="w-4 h-4" />
+                                                    </button>
+                                                    <Input
+                                                        type="number"
+                                                        min={minOrderQty}
+                                                        max={maxStock}
+                                                        value={quantity}
+                                                        onChange={(e) => {
+                                                            const val = parseInt(e.target.value) || minOrderQty;
+                                                            if (maxStock !== undefined && val > maxStock) {
+                                                                setQuantity(maxStock);
+                                                            } else {
+                                                                setQuantity(Math.max(minOrderQty, val));
+                                                            }
+                                                        }}
+                                                        className="h-full border-0 focus-visible:ring-0 rounded-none text-center font-extrabold text-slate-800 bg-transparent text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    />
 
-                                            <button
-                                                type="button"
-                                                onClick={() => setQuantity(quantity + 1)}
-                                                className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
-                                                title="Increase quantity"
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (maxStock !== undefined && quantity >= maxStock) {
+                                                                return;
+                                                            }
+                                                            setQuantity(quantity + 1);
+                                                        }}
+                                                        disabled={maxStock !== undefined && quantity >= maxStock}
+                                                        className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        title="Increase quantity"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
 
                                     {/* Add to Cart Button */}
@@ -453,69 +504,23 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                             <span className="text-[11px] font-semibold text-slate-500">{quantity} {quantity === 1 ? 'unit' : 'units'}</span>
                                         </div>
 
-                                        {/* Stepped breakdown list */}
+                                        {/* Tier rate & unit calculation from API StandardPricing */}
                                         <div className="space-y-1.5 text-xs text-slate-600">
-                                            {(() => {
-                                                const tiersList = [
-                                                    { label: "1 - 9 units", min: 1, max: 9, rate: finalPriceINR },
-                                                    { label: "10 - 24 units", min: 10, max: 24, rate: finalPriceINR * 0.92 },
-                                                    { label: "25 - 49 units", min: 25, max: 49, rate: finalPriceINR * 0.85 },
-                                                    { label: "50 - 99 units", min: 50, max: 99, rate: finalPriceINR * 0.78 },
-                                                    { label: "100 - 499 units", min: 100, max: 499, rate: finalPriceINR * 0.70 },
-                                                    { label: "500+ units", min: 500, max: Infinity, rate: finalPriceINR * 0.62 },
-                                                ];
-
-                                                let remaining = quantity;
-                                                const activeBreakdowns: Array<{ label: string; qty: number; rate: number; subtotal: number }> = [];
-
-                                                for (const t of tiersList) {
-                                                    if (remaining <= 0) break;
-                                                    const maxInTier = t.max === Infinity ? remaining : (t.max - t.min + 1);
-                                                    const qtyInTier = Math.min(remaining, maxInTier);
-                                                    if (qtyInTier > 0) {
-                                                        activeBreakdowns.push({
-                                                            label: `${qtyInTier} × ₹${t.rate.toFixed(2)} (${t.label})`,
-                                                            qty: qtyInTier,
-                                                            rate: t.rate,
-                                                            subtotal: qtyInTier * t.rate,
-                                                        });
-                                                        remaining -= qtyInTier;
-                                                    }
-                                                }
-
-                                                return activeBreakdowns.map((item, idx) => (
-                                                    <div key={idx} className="flex justify-between items-center text-[11px]">
-                                                        <span className="text-slate-600">{item.label}</span>
-                                                        <span className="font-semibold text-slate-800">₹{item.subtotal.toFixed(2)}</span>
-                                                    </div>
-                                                ));
-                                            })()}
+                                            <div className="flex justify-between items-center text-[11px]">
+                                                <span className="text-slate-600">Unit Price ({quantity} {quantity === 1 ? 'unit' : 'units'})</span>
+                                                <span className="font-semibold text-slate-800">₹{currentUnitPrice.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px]">
+                                                <span className="text-slate-600">Calculation ({quantity} × ₹{currentUnitPrice.toFixed(2)})</span>
+                                                <span className="font-semibold text-slate-800">₹{calculatedTotalPrice.toFixed(2)}</span>
+                                            </div>
                                         </div>
 
                                         {/* Final Calculated Total */}
                                         <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
                                             <span className="text-xs font-black text-slate-900">Total Calculation:</span>
                                             <span className="text-base font-black text-primary">
-                                                ₹{(() => {
-                                                    const tiersList = [
-                                                        { min: 1, max: 9, rate: finalPriceINR },
-                                                        { min: 10, max: 24, rate: finalPriceINR * 0.92 },
-                                                        { min: 25, max: 49, rate: finalPriceINR * 0.85 },
-                                                        { min: 50, max: 99, rate: finalPriceINR * 0.78 },
-                                                        { min: 100, max: 499, rate: finalPriceINR * 0.70 },
-                                                        { min: 500, max: Infinity, rate: finalPriceINR * 0.62 },
-                                                    ];
-                                                    let rem = quantity;
-                                                    let total = 0;
-                                                    for (const t of tiersList) {
-                                                        if (rem <= 0) break;
-                                                        const maxInTier = t.max === Infinity ? rem : (t.max - t.min + 1);
-                                                        const q = Math.min(rem, maxInTier);
-                                                        total += q * t.rate;
-                                                        rem -= q;
-                                                    }
-                                                    return total.toFixed(2);
-                                                })()}
+                                                ₹{calculatedTotalPrice.toFixed(2)}
                                             </span>
                                         </div>
                                     </div>
