@@ -85,7 +85,7 @@ export default function PartsPage() {
         const desc = product.Description?.DetailedDescription || product.Description?.ProductDescription || "High quality component";
         const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
         const rawUnitPrice = product.UnitPrice ? (product.UnitPrice > 1 ? product.UnitPrice : product.UnitPrice * 80) : 10;
-        
+
         // Respect minimum required order quantity
         const minQty = product.MinimumOrderQuantity || product.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
         const standardPricing = product.StandardPricing || product.ProductVariations?.[0]?.StandardPricing;
@@ -145,7 +145,6 @@ export default function PartsPage() {
             <ServiceHeader
                 title="Parts & Electronics Components Catalog"
                 subtitle="Browse through electronic parts, microcontrollers, resistors, and hardware components."
-                badge="Parts Catalog"
                 breadcrumbs={breadcrumbs}
             />
 
