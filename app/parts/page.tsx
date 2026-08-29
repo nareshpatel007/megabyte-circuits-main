@@ -223,35 +223,33 @@ export default function PartsPage() {
 
             <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 {/* Top Search Header */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-3 sm:p-4 border border-slate-200/80 dark:border-zinc-800 shadow-sm mb-8 transition-all">
-                    <div className="relative flex items-center w-full group">
-                        <Search className="w-5 h-5 text-slate-400 dark:text-zinc-500 absolute left-4 pointer-events-none group-focus-within:text-primary transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="Type to search by part number, description, manufacturer, keyword..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-12 h-12 bg-slate-50/70 dark:bg-zinc-800/50 rounded-xl border border-slate-200/90 dark:border-zinc-700 text-sm font-medium text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:bg-white dark:focus:bg-zinc-900 focus:border-primary/60 focus:ring-4 focus:ring-primary/10 transition-all"
-                        />
-                        <div className="absolute right-3.5 flex items-center gap-2">
-                            {loading && (
-                                <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                            )}
-                            {searchQuery && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setSearchQuery("");
-                                        setActiveQuery("");
-                                        setCurrentPage(1);
-                                    }}
-                                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                                    title="Clear search"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
+                <div className="relative flex items-center w-full group mb-8">
+                    <Search className="w-5 h-5 text-slate-400 dark:text-zinc-500 absolute left-4 pointer-events-none group-focus-within:text-primary transition-colors z-10" />
+                    <input
+                        type="text"
+                        placeholder="Type to search by part number, description, manufacturer, keyword..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-12 pr-12 h-14 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/80 dark:border-zinc-800 shadow-sm text-sm font-medium text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-primary/60 focus:ring-4 focus:ring-primary/10 transition-all"
+                    />
+                    <div className="absolute right-4 flex items-center gap-2 z-10">
+                        {loading && (
+                            <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                        )}
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSearchQuery("");
+                                    setActiveQuery("");
+                                    setCurrentPage(1);
+                                }}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                title="Clear search"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
                 </div>
 
