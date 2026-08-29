@@ -301,7 +301,7 @@ export default function PartsPage() {
                             <div className="space-y-1 max-h-[600px] overflow-y-auto pr-1">
                                 <button
                                     onClick={() => handleCategorySelect("All")}
-                                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all flex items-center justify-between ${selectedCategory === "All"
+                                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all flex items-center justify-between cursor-pointer ${selectedCategory === "All"
                                         ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
                                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                         }`}
@@ -320,7 +320,7 @@ export default function PartsPage() {
                                             <button
                                                 key={idx}
                                                 onClick={() => handleCategorySelect(cat.name)}
-                                                className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm transition-all flex items-center justify-between capitalize ${isActive
+                                                className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs md:text-sm transition-all flex items-center justify-between capitalize cursor-pointer ${isActive
                                                     ? "bg-primary text-white font-bold shadow-md shadow-primary/20"
                                                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                                     }`}
