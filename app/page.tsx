@@ -296,7 +296,7 @@ export default function Home() {
             points: [
                 "PCB Assembly with the Highest Quality and on-time delivery for surface mount, through hole and press-Fit technology.",
                 "Focus on Engineering prototypes, NPI, Rapid Prototyping, Low-mid Volume manufacturing with Quick turnaround time.",
-                "Supports Single-sided, Double-sided, Surface mount assembly and Through-hole PCBA Assembly.",
+                "Supports Single-sided, Double-sided, Surface mount assembly and Through-hole PCBA Assembly",
                 "PCBA Assembly of surface mount and through hole components on Rigid, Flexible, and Flex-Rigid PCB's.",
                 "Meticulous PCB assembly services backed by highly skilled professionals and processes.",
                 "A comprehensive multi-stage QC process ensures consistent quality and high production yield.",
@@ -327,14 +327,14 @@ export default function Home() {
         <div className="flex flex-col min-h-screen">
 
             {/* 1. HERO */}
-            <section className="relative flex items-center pt-28 sm:pt-32 md:pt-50 pb-12 md:pb-16 overflow-hidden bg-secondary">
+            <section className="relative flex items-center pt-28 sm:pt-32 md:pt-40 pb-16 md:pb-24 overflow-hidden bg-secondary">
                 <CircuitBackground />
 
                 <div className="section-container w-full relative z-10">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
                         {/* Left */}
                         <motion.div initial="hidden" animate="visible" variants={stagger}>
-                            <motion.div variants={fadeUp} className="mb-5">
+                            <motion.div variants={fadeUp} className="mb-6">
                                 <span className="inline-flex items-center gap-2 bg-primary/15 border border-primary/25 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                                     From Imagination To Innovation
@@ -344,12 +344,21 @@ export default function Home() {
                             <motion.h1 variants={fadeUp} className="text-4xl md:text-5xl xl:text-6xl font-display font-bold leading-[1.1] text-white mb-6">
                                 India's Biggest
                                 <span className="block text-gradient">PCB Manufacturer</span>
-                                in Ahmedabad Megabytes Circuit Systems
+                                in Ahmedabad
                             </motion.h1>
 
-                            <motion.p variants={fadeUp} className="text-lg text-white/65 mb-10 max-w-2xl leading-relaxed">
-                                Welcome to Megabytes Circuit Systems, Ahmedabad's trusted PCB manufacturing partner since 2021. We deliver high-quality circuit boards across India, ensuring precision, reliability, and custom solutions for your business.
+                            <motion.p variants={fadeUp} className="text-base md:text-lg text-white/75 mb-8 max-w-xl leading-relaxed">
+                                Welcome to <b>Megabytes Circuit Systems</b>, a trusted name in PCB manufacturing based in Ahmedabad, Gujarat. Delivering high-quality circuit boards across India with precision, reliability, and fast turnaround.
                             </motion.p>
+
+                            <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
+                                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold px-8 shadow-lg shadow-primary/25">
+                                    <Link href="/pcb-calculator">Instant Quote <ArrowRight className="ml-2 w-4 h-4" /></Link>
+                                </Button>
+                                <Button asChild size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 font-semibold px-8 backdrop-blur-sm">
+                                    <Link href="/contact">Contact Us</Link>
+                                </Button>
+                            </motion.div>
                         </motion.div>
 
                         {/* Right – PCB Visual */}
@@ -521,8 +530,281 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* 1.5 FEATURED PRODUCTS */}
-            <FeaturedProducts />
+            {/* 1.3 DETAILED OVERVIEW SECTIONS MATCHING NEXT.JS THEME DESIGN */}
+            <section className="py-24 bg-gradient-to-b from-white via-slate-50/50 to-white relative overflow-hidden">
+                {/* Background decorative glow */}
+                <div className="absolute top-1/3 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 pointer-events-none" />
+                <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl translate-x-1/2 pointer-events-none" />
+
+                <div className="section-container max-w-7xl mx-auto space-y-24 relative z-10">
+
+                    {/* 1.5 FEATURED PRODUCTS */}
+                    <FeaturedProducts />
+
+                    {/* Section 1: Custom PCB Manufacturer in Ahmedabad */}
+                    <InViewSection>
+                        <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200/80 shadow-xl shadow-slate-900/5 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-bl-full pointer-events-none" />
+                            <div className="max-w-4xl mx-auto text-center space-y-6">
+                                <span className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                                    Trusted Manufacturing Partner
+                                </span>
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-secondary leading-tight">
+                                    Custom PCB Manufacturer <span className="text-primary">in Ahmedabad</span>
+                                </h2>
+                                <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                                    At Megabytes Circuit Systems, we take pride in being a dependable PCB manufacturer in Ahmedabad, serving clients with state-of-the-art technology and personalized support. Our team, based in Gujarat, crafts printed circuit boards that empower industries like automotive, medical, and consumer electronics with reliable performance. We blend local expertise with nationwide reach, making it simple for you to work with us—whether you’re near our Ahmedabad facility or ordering online from anywhere in India.
+                                </p>
+                                <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+                                    Our dedication to quality and customer satisfaction distinguishes us among circuit board manufacturing companies. From entrepreneurs needing a single prototype to large enterprises requiring extensive production runs, we provide solutions that adhere to international standards. With Megabytes Circuit Systems, you’re not just getting a PCB manufacturer—you’re gaining a partner committed to ensuring your projects thrive in today’s competitive landscape. Our goal is to deliver circuit boards that meet your expectations and drive innovation, every time.
+                                </p>
+                            </div>
+                        </div>
+                    </InViewSection>
+
+                    {/* Section 2: Why Choose Megabytes Circuit Systems? */}
+                    <InViewSection>
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <span className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                                Why Choose Us
+                            </span>
+                            <h2 className="text-3xl md:text-5xl font-display font-bold text-secondary mb-4">
+                                Why Choose Megabytes <span className="text-primary">Circuit Systems?</span>
+                            </h2>
+                            <p className="text-muted-foreground text-base md:text-lg">
+                                Choosing the right partner for your PCB needs is essential, and here’s why Megabytes Circuit Systems stands out across India.
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            <div className="group bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+                                <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/5 blur-xl group-hover:bg-primary/10 transition-all duration-300 pointer-events-none" />
+                                <div>
+                                    <div className="w-14 h-14 bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl flex items-center justify-center mb-6 border border-emerald-100/50 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                        <Award className="w-7 h-7 text-primary" />
+                                    </div>
+                                    <h3 className="text-xl font-display font-bold text-secondary mb-4 group-hover:text-primary transition-colors">
+                                        Precision and Quality You Can Trust
+                                    </h3>
+                                    <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                                        Megabytes Circuit Systems uses advanced tools to produce reliable PCBs that businesses depend on. Our focus on precision ensures that every board—whether single-sided or multilayer—is built to the highest standards.
+                                    </p>
+                                    <p className="text-slate-600 text-sm leading-relaxed">
+                                        We understand that quality is key in industries like telecommunications and electronics, where performance can’t be compromised. Our skilled team in Ahmedabad works diligently to craft circuit boards that deliver consistent results for your most demanding applications.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="group bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+                                <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/5 blur-xl group-hover:bg-primary/10 transition-all duration-300 pointer-events-none" />
+                                <div>
+                                    <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-sky-100 rounded-2xl flex items-center justify-center mb-6 border border-sky-100/50 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                        <Globe className="w-7 h-7 text-primary" />
+                                    </div>
+                                    <h3 className="text-xl font-display font-bold text-secondary mb-4 group-hover:text-primary transition-colors">
+                                        Full-Service PCB Manufacturers in India
+                                    </h3>
+                                    <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                                        Megabytes Circuit Systems offers a complete range of PCB Manufacturing services, from design to assembly, catering to clients nationwide. Based in Ahmedabad, our team provides custom <Link href="/pcb-design-ahmedabad" className="text-primary font-bold hover:underline">PCB design services near me</Link>, working closely with local clients to create tailored solutions.
+                                    </p>
+                                    <p className="text-slate-600 text-sm leading-relaxed">
+                                        For those beyond Gujarat, our online platform makes ordering seamless. We handle initial sketches, prototyping, and final <Link href="/pcb-assembly-ahmedabad" className="text-primary font-bold hover:underline">PCB assembly</Link> with total expertise.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="group bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+                                <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/5 blur-xl group-hover:bg-primary/10 transition-all duration-300 pointer-events-none" />
+                                <div>
+                                    <div className="w-14 h-14 bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl flex items-center justify-center mb-6 border border-amber-100/50 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                        <Zap className="w-7 h-7 text-primary" />
+                                    </div>
+                                    <h3 className="text-xl font-display font-bold text-secondary mb-2 group-hover:text-primary transition-colors">
+                                        Affordable Solutions with Fast Delivery
+                                    </h3>
+                                    <span className="inline-block text-xs font-black uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-md mb-4">
+                                        No Minimum Order Limit
+                                    </span>
+                                    <p className="text-slate-600 text-sm leading-relaxed">
+                                        At Megabytes Circuit Systems, we believe in flexibility. That’s why we have no minimum order quantity requirement, making it easy for startups, hobbyists, and small businesses to get the PCBs they need without excessive costs. Whether you need a single prototype or a large production batch, we are ready to meet your requirements with the same high quality.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </InViewSection>
+
+                    {/* Section 3: Our PCB Manufacturing Services */}
+                    <InViewSection>
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <span className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                                End-to-End Solutions
+                            </span>
+                            <h2 className="text-3xl md:text-5xl font-display font-bold text-secondary mb-4">
+                                Our PCB Manufacturing <span className="text-primary">Services</span>
+                            </h2>
+                            <p className="text-muted-foreground text-base md:text-lg">
+                                We provide comprehensive solutions designed to meet your unique needs with precision and care.
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden flex flex-col justify-between border border-slate-800">
+                                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
+                                    <Settings className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                    <h4 className="text-2xl font-display font-bold text-white mb-4">Custom Design and Layout</h4>
+                                    <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                                        Our PCB design services near me offer Ahmedabad clients the chance to create layouts that optimize performance. We use advanced software to develop designs matching your exact specifications.
+                                    </p>
+                                    <p className="text-slate-400 text-xs leading-relaxed">
+                                        Our team collaborates with you to understand your goals, crafting solutions that enhance functionality whether for simple or complex multilayer designs.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden flex flex-col justify-between border border-slate-800">
+                                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
+                                    <CircuitBoard className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                    <h4 className="text-2xl font-display font-bold text-white mb-4">Prototyping to Production</h4>
+                                    <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                                        From prototyping to full-scale production, we produce PCBs with precision at our Gujarat facility, supporting <Link href="/products/single-layer-pcb-ahmedabad" className="text-primary font-semibold hover:underline">single-sided</Link>, <Link href="/products/double-layer-pcb-ahmedabad" className="text-primary font-semibold hover:underline">double-sided</Link>, and <Link href="/products/multi-layer-pcb-ahmedabad" className="text-primary font-semibold hover:underline">multilayer</Link> boards.
+                                    </p>
+                                    <p className="text-slate-400 text-xs leading-relaxed">
+                                        Test and refine your designs before scaling up to larger runs with consistent quality across every batch.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden flex flex-col justify-between border border-slate-800">
+                                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
+                                    <Shield className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                    <h4 className="text-2xl font-display font-bold text-white mb-4">Quality Testing and Assurance</h4>
+                                    <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                                        Every PCB we produce undergoes rigorous testing at our Ahmedabad facility, checking for functionality, durability, and compliance with global standards.
+                                    </p>
+                                    <p className="text-slate-400 text-xs leading-relaxed">
+                                        Visual inspections and functional tests guarantee circuit boards built to excel in demanding medical or automotive environments.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </InViewSection>
+
+                    {/* Section 4: Our Process at Megabytes Circuit Systems */}
+                    <InViewSection>
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <span className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                                Workflow
+                            </span>
+                            <h2 className="text-3xl md:text-5xl font-display font-bold text-secondary mb-4">
+                                Our Process at Megabytes <span className="text-primary">Circuit Systems</span>
+                            </h2>
+                            <p className="text-muted-foreground text-base md:text-lg">
+                                Our streamlined process ensures high-quality PCBs from start to finish, crafted with care at our Ahmedabad facility.
+                            </p>
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[
+                                {
+                                    step: "01",
+                                    title: "Initial Consultation",
+                                    desc: "We begin with a consultation to capture your vision. Our Ahmedabad team offers personalized support, reviewing specifications to set a solid foundation for success."
+                                },
+                                {
+                                    step: "02",
+                                    title: "Prototype PCB",
+                                    desc: "Using advanced tools, we build prototypes at our Gujarat facility to validate functionality and refine details early before production.",
+                                    link: "/prototype-pcb"
+                                },
+                                {
+                                    step: "03",
+                                    title: "Full Production",
+                                    desc: "Our Ahmedabad facility scales up to full production with state-of-the-art equipment to deliver PCBs in any volume, maintaining consistent quality."
+                                },
+                                {
+                                    step: "04",
+                                    title: "Final Testing",
+                                    desc: "Every board is thoroughly tested at our facility for functionality, durability, and compliance so your PCBs perform reliably in real-world applications."
+                                }
+                            ].map((item, idx) => (
+                                <div key={idx} className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative">
+                                    <div>
+                                        <span className="text-3xl font-display font-black text-primary/30 mb-3 block">
+                                            {item.step}
+                                        </span>
+                                        <h4 className="text-lg font-bold text-secondary mb-3">{item.title}</h4>
+                                        <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
+                                            {item.desc}
+                                            {item.link && (
+                                                <Link href={item.link} className="text-primary font-bold ml-1 hover:underline">Read more</Link>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </InViewSection>
+
+                    {/* Section 5: What Sets Us Apart as PCB Manufacturers in India? */}
+                    <InViewSection>
+                        <div className="bg-secondary rounded-3xl p-8 md:p-14 text-white relative overflow-hidden border border-slate-800 shadow-2xl">
+                            <CircuitBackground />
+                            <div className="relative z-10 space-y-12">
+                                <div className="text-center max-w-3xl mx-auto">
+                                    <span className="inline-flex items-center gap-2 bg-primary/20 border border-primary/30 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                                        Key Highlights
+                                    </span>
+                                    <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
+                                        What Sets Us Apart as <span className="text-gradient">PCB Manufacturers in India?</span>
+                                    </h2>
+                                    <p className="text-white/70 text-base md:text-lg">
+                                        Megabytes Circuit Systems excels through quality, customer focus, and a unique blend of local and national strengths.
+                                    </p>
+                                </div>
+
+                                <div className="grid md:grid-cols-3 gap-8">
+                                    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 space-y-3">
+                                        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                                            <Award className="w-5 h-5" />
+                                        </div>
+                                        <h3 className="text-xl font-display font-bold text-white">ISO-Certified Standards</h3>
+                                        <p className="text-white/70 text-xs md:text-sm leading-relaxed">
+                                            Our Gujarat facility follows ISO standards, ensuring every PCB meets global quality benchmarks with rigorous checks at design, production, and testing stages.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 space-y-3">
+                                        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                                            <Users className="w-5 h-5" />
+                                        </div>
+                                        <h3 className="text-xl font-display font-bold text-white">Customer-Centric Solutions</h3>
+                                        <p className="text-white/70 text-xs md:text-sm leading-relaxed">
+                                            We prioritize your needs as dedicated <Link href="/pcb-manufacturing-ahmedabad" className="text-primary font-bold hover:underline">PCB manufacturers in India</Link>, offering tailored support and flexibility whether you are local or nationwide.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 space-y-3">
+                                        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                                            <Globe className="w-5 h-5" />
+                                        </div>
+                                        <h3 className="text-xl font-display font-bold text-white">Local & National Expertise</h3>
+                                        <p className="text-white/70 text-xs md:text-sm leading-relaxed">
+                                            Our Ahmedabad roots give us a unique edge, blending local knowledge with nationwide service capabilities and quick collaboration for all industries.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </InViewSection>
+
+                </div>
+            </section>
 
             {/* ─── Capabilities Tab Section ─── */}
             <section className="py-24 bg-slate-50 border-y border-slate-100">
