@@ -96,7 +96,7 @@ export default function Page() {
     return (
         <div className="flex flex-col min-h-screen bg-slate-50/50">
             <ServiceHeader
-                title="Prototype PCB Manufacturing"
+                title="Prototype PCB Manufacturing in Ahmedabad, India"
                 subtitle="High-Quality Prototype PCB Manufacturing Services in Ahmedabad, India"
                 badge="Our Services"
                 breadcrumbs={breadcrumbs}
@@ -112,22 +112,22 @@ export default function Page() {
 
                             {/* Introduction */}
                             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50">
-                                <h3 className="text-xl md:text-2xl font-display font-bold text-secondary mb-4 leading-snug">
-                                    Prototype PCB Manufacturing in <span className="text-primary">Ahmedabad, India</span>
-                                </h3>
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary mb-4 leading-snug">
+                                    High-Quality Prototype PCB Manufacturing Services in <span className="text-primary">Ahmedabad, India</span>
+                                </h2>
                                 <p className="text-sm text-slate-800 leading-relaxed mb-6 whitespace-pre-line">
                                     MEGABYTE CIRCUIT is your trusted partner for precision prototype PCB manufacturing in Ahmedabad, Gujarat, and across India. We specialize in delivering fast, reliable, and customized prototype circuit boards to help engineers, startups, and businesses test, validate, and refine their designs before full-scale production.
                                 </p>
                                 <p className="text-sm text-slate-800 leading-relaxed mb-0">
-                                    Whether you need a single-layer prototype or a complex multi-layer PCB, our advanced manufacturing facility and expert team ensure high-performance boards that meet global industry standards.
+                                    Whether you need a single-layer prototype or a complex <a href="https://www.megabytecircuit.com/products/multi-layer-pcb.html" className="font-bold text-primary hover:underline">multi-layer PCB</a>, our advanced manufacturing facility and expert team ensure high-performance boards that meet global industry standards.
                                 </p>
                             </div>
 
                             {/* What is Prototype PCB */}
                             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50">
-                                <h3 className="text-xl md:text-2xl font-display font-bold text-secondary mb-4">
-                                    What is a <span className="text-primary">Prototype PCB</span>?
-                                </h3>
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary mb-4">
+                                    What is a <span className="text-primary">Prototype PCB?</span>
+                                </h2>
                                 <p className="text-sm text-slate-600 leading-relaxed mb-6">
                                     A Prototype PCB (Printed Circuit Board) is a preliminary version of a circuit board used to:
                                 </p>
@@ -142,11 +142,11 @@ export default function Page() {
                                     </li>
                                     <li className="flex items-start gap-3">
                                         <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                                        <span className="text-sm text-slate-700 font-medium">Validate concepts in custom layers, layout, size, and material selection</span>
+                                        <span className="text-sm text-slate-700 font-medium">Validate concepts in industries like IoT, automotive, medical, and industrial electronics</span>
                                     </li>
                                 </ul>
                                 <p className="text-sm text-slate-800 leading-relaxed mb-0">
-                                    At <span className="font-bold text-secondary">MEGABYTE CIRCUIT</span>, we offer end-to-end prototype PCB services, from simple breadboard prototypes to advanced multi-layer designs, ensuring your product development stays on track.
+                                    At <a href="https://www.megabytecircuit.com/" className="font-bold text-secondary hover:underline">MEGABYTE CIRCUIT</a>, we offer end-to-end prototype PCB services, from simple breadboard prototypes to advanced multi-layer designs, ensuring your product development stays on track.
                                 </p>
                             </div>
 
@@ -217,9 +217,9 @@ export default function Page() {
 
                             {/* Industries We Serve */}
                             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
-                                <h3 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
                                     Industries <span className="text-primary">We Serve</span>
-                                </h3>
+                                </h2>
                                 <ul className="grid md:grid-cols-2 gap-4">
                                     {industries.map((item, index) => (
                                         <li key={index} className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">

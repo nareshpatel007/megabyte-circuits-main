@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import ClientPage from "./ClientPage";
 
 export const metadata: Metadata = {
-    title: "Prototype PCB Manufacturing In Ahmedabad, India | MEGABYTE CIRCUIT",
-    description: "Get High-quality Prototype PCB Manufacturing In Ahmedabad, Gujarat, India With MEGABYTE CIRCUIT. Fast, Reliable, And Customized Solutions For Your Circuit Board Needs.",
+    title: "Prototype PCB Manufacturing in Ahmedabad, India | MEGABYTE CIRCUIT",
+    description: "Get high-quality prototype PCB manufacturing in Ahmedabad, Gujarat, India with MEGABYTE CIRCUIT. Fast, reliable, and customized solutions for your circuit board needs.",
 };
 
 export default function Page() {
