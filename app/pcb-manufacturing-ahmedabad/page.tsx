@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import ClientPage from "./ClientPage";
 
 export const metadata: Metadata = {
-    title: "About Us - Megabytes Circuit Systems Ahmedabad",
-    description: "Megabyte Circuit Is A Leading Name In PCB Manufacturing In Ahmedabad, Delivering End-to-end Circuit Board Manufacturing Solutions Across India. From PCB Layout Design To Complete Testing, We Ensure Precision, Speed, And Reliability In Every Project.",
+    title: "PCB Manufacturing in Ahmedabad | Top Circuit Board Manufacturer in India – Megabyte Circuit",
+    description: "Megabyte Circuit is a leading name in PCB manufacturing in Ahmedabad, delivering end-to-end circuit board manufacturing solutions across India. From PCB Layout Design to complete testing, we ensure precision, speed, and reliability in every project.",
 };
 
 export default function Page() {
     return <ClientPage />;
 }
+
