@@ -4,7 +4,7 @@ import ClientPage from "./ClientPage";
 
 export const metadata: Metadata = {
     title: "DFM Support Services | Megabytes Circuite",
-    description: "DFM Support By Megabytes Circuite Systems. Optimize PCB Designs For Manufacturability, Cost-efficiency, And Performance. Get A Free Quote!",
+    description: "DFM support by Megabytes Circuite Systems. Optimize PCB designs for manufacturability, cost-efficiency, and performance. Get a free quote!",
 };
 
 export default function Page() {
