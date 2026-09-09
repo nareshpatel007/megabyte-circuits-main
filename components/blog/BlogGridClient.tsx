@@ -7,6 +7,7 @@ import { Calendar, Clock, ArrowRight, Search, ThumbsUp, MessageSquare } from "lu
 import { BLOG_POSTS } from "@/lib/blog";
 import { Badge } from "@/components/ui/badge";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -164,7 +165,47 @@ export function BlogGridClient() {
             <section className="py-16 bg-gray-50">
                 <div className="section-container">
                     {loading ? (
-                        <div className="py-20 text-center text-gray-500 font-medium">Loading articles...</div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="flex flex-col bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm h-full"
+                                >
+                                    {/* Skeleton Image Header */}
+                                    <div className="relative h-48 bg-gray-100 p-4">
+                                        <Skeleton className="w-full h-full rounded-lg" />
+                                        <div className="absolute top-4 left-4">
+                                            <Skeleton className="h-6 w-24 rounded-full" />
+                                        </div>
+                                    </div>
+
+                                    {/* Skeleton Body */}
+                                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-4">
+                                                <Skeleton className="h-3.5 w-24 rounded" />
+                                                <Skeleton className="h-3.5 w-20 rounded" />
+                                            </div>
+                                            <Skeleton className="h-5 w-full rounded" />
+                                            <Skeleton className="h-5 w-3/4 rounded" />
+                                            <div className="space-y-2 pt-2">
+                                                <Skeleton className="h-3.5 w-full rounded" />
+                                                <Skeleton className="h-3.5 w-5/6 rounded" />
+                                            </div>
+                                        </div>
+
+                                        {/* Skeleton Footer */}
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                            <div className="flex items-center gap-2.5">
+                                                <Skeleton className="w-8 h-8 rounded-full shrink-0" />
+                                                <Skeleton className="h-4 w-28 rounded" />
+                                            </div>
+                                            <Skeleton className="h-4 w-12 rounded" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     ) : posts.length === 0 ? (
                         <div className="py-20 text-center text-gray-500 font-medium">No blog posts found matching your criteria.</div>
                     ) : (
