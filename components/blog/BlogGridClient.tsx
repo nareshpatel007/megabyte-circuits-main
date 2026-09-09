@@ -125,11 +125,10 @@ export function BlogGridClient() {
                     <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
                         <button
                             onClick={() => { setSelectedCategory(""); setPage(1); }}
-                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                                selectedCategory === ""
-                                    ? "bg-primary text-white shadow-sm"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                            }`}
+                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${selectedCategory === ""
+                                ? "bg-primary text-white shadow-sm"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                }`}
                         >
                             All Posts
                         </button>
@@ -137,11 +136,10 @@ export function BlogGridClient() {
                             <button
                                 key={cat.id}
                                 onClick={() => { setSelectedCategory(cat.slug || cat.name); setPage(1); }}
-                                className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                                    selectedCategory === (cat.slug || cat.name)
-                                        ? "bg-primary text-white shadow-sm"
-                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                }`}
+                                className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${selectedCategory === (cat.slug || cat.name)
+                                    ? "bg-primary text-white shadow-sm"
+                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    }`}
                             >
                                 {cat.name}
                             </button>
@@ -224,8 +222,7 @@ export function BlogGridClient() {
                                                         {post.author_avatar || post.author?.avatar || (post.author_name ? post.author_name.charAt(0) : "MC")}
                                                     </div>
                                                     <div>
-                                                        <p className="text-xs font-bold text-secondary leading-none">{post.author_name || post.author?.name || "Senior Layout Engineer"}</p>
-                                                        <p className="text-[10px] text-muted-foreground">{post.author_role || post.author?.role || "Engineering Team"}</p>
+                                                        <p className="text-xs font-bold text-secondary leading-none">{post.author_name || post.author?.name || "MegaByte Circuits"}</p>
                                                     </div>
                                                 </div>
                                                 <span className="inline-flex items-center gap-1 text-xs font-bold text-primary group-hover:gap-2 transition-all">

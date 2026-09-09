@@ -112,8 +112,15 @@ export function BlogDetailClient({
         }
     };
 
-    const pageUrl = typeof window !== "undefined" ? encodeURIComponent(window.location.href) : "";
-    const pageTitle = encodeURIComponent(blog.title);
+    const [pageUrl, setPageUrl] = useState("");
+
+    React.useEffect(() => {
+        if (typeof window !== "undefined") {
+            setPageUrl(encodeURIComponent(window.location.href));
+        }
+    }, []);
+
+    const pageTitle = encodeURIComponent(blog.title || "");
 
     return (
         <div className="w-full bg-gray-50 min-h-screen pb-20">
@@ -148,13 +155,12 @@ export function BlogDetailClient({
                             </div>
                             <div>
                                 <p className="font-bold text-gray-900 text-sm">{author.name}</p>
-                                <p className="text-[11px] text-gray-500">{author.role}</p>
                             </div>
                         </div>
 
                         {/* Article Metrics */}
                         <div className="flex items-center gap-6">
-                            <span className="flex items-center gap-1.5">
+                            <span className="flex items-center gap-1.5" suppressHydrationWarning>
                                 <Calendar className="w-4 h-4 text-gray-400" />
                                 {blog.published_at
                                     ? new Date(blog.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
@@ -173,7 +179,7 @@ export function BlogDetailClient({
                 </div>
 
                 {/* Featured Image */}
-                {blog.featured_image && (
+                {/* {blog.featured_image && (
                     <div className="mb-10 rounded-2xl overflow-hidden shadow-md border border-gray-200 max-h-[460px] bg-gray-100">
                         <img
                             src={blog.featured_image}
@@ -181,7 +187,7 @@ export function BlogDetailClient({
                             className="w-full h-full object-cover"
                         />
                     </div>
-                )}
+                )} */}
 
                 {/* Article HTML Content */}
                 <article className="bg-white rounded-2xl p-8 md:p-12 border border-gray-200 shadow-sm mb-10 prose prose-emerald max-w-none">
@@ -209,11 +215,10 @@ export function BlogDetailClient({
                     <button
                         onClick={handleLikeToggle}
                         disabled={likeLoading}
-                        className={`flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 ${
-                            liked
-                                ? "bg-rose-50 text-rose-600 border border-rose-200 shadow-sm"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
+                        className={`flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 ${liked
+                            ? "bg-rose-50 text-rose-600 border border-rose-200 shadow-sm"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
                     >
                         <ThumbsUp className={`w-4 h-4 ${liked ? "fill-rose-600" : ""}`} />
                         <span>{liked ? "Liked" : "Like Article"}</span>
