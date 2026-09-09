@@ -4,7 +4,7 @@ import ClientPage from "./ClientPage";
 
 export const metadata: Metadata = {
     title: "About Us - Megabytes Circuit Systems Ahmedabad",
-    description: "Megabytes Circuit Systems, Ahmedabad’s Trusted PCB Manufacturer Since 2021. High quality PCBs For Telecom, Automotive, And Medical Industries.",
+    description: "Megabytes Circuit Systems, Ahmedabad’s trusted PCB manufacturer since 2021. High-quality PCBs for telecom, automotive, and medical industries.",
 };
 
 export default function Page() {

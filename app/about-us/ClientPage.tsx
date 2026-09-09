@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
     Globe, Award, Target, Zap, CheckCircle2,
     ArrowRight, Users, Factory, Clock, Star,
+    Plane, Car, Briefcase, Radio, GraduationCap, Heart, HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
@@ -89,10 +90,10 @@ export default function About() {
                                     ABOUT <span className="text-primary underline decoration-2 underline-offset-8">MEGABYTES CIRCUIT SYSTEMS</span>
                                 </h2>
                                 <p className="text-gray-600 text-lg leading-relaxed font-normal">
-                                    Established in the year <strong>2021 at Ahmedabad - 382430, (Gujarat, India)</strong>. We <strong>"Megabytes Circuit Systems"</strong> a Proprietorship firm, are engaged as the foremost Manufacturer of <strong>PCB Circuits, Double Sided PCBs, Single Sided Circuit Boards</strong>, and many more such products. Our company specializes in the design and production of printed circuit boards (PCBs) that cater to a diverse range of industries, including telecommunications, automotive, consumer electronics, and medical devices.
+                                    Established in the year <strong>2021 at Ahmedabad - 382350, (Gujarat, India)</strong>. We <strong>"Megabytes Circuit Systems"</strong> a Proprietorship firm, are engaged as the foremost Manufacturer of <strong>PCB Circuits, Double Sided PCBs, Single Sided Circuit Boards</strong>, and many more such products. Our company specializes in the design and production of printed circuit boards (PCBs) that cater to a diverse range of industries, including telecommunications, automotive, consumer electronics, and medical devices. With a commitment to innovation and precision, we utilize state-of-the-art technology and advanced manufacturing processes to ensure that each circuit board meets the highest standards of reliability and performance. Our team of skilled engineers and technicians works diligently to deliver products that not only meet but exceed customer expectations.
                                 </p>
                                 <p className="text-gray-600 text-lg leading-relaxed font-normal">
-                                    Our PCB Circuits are designed with versatility in mind, accommodating various specifications and complexities. We offer a wide array of options, including single-sided, double-sided, and multi-layer boards, tailored to suit specific project requirements. Each circuit board is manufactured using high-grade materials that enhance durability and conductivity, ensuring optimal functionality in even the most demanding environments.
+                                    Our PCB Circuits are designed with versatility in mind, accommodating various specifications and complexities. We offer a wide array of options, including single-sided, double-sided, and multi-layer boards, tailored to suit specific project requirements. Each circuit board is manufactured using high-grade materials that enhance durability and conductivity, ensuring optimal functionality in even the most demanding environments. Additionally, we provide comprehensive services, from prototyping to mass production, allowing clients to streamline their development processes and bring their products to market efficiently.
                                 </p>
                             </motion.div>
 
@@ -104,11 +105,132 @@ export default function About() {
                                     At our Ahmedabad facility, we prioritize quality control and customer satisfaction. Our rigorous testing protocols ensure that every PCB Circuit undergoes thorough inspections for electrical performance, thermal management, and mechanical integrity.
                                 </p>
                                 <p className="text-gray-600 text-base leading-relaxed">
-                                    We are dedicated to fostering long-term partnerships with our clients by offering exceptional support and flexible solutions that adapt to their evolving needs. By choosing our PCB Circuit services, you are investing in a reliable and innovative partner that is committed to driving your success.
+                                    We are dedicated to fostering long-term partnerships with our clients by offering exceptional support and flexible solutions that adapt to their evolving needs. By choosing our PCB Circuit services, you are investing in a reliable and innovative partner that is committed to driving your success in the competitive landscape of technology and electronics.
                                 </p>
                                 <div className="pt-4 border-t border-gray-200">
                                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Location Facility</p>
                                     <p className="text-sm font-bold text-secondary">Ahmedabad, Gujarat, India</p>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    </InView>
+                </div>
+            </section>
+
+            {/* ── Industries We Serve (whyus.php) ────────────────────── */}
+            <section className="py-24 bg-gray-50 border-y border-gray-100">
+                <div className={C}>
+                    <InView>
+                        <motion.div variants={stagger} className="text-center max-w-3xl mx-auto mb-16">
+                            <motion.span variants={fadeUp} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary mb-3">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Megabytes Circuit Systems
+                            </motion.span>
+                            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-display font-bold text-secondary mb-4">
+                                Industries We Serve
+                            </motion.h2>
+                            <motion.p variants={fadeUp} className="text-gray-600 text-base leading-relaxed mb-3">
+                                Our company specializes in the design and production of printed circuit boards (PCBs) that cater to a diverse range of industries.
+                            </motion.p>
+                            <motion.p variants={fadeUp} className="text-gray-500 text-sm leading-relaxed">
+                                We deliver innovative products and services that enhance operational efficiency and drive growth. By understanding the specific challenges faced by these industries, we are committed to offering high-quality, reliable solutions that empower our clients to achieve their goals.
+                            </motion.p>
+                        </motion.div>
+
+                        <motion.div variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[
+                                { label: "Aerospace and Defense", icon: Plane },
+                                { label: "Automotive", icon: Car },
+                                { label: "Commercial", icon: Briefcase },
+                                { label: "Industrial", icon: Factory },
+                                { label: "Lighting", icon: Zap },
+                                { label: "Medical", icon: Heart },
+                                { label: "Telecom", icon: Radio },
+                                { label: "Educational Institutes", icon: GraduationCap },
+                            ].map((ind, i) => (
+                                <motion.div
+                                    key={i}
+                                    variants={fadeUp}
+                                    className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center gap-4 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
+                                >
+                                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300 shrink-0">
+                                        <ind.icon className="w-6 h-6 text-primary group-hover:text-white transition-colors duration-300" />
+                                    </div>
+                                    <h3 className="font-display font-bold text-secondary text-base group-hover:text-primary transition-colors duration-200">
+                                        {ind.label}
+                                    </h3>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </InView>
+                </div>
+            </section>
+
+            {/* ── Key Strengths & Quality (serv_lists2.php) ──────────── */}
+            <section className="py-24 bg-white">
+                <div className={C}>
+                    <InView>
+                        <motion.div variants={stagger} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Quality Assurance */}
+                            <motion.div variants={fadeUp} className="bg-gray-50 rounded-3xl border border-gray-100 p-8 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
+                                <div>
+                                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+                                        <Star className="w-7 h-7 text-primary" />
+                                    </div>
+                                    <h3 className="text-2xl font-display font-bold text-secondary mb-4">
+                                        Quality Assurance
+                                    </h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                        To become the customer-oriented organization, we are engaged in offering best quality products at reasonable prices. In order to maintain high quality standards in our range, we have hired skilled quality analysts, who keep close eye on procurement process and ensure that only flawless range is procured. We lay great emphasis on packaging of our range, so that products reach safely to the clients end.
+                                    </p>
+                                </div>
+                            </motion.div>
+
+                            {/* Why Us? */}
+                            <motion.div variants={fadeUp} className="bg-primary text-white rounded-3xl p-8 flex flex-col justify-between shadow-xl shadow-primary/10 hover:shadow-primary/20 transition-all duration-300">
+                                <div>
+                                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
+                                        <HelpCircle className="w-7 h-7 text-white" />
+                                    </div>
+                                    <h3 className="text-2xl font-display font-bold text-white mb-4">
+                                        Why Us?
+                                    </h3>
+                                    <p className="text-white/90 text-sm leading-relaxed mb-6">
+                                        Our tremendous industrial experience and knowledge has enabled us to gain a prominent position in industry. Our friendly policies and timely deliveries have enabled us to become the first choice of the clients nationwide.
+                                    </p>
+                                </div>
+                                <div className="pt-6 border-t border-white/20">
+                                    <p className="text-xs uppercase tracking-wider text-white/80 font-bold mb-3">
+                                        Following are the reasons for our success:
+                                    </p>
+                                    <ul className="space-y-2">
+                                        {[
+                                            "Prompt delivery of order",
+                                            "Ethical business deals",
+                                            "Transparency",
+                                            "Flexible payment modes",
+                                            "Huge distribution network"
+                                        ].map((reason, index) => (
+                                            <li key={index} className="flex items-center gap-2 text-xs font-semibold text-white">
+                                                <CheckCircle2 className="w-4 h-4 text-white shrink-0" />
+                                                <span>{reason}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </motion.div>
+
+                            {/* Team of Experts */}
+                            <motion.div variants={fadeUp} className="bg-gray-50 rounded-3xl border border-gray-100 p-8 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
+                                <div>
+                                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+                                        <Users className="w-7 h-7 text-primary" />
+                                    </div>
+                                    <h3 className="text-2xl font-display font-bold text-secondary mb-4">
+                                        Team of Experts
+                                    </h3>
+                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                        We have selected a group of experts and professionals in our team to ensure timely completion of productivity. By providing specialized training sessions for these employees, we will ensure that the professionals are always updated themselves with current market demands and customer behavior. All individuals working under the supervision of highly experienced supervisors and inspectors.
+                                    </p>
                                 </div>
                             </motion.div>
                         </motion.div>
@@ -257,3 +379,4 @@ export default function About() {
         </div>
     );
 }
+
