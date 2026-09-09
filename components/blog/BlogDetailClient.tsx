@@ -18,7 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
 
-const API_BASE = "";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 interface BlogDetailProps {
     blog: any;
@@ -37,6 +37,7 @@ export function BlogDetailClient({
     hasLiked: initialHasLiked,
     related,
 }: BlogDetailProps) {
+    const [views, setViews] = useState(blog.views || 0);
     const [likes, setLikes] = useState(initialLikesCount);
     const [liked, setLiked] = useState(initialHasLiked);
     const [likeLoading, setLikeLoading] = useState(false);
@@ -52,6 +53,32 @@ export function BlogDetailClient({
 
     // Share toast
     const [copied, setCopied] = useState(false);
+    const [pageUrl, setPageUrl] = useState("");
+
+    React.useEffect(() => {
+        if (typeof window !== "undefined") {
+            setPageUrl(encodeURIComponent(window.location.href));
+
+            // Only increment view count ONCE per browser tab session
+            const blogIdentifier = blog.id || blog.slug;
+            if (blogIdentifier) {
+                const storageKey = `viewed_blog_${blogIdentifier}`;
+                const hasViewedInTab = sessionStorage.getItem(storageKey);
+
+                if (!hasViewedInTab) {
+                    sessionStorage.setItem(storageKey, "true");
+                    fetch(`${API_BASE}/api/blogs/${blogIdentifier}/view`, { method: "POST" })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.status && typeof data.views === "number") {
+                                setViews(data.views);
+                            }
+                        })
+                        .catch((e) => console.error("View increment error:", e));
+                }
+            }
+        }
+    }, [blog.id, blog.slug]);
 
     const handleLikeToggle = async () => {
         if (likeLoading) return;
@@ -112,14 +139,6 @@ export function BlogDetailClient({
         }
     };
 
-    const [pageUrl, setPageUrl] = useState("");
-
-    React.useEffect(() => {
-        if (typeof window !== "undefined") {
-            setPageUrl(encodeURIComponent(window.location.href));
-        }
-    }, []);
-
     const pageTitle = encodeURIComponent(blog.title || "");
 
     return (
@@ -172,11 +191,12 @@ export function BlogDetailClient({
                             </span>
                             <span className="flex items-center gap-1.5">
                                 <Eye className="w-4 h-4 text-gray-400" />
-                                {blog.views || 0} views
+                                {views} views
                             </span>
                         </div>
                     </div>
                 </div>
+
 
                 {/* Featured Image */}
                 {/* {blog.featured_image && (
@@ -369,7 +389,7 @@ export function BlogDetailClient({
                                                 </div>
                                                 <span className="font-bold text-xs text-gray-900">{comment.name}</span>
                                             </div>
-                                            <span className="text-[10px] text-gray-400">
+                                            <span className="text-[10px] text-gray-400" suppressHydrationWarning>
                                                 {new Date(comment.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
@@ -390,10 +410,11 @@ export function BlogDetailClient({
                                                     <div key={reply.id} className="bg-white p-3 rounded-lg border border-gray-100">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <span className="font-bold text-xs text-gray-900">{reply.name}</span>
-                                                            <span className="text-[10px] text-gray-400">
+                                                            <span className="text-[10px] text-gray-400" suppressHydrationWarning>
                                                                 {new Date(reply.created_at).toLocaleDateString()}
                                                             </span>
                                                         </div>
+
                                                         <p className="text-xs text-gray-700">{reply.content}</p>
                                                     </div>
                                                 ))}
