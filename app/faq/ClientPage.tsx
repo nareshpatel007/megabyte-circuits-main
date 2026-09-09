@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
-import { 
-  HelpCircle, ChevronDown, Search, ArrowRight, MessageSquare, 
+import {
+  HelpCircle, ChevronDown, Search, ArrowRight, MessageSquare,
   Settings, ShieldAlert, Cpu, Truck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,18 +41,6 @@ const FAQS_DATA: FAQItem[] = [
     category: "capabilities",
     question: "Can you handle high-mix, low-volume orders?",
     answer: "Absolutely. We cater to both large-scale production runs and small, custom prototype orders with no minimum order quantity requirements.",
-  },
-  {
-    id: "capabilities-specs",
-    category: "capabilities",
-    question: "What are your standard manufacturing tolerances and capabilities?",
-    answer: "We support up to 32-layer PCBs, minimum trace width/spacing of 3mil, minimum drill size of 0.15mm, and finishes including HASL, Lead-free HASL, ENIG, and Immersion Silver.",
-  },
-  {
-    id: "shipping-global",
-    category: "production",
-    question: "Do you offer global shipping?",
-    answer: "Yes, we ship worldwide. We partner with leading global logistics providers like DHL and FedEx to ensure secure, rapid, and trackable deliveries to your doorstep.",
   }
 ];
 
@@ -66,8 +54,8 @@ export default function FAQPage() {
   };
 
   const filteredFAQs = FAQS_DATA.filter((faq) => {
-    const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "all" || faq.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
@@ -95,7 +83,7 @@ export default function FAQPage() {
 
       <section className="py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center mb-12">
             <span className="text-xs font-bold text-primary uppercase tracking-widest bg-primary/10 px-3.5 py-1.5 rounded-full mb-3 inline-block">
               Megabytes Circuit Systems
@@ -129,11 +117,10 @@ export default function FAQPage() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id as any)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all border ${
-                      isActive 
-                        ? "bg-primary border-primary text-white shadow-md shadow-primary/20" 
-                        : "bg-white border-slate-100 text-slate-600 hover:border-slate-200 hover:bg-slate-50"
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all border ${isActive
+                      ? "bg-primary border-primary text-white shadow-md shadow-primary/20"
+                      : "bg-white border-slate-100 text-slate-600 hover:border-slate-200 hover:bg-slate-50"
+                      }`}
                   >
                     <Icon className="w-4 h-4" />
                     <span>{cat.label}</span>
@@ -149,8 +136,8 @@ export default function FAQPage() {
               filteredFAQs.map((faq) => {
                 const isOpen = expandedId === faq.id;
                 return (
-                  <div 
-                    key={faq.id} 
+                  <div
+                    key={faq.id}
                     className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden transition-all duration-300"
                   >
                     <button
@@ -158,16 +145,14 @@ export default function FAQPage() {
                       className="w-full flex items-center justify-between p-5 text-left font-display font-bold text-secondary hover:text-primary transition-colors gap-4"
                     >
                       <span className="text-base md:text-lg">{faq.question}</span>
-                      <ChevronDown 
-                        className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-300 ${
-                          isOpen ? "rotate-180 text-primary" : ""
-                        }`}
+                      <ChevronDown
+                        className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180 text-primary" : ""
+                          }`}
                       />
                     </button>
-                    <div 
-                      className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                        isOpen ? "max-h-[300px] border-t border-slate-50" : "max-h-0"
-                      }`}
+                    <div
+                      className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-[300px] border-t border-slate-50" : "max-h-0"
+                        }`}
                     >
                       <div className="p-5 text-sm text-slate-600 leading-relaxed font-medium bg-slate-50/30">
                         {faq.answer}
