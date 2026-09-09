@@ -4,7 +4,7 @@ import ClientPage from "./ClientPage";
 
 export const metadata: Metadata = {
     title: "Multi Layer PCB Manufacturer Ahmedabad | Megabyte Circuits",
-    description: "Multi Layer PCBs From Megabyte Circuit Systems In Ahmedabad. High density, Reliable Circuit Boards For Electronics & Automation.",
+    description: "Multi layer PCBs from Megabyte Circuit Systems in Ahmedabad. High-density, reliable circuit boards for electronics & automation.",
 };
 
 export default function Page() {
