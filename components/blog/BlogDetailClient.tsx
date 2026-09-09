@@ -1,435 +1,443 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useSpring } from "framer-motion";
 import {
-    Calendar, Clock, ArrowLeft, Share2, Twitter, Linkedin, Facebook,
-    CheckCircle2, Mail, Link2, Copy, Check,
-    ArrowRight
+    Calendar,
+    Clock,
+    Eye,
+    ThumbsUp,
+    MessageSquare,
+    Share2,
+    Check,
+    ArrowRight,
+    ArrowLeft,
+    Send,
+    User,
 } from "lucide-react";
-import { BlogPost } from "@/lib/blog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
 
-interface BlogDetailClientProps {
-    post: BlogPost;
-    relatedPosts: BlogPost[];
+const API_BASE = "";
+
+interface BlogDetailProps {
+    blog: any;
+    author: any;
+    comments: any[];
+    likesCount: number;
+    hasLiked: boolean;
+    related: any[];
 }
 
-export function BlogDetailClient({ post, relatedPosts }: BlogDetailClientProps) {
-    const contentRef = useRef<HTMLDivElement>(null);
-    const [activeSection, setActiveSection] = useState<string>("");
-    const [copied, setCopied] = useState(false);
+export function BlogDetailClient({
+    blog,
+    author,
+    comments: initialComments,
+    likesCount: initialLikesCount,
+    hasLiked: initialHasLiked,
+    related,
+}: BlogDetailProps) {
+    const [likes, setLikes] = useState(initialLikesCount);
+    const [liked, setLiked] = useState(initialHasLiked);
+    const [likeLoading, setLikeLoading] = useState(false);
+
+    // Comment Form State
+    const [comments, setComments] = useState(initialComments);
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [submitting, setSubmitting] = useState(false);
-    const [subscribed, setSubscribed] = useState(false);
+    const [commentText, setCommentText] = useState("");
+    const [replyToId, setReplyToId] = useState<number | null>(null);
+    const [submittingComment, setSubmittingComment] = useState(false);
+    const [commentSuccess, setCommentSuccess] = useState("");
 
-    // Reading progress bar setup
-    const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
+    // Share toast
+    const [copied, setCopied] = useState(false);
 
-    // Extract headings from the content blocks for Table of Contents
-    const headings = post.content
-        .filter(block => block.type === "heading" && block.text)
-        .map(block => ({
-            text: block.text!,
-            id: block.text!.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-        }));
-
-    // Monitor which section is currently viewed
-    useEffect(() => {
-        const observerOptions = {
-            root: null,
-            rootMargin: "-20% 0px -60% 0px",
-            threshold: 0
-        };
-
-        const observerCallback = (entries: IntersectionObserverEntry[]) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setActiveSection(entry.target.id);
-                }
+    const handleLikeToggle = async () => {
+        if (likeLoading) return;
+        setLikeLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/api/blogs/${blog.id}/like`, {
+                method: "POST",
             });
-        };
+            const data = await res.json();
+            if (data.status) {
+                setLiked(data.liked);
+                setLikes(data.likes_count);
+            }
+        } catch (e) {
+            console.error("Like error:", e);
+        } finally {
+            setLikeLoading(false);
+        }
+    };
 
-        const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const handleCommentSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!name.trim() || !email.trim() || !commentText.trim()) return;
 
-        headings.forEach(heading => {
-            const el = document.getElementById(heading.id);
-            if (el) observer.observe(el);
-        });
-
-        return () => {
-            headings.forEach(heading => {
-                const el = document.getElementById(heading.id);
-                if (el) observer.unobserve(el);
+        setSubmittingComment(true);
+        setCommentSuccess("");
+        try {
+            const res = await fetch(`${API_BASE}/api/blogs/${blog.id}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    content: commentText,
+                    parent_id: replyToId,
+                }),
             });
-        };
-    }, [headings]);
+            const data = await res.json();
+            if (data.status) {
+                setCommentSuccess(data.message || "Comment submitted for moderation.");
+                setCommentText("");
+                setReplyToId(null);
+            } else {
+                alert(data.message || "Failed to submit comment.");
+            }
+        } catch (e) {
+            alert("Error submitting comment.");
+        } finally {
+            setSubmittingComment(false);
+        }
+    };
 
     const handleCopyLink = () => {
-        navigator.clipboard.writeText(window.location.href);
-        setCopied(true);
-        toast.success("Article link copied to clipboard!");
-        setTimeout(() => setCopied(false), 2000);
+        if (typeof window !== "undefined") {
+            navigator.clipboard.writeText(window.location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2500);
+        }
     };
 
-    const handleSubscribe = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!email) return;
-
-        setSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            setSubmitting(false);
-            setSubscribed(true);
-            setEmail("");
-            toast.success("Successfully subscribed to engineering newsletter!");
-        }, 1200);
-    };
-
-    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-    const twitterShare = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(post.title)}`;
-    const linkedinShare = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-    const facebookShare = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-
-    const breadcrumbs = [
-        { label: "Home", href: "/" },
-        { label: "Blog", href: "/blog" },
-        { label: post.title }
-    ];
+    const pageUrl = typeof window !== "undefined" ? encodeURIComponent(window.location.href) : "";
+    const pageTitle = encodeURIComponent(blog.title);
 
     return (
-        <div className="w-full bg-white relative">
-            {/* Reading Progress Indicator */}
-            <motion.div
-                className="fixed top-0 left-0 right-0 h-1.5 bg-primary z-50 origin-left"
-                style={{ scaleX }}
+        <div className="w-full bg-gray-50 min-h-screen pb-20">
+            {/* Service Header / Hero */}
+            <ServiceHeader
+                title={blog.title}
+                subtitle={blog.excerpt}
+                badge={blog.category_name || blog.category || "PCB Engineering"}
+                breadcrumbs={[
+                    { label: "Home", href: "/" },
+                    { label: "Blog", href: "/blog" },
+                    { label: blog.title }
+                ]}
             />
 
-            {/* Back to Blog header section */}
-            <div className="border-b border-gray-100 bg-gray-50/50 py-4">
-                <div className="section-container flex items-center justify-between">
+            {/* Article Container */}
+            <div className="section-container py-12 max-w-4xl mx-auto">
+                {/* Back button & Article Meta Header */}
+                <div className="mb-8">
                     <Link
                         href="/blog"
-                        className="inline-flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-primary transition-colors group cursor-pointer"
+                        className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-primary transition-colors mb-6"
                     >
-                        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                        Back to Engineering Insights
+                        <ArrowLeft className="w-4 h-4" /> Back to all articles
                     </Link>
+
+                    <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-gray-200 text-xs font-semibold text-gray-500">
+                        {/* Author Info */}
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-display font-bold text-sm text-primary">
+                                {author.avatar || author.name.charAt(0)}
+                            </div>
+                            <div>
+                                <p className="font-bold text-gray-900 text-sm">{author.name}</p>
+                                <p className="text-[11px] text-gray-500">{author.role}</p>
+                            </div>
+                        </div>
+
+                        {/* Article Metrics */}
+                        <div className="flex items-center gap-6">
+                            <span className="flex items-center gap-1.5">
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                {blog.published_at
+                                    ? new Date(blog.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+                                    : "Recent"}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <Clock className="w-4 h-4 text-gray-400" />
+                                {blog.reading_time || "5 min read"}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <Eye className="w-4 h-4 text-gray-400" />
+                                {blog.views || 0} views
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            {/* Common Hero Header */}
-            <ServiceHeader
-                title={post.title}
-                subtitle={post.desc}
-                badge={post.tag}
-                breadcrumbs={breadcrumbs}
-            />
+                {/* Featured Image */}
+                {blog.featured_image && (
+                    <div className="mb-10 rounded-2xl overflow-hidden shadow-md border border-gray-200 max-h-[460px] bg-gray-100">
+                        <img
+                            src={blog.featured_image}
+                            alt={blog.title}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                )}
 
-            {/* Article Content Layout */}
-            <section className="py-20">
-                <div className="section-container">
-                    <div className="grid lg:grid-cols-12 gap-12 items-start">
-                        {/* Left Side: Article Content */}
-                        <article className="lg:col-span-8 space-y-8" ref={contentRef}>
-                            {/* Author & Date Metadata */}
-                            <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-gray-150 mb-8">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-display font-bold text-primary text-sm">
-                                        {post.author.avatar}
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-secondary text-sm">{post.author.name}</h4>
-                                        <p className="text-[11px] text-muted-foreground">{post.author.role}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-4 text-xs font-semibold text-gray-500">
-                                    <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {post.date}</span>
-                                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {post.readTime}</span>
-                                </div>
-                            </div>
+                {/* Article HTML Content */}
+                <article className="bg-white rounded-2xl p-8 md:p-12 border border-gray-200 shadow-sm mb-10 prose prose-emerald max-w-none">
+                    <div
+                        className="leading-relaxed text-gray-700 font-sans space-y-6"
+                        dangerouslySetInnerHTML={{ __html: blog.content }}
+                    />
 
-                            {/* Top Banner Image */}
-                            <div className="relative h-[300px] md:h-[420px] rounded-2xl overflow-hidden shadow-sm mb-8">
-                                <img
-                                    src={post.image}
-                                    alt={post.title}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
+                    {/* Tags */}
+                    {blog.tags && (
+                        <div className="mt-10 pt-6 border-t border-gray-100 flex flex-wrap items-center gap-2">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Tags:</span>
+                            {blog.tags.split(",").map((t: string, i: number) => (
+                                <Badge key={i} variant="outline" className="text-xs font-semibold bg-gray-50">
+                                    #{t.trim()}
+                                </Badge>
+                            ))}
+                        </div>
+                    )}
+                </article>
 
-                            {post.content.map((block, idx) => {
-                                switch (block.type) {
-                                    case "paragraph":
-                                        return (
-                                            <p key={idx} className="text-gray-700 text-lg leading-relaxed font-normal">
-                                                {block.text}
-                                            </p>
-                                        );
+                {/* Engagement Bar: Like & Social Share */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 mb-12">
+                    {/* Like Button */}
+                    <button
+                        onClick={handleLikeToggle}
+                        disabled={likeLoading}
+                        className={`flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 ${
+                            liked
+                                ? "bg-rose-50 text-rose-600 border border-rose-200 shadow-sm"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                    >
+                        <ThumbsUp className={`w-4 h-4 ${liked ? "fill-rose-600" : ""}`} />
+                        <span>{liked ? "Liked" : "Like Article"}</span>
+                        <span className="ml-1 px-2 py-0.5 rounded-full bg-white text-xs text-gray-900 border border-gray-200 font-extrabold">
+                            {likes}
+                        </span>
+                    </button>
 
-                                    case "heading":
-                                        const HeadingTag = block.level === 3 ? "h3" : "h2";
-                                        const headingId = block.text?.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "";
-                                        return (
-                                            <HeadingTag
-                                                key={idx}
-                                                id={headingId}
-                                                className={`font-display font-extrabold text-secondary tracking-tight scroll-mt-24 mt-10 mb-4 ${block.level === 3 ? "text-xl md:text-2xl" : "text-2xl md:text-3xl"
-                                                    }`}
-                                            >
-                                                {block.text}
-                                            </HeadingTag>
-                                        );
+                    {/* Social Share Buttons */}
+                    <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Share:</span>
 
-                                    case "list":
-                                        return (
-                                            <ul key={idx} className="space-y-3.5 pl-2 my-6">
-                                                {block.items?.map((item, itemIdx) => (
-                                                    <li key={itemIdx} className="flex items-start gap-3 text-gray-700 text-lg leading-relaxed">
-                                                        <CheckCircle2 className="w-5.5 h-5.5 text-primary shrink-0 mt-0.5" />
-                                                        <span>{item}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        );
+                        {/* WhatsApp */}
+                        <a
+                            href={`https://api.whatsapp.com/send?text=${pageTitle}%20${pageUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                            title="Share on WhatsApp"
+                        >
+                            <Share2 className="w-4 h-4" />
+                        </a>
 
-                                    case "quote":
-                                        return (
-                                            <blockquote key={idx} className="border-l-4 border-primary pl-6 my-8 italic text-xl text-secondary font-medium leading-relaxed bg-primary/5 py-4 pr-4 rounded-r-xl">
-                                                "{block.text}"
-                                            </blockquote>
-                                        );
+                        {/* Twitter */}
+                        <a
+                            href={`https://twitter.com/intent/tweet?text=${pageTitle}&url=${pageUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
+                            title="Share on X / Twitter"
+                        >
+                            <Share2 className="w-4 h-4" />
+                        </a>
 
-                                    case "callout":
-                                        const calloutStyles = {
-                                            info: "bg-blue-50/50 border-blue-200 text-blue-900",
-                                            warning: "bg-amber-50/50 border-amber-200 text-amber-900",
-                                            tip: "bg-emerald-50/50 border-emerald-200 text-emerald-900"
-                                        };
-                                        return (
-                                            <div key={idx} className={`border rounded-2xl p-6 my-6 leading-relaxed ${calloutStyles[block.variant || 'info']}`}>
-                                                <p className="text-base font-semibold leading-relaxed">
-                                                    {block.text}
-                                                </p>
-                                            </div>
-                                        );
+                        {/* LinkedIn */}
+                        <a
+                            href={`https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                            title="Share on LinkedIn"
+                        >
+                            <Share2 className="w-4 h-4" />
+                        </a>
 
-                                    case "code":
-                                        return (
-                                            <div key={idx} className="relative my-8 group bg-secondary rounded-2xl overflow-hidden border border-white/10 shadow-lg">
-                                                <div className="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-black/40 text-xs text-gray-400 font-mono">
-                                                    <span>{block.language || "code"}</span>
-                                                    <button
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText(block.code || "");
-                                                            toast.success("Code snippet copied!");
-                                                        }}
-                                                        className="hover:text-white transition-colors cursor-pointer"
-                                                    >
-                                                        Copy code
-                                                    </button>
-                                                </div>
-                                                <pre className="p-6 overflow-x-auto text-sm text-gray-300 font-mono leading-relaxed bg-black/20">
-                                                    <code>{block.code}</code>
-                                                </pre>
-                                            </div>
-                                        );
+                        {/* Copy Link */}
+                        <button
+                            onClick={handleCopyLink}
+                            className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-bold transition-all flex items-center gap-1.5"
+                        >
+                            {copied ? (
+                                <>
+                                    <Check className="w-3.5 h-3.5 text-emerald-600" /> Copied!
+                                </>
+                            ) : (
+                                "Copy Link"
+                            )}
+                        </button>
+                    </div>
+                </div>
 
-                                    default:
-                                        return null;
-                                }
-                            })}
-                        </article>
+                {/* Comments Section */}
+                {blog.allow_comments && (
+                    <div className="bg-white rounded-2xl p-8 md:p-10 border border-gray-200 shadow-sm mb-12">
+                        <h3 className="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
+                            <MessageSquare className="w-5 h-5 text-primary" /> Comments ({comments.length})
+                        </h3>
 
-                        {/* Right Side: Sidebar */}
-                        <aside className="lg:col-span-4 space-y-8 lg:sticky lg:top-28">
+                        {/* Submit Comment Form */}
+                        <form onSubmit={handleCommentSubmit} className="mb-10 space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                            <h4 className="text-sm font-bold text-gray-800">
+                                {replyToId ? "Leave a Reply" : "Leave a Comment"}
+                            </h4>
+                            {replyToId && (
+                                <button
+                                    type="button"
+                                    onClick={() => setReplyToId(null)}
+                                    className="text-xs text-rose-600 font-bold hover:underline"
+                                >
+                                    Cancel Reply
+                                </button>
+                            )}
 
-                            {/* Table of Contents Widget */}
-                            {headings.length > 0 && (
-                                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                                    <h4 className="font-display font-extrabold text-secondary mb-4 text-base tracking-tight">
-                                        On This Page
-                                    </h4>
-                                    <nav className="space-y-3">
-                                        {headings.map((heading) => (
-                                            <a
-                                                key={heading.id}
-                                                href={`#${heading.id}`}
-                                                className={`block text-sm font-semibold transition-all duration-200 pl-3 border-l-2 ${activeSection === heading.id
-                                                    ? "border-primary text-primary font-bold"
-                                                    : "border-gray-200 text-gray-500 hover:text-secondary hover:border-gray-300"
-                                                    }`}
-                                            >
-                                                {heading.text}
-                                            </a>
-                                        ))}
-                                    </nav>
+                            {commentSuccess && (
+                                <div className="p-3 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-lg border border-emerald-200">
+                                    {commentSuccess}
                                 </div>
                             )}
 
-                            {/* Share Widget */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                                <h4 className="font-display font-extrabold text-secondary mb-4 text-base tracking-tight flex items-center gap-2">
-                                    <Share2 className="w-4 h-4 text-primary" /> Share This Article
-                                </h4>
-                                <div className="grid grid-cols-4 gap-2">
-                                    <a
-                                        href={linkedinShare}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center p-3 border border-gray-200 hover:border-primary/30 hover:bg-primary/5 rounded-xl transition-all duration-300 text-gray-600 hover:text-primary"
-                                    >
-                                        <Linkedin className="w-5 h-5" />
-                                    </a>
-                                    <a
-                                        href={twitterShare}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center p-3 border border-gray-200 hover:border-primary/30 hover:bg-primary/5 rounded-xl transition-all duration-300 text-gray-600 hover:text-primary"
-                                    >
-                                        <Twitter className="w-5 h-5" />
-                                    </a>
-                                    <a
-                                        href={facebookShare}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center p-3 border border-gray-200 hover:border-primary/30 hover:bg-primary/5 rounded-xl transition-all duration-300 text-gray-600 hover:text-primary"
-                                    >
-                                        <Facebook className="w-5 h-5" />
-                                    </a>
-                                    <button
-                                        onClick={handleCopyLink}
-                                        className="flex items-center justify-center p-3 border border-gray-200 hover:border-primary/30 hover:bg-primary/5 rounded-xl transition-all duration-300 text-gray-600 hover:text-primary cursor-pointer"
-                                    >
-                                        {copied ? <Check className="w-5 h-5 text-primary" /> : <Link2 className="w-5 h-5" />}
-                                    </button>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-600 mb-1">Your Name *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="e.g. John Doe"
+                                        className="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:border-primary"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-600 mb-1">Your Email (kept private) *</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="john@example.com"
+                                        className="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:border-primary"
+                                    />
                                 </div>
                             </div>
 
-                            {/* Newsletter widget */}
-                            <div className="bg-gradient-to-br from-secondary to-secondary-foreground text-white rounded-2xl p-6 shadow-xl border border-white/10 relative overflow-hidden">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(11,122,51,0.2),transparent)]" />
-                                <div className="relative z-10">
-                                    <Mail className="w-8 h-8 text-primary mb-4" />
-                                    <h4 className="font-display font-extrabold text-lg mb-2">
-                                        Engineering Newsletter
-                                    </h4>
-                                    <p className="text-xs text-gray-400 mb-6 leading-relaxed">
-                                        Get advanced layout recommendations, stackup insights, and DFM guidelines directly in your inbox.
-                                    </p>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">Comment *</label>
+                                <textarea
+                                    required
+                                    rows={4}
+                                    value={commentText}
+                                    onChange={(e) => setCommentText(e.target.value)}
+                                    placeholder="Write your comment or question here..."
+                                    className="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:border-primary"
+                                />
+                            </div>
 
-                                    {subscribed ? (
-                                        <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center">
-                                            <p className="text-sm font-semibold text-primary">Thanks for subscribing!</p>
+                            <button
+                                type="submit"
+                                disabled={submittingComment}
+                                className="px-6 py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+                            >
+                                <Send className="w-3.5 h-3.5" />
+                                {submittingComment ? "Submitting..." : "Post Comment"}
+                            </button>
+                        </form>
+
+                        {/* Existing Comments Tree */}
+                        {comments.length === 0 ? (
+                            <p className="text-xs text-gray-400 text-center py-6">No comments yet. Be the first to share your thoughts!</p>
+                        ) : (
+                            <div className="space-y-6">
+                                {comments.map((comment) => (
+                                    <div key={comment.id} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center">
+                                                    {comment.name.charAt(0)}
+                                                </div>
+                                                <span className="font-bold text-xs text-gray-900">{comment.name}</span>
+                                            </div>
+                                            <span className="text-[10px] text-gray-400">
+                                                {new Date(comment.created_at).toLocaleDateString()}
+                                            </span>
                                         </div>
-                                    ) : (
-                                        <form onSubmit={handleSubscribe} className="space-y-3">
-                                            <Input
-                                                type="email"
-                                                required
-                                                placeholder="Enter engineering email..."
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                className="bg-white text-secondary placeholder:text-gray-400 border-gray-200 focus-visible:ring-primary focus-visible:ring-offset-0 focus:bg-white text-sm py-2 px-3 h-10 rounded-xl outline-none"
-                                            />
-                                            <Button
-                                                type="submit"
-                                                disabled={submitting}
-                                                className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-xl h-10 text-sm cursor-pointer"
-                                            >
-                                                {submitting ? "Subscribing..." : "Subscribe Now"}
-                                            </Button>
-                                        </form>
-                                    )}
-                                </div>
+                                        <p className="text-xs text-gray-700 leading-relaxed mb-3">{comment.content}</p>
+
+                                        {/* Reply button */}
+                                        <button
+                                            onClick={() => setReplyToId(comment.id)}
+                                            className="text-[11px] font-bold text-primary hover:underline"
+                                        >
+                                            Reply
+                                        </button>
+
+                                        {/* Nested Replies */}
+                                        {comment.replies && comment.replies.length > 0 && (
+                                            <div className="mt-4 pl-4 border-l-2 border-primary/20 space-y-3">
+                                                {comment.replies.map((reply: any) => (
+                                                    <div key={reply.id} className="bg-white p-3 rounded-lg border border-gray-100">
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <span className="font-bold text-xs text-gray-900">{reply.name}</span>
+                                                            <span className="text-[10px] text-gray-400">
+                                                                {new Date(reply.created_at).toLocaleDateString()}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-gray-700">{reply.content}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
-                        </aside>
+                        )}
                     </div>
-                </div>
-            </section>
+                )}
 
-            {/* Bottom Related Articles Section */}
-            {relatedPosts.length > 0 && (
-                <section className="py-20 bg-gray-50 border-t border-gray-200">
-                    <div className="section-container">
-                        <div className="text-center max-w-2xl mx-auto mb-12">
-                            <h2 className="text-3xl font-display font-extrabold text-secondary mb-3">
-                                Recommended Reading
-                            </h2>
-                            <p className="text-muted-foreground text-base">
-                                Continue reading from our pool of PCB layout, manufacturing, and SMT assembly expertise.
-                            </p>
-                        </div>
-
-                        <div className="grid md:grid-cols-3 gap-8">
-                            {relatedPosts.map((post) => (
-                                <div
-                                    key={post.slug}
-                                    className="group flex flex-col bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 hover:-translate-y-1 h-full"
+                {/* Related Articles Section */}
+                {related && related.length > 0 && (
+                    <div className="mt-16">
+                        <h3 className="text-2xl font-bold text-secondary mb-8">Related Articles</h3>
+                        <div className="grid md:grid-cols-3 gap-6">
+                            {related.map((rel) => (
+                                <Link
+                                    key={rel.slug}
+                                    href={`/blog/${rel.slug}`}
+                                    className="group bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col h-full"
                                 >
-                                    <Link href={`/blog/${post.slug}`} className="flex flex-col h-full">
-                                        {/* Card Visual Image */}
-                                        <div className="relative h-48 overflow-hidden bg-gray-100 border-b border-gray-100">
-                                            <img
-                                                src={post.image}
-                                                alt={post.title}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            />
-                                            <div className="absolute top-4 left-4">
-                                                <Badge className="bg-primary text-white border-0 font-bold px-3 py-1 text-xs">
-                                                    {post.tag}
-                                                </Badge>
-                                            </div>
+                                    <div className="h-36 bg-gray-100 overflow-hidden">
+                                        <img
+                                            src={rel.featured_image || "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop"}
+                                            alt={rel.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    </div>
+                                    <div className="p-4 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <span className="text-[10px] font-bold text-primary uppercase tracking-wider block mb-1">
+                                                {rel.category || "Engineering"}
+                                            </span>
+                                            <h4 className="font-bold text-sm text-secondary group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                                                {rel.title}
+                                            </h4>
                                         </div>
-
-                                        {/* Card Body */}
-                                        <div className="p-6 flex-1 flex flex-col justify-between">
-                                            <div>
-                                                <div className="flex items-center gap-4 text-[11px] font-semibold text-gray-500 mb-3">
-                                                    <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {post.date}</span>
-                                                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {post.readTime}</span>
-                                                </div>
-                                                <h3 className="font-display font-bold text-secondary text-base leading-snug group-hover:text-primary transition-colors mb-3">
-                                                    {post.title}
-                                                </h3>
-                                                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-                                                    {post.desc}
-                                                </p>
-                                            </div>
-
-                                            {/* Card Footer */}
-                                            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-display font-bold text-xs text-primary">
-                                                        {post.author.avatar}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-secondary leading-none">{post.author.name}</p>
-                                                        <p className="text-[10px] text-muted-foreground">{post.author.role}</p>
-                                                    </div>
-                                                </div>
-                                                <span className="inline-flex items-center gap-1 text-xs font-bold text-primary group-hover:gap-2 transition-all">
-                                                    Read <ArrowRight className="w-3.5 h-3.5" />
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
+                                        <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all mt-4">
+                                            Read More <ArrowRight className="w-3.5 h-3.5" />
+                                        </span>
+                                    </div>
+                                </Link>
                             ))}
                         </div>
                     </div>
-                </section>
-            )}
+                )}
+            </div>
         </div>
     );
 }
