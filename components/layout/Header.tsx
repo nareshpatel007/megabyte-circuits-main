@@ -33,6 +33,7 @@ const SERVICES_LINKS = [
     { label: "Prototype PCB", href: "/prototype-pcb" },
     { label: "PCB Design", href: "/pcb-design-ahmedabad" },
     { label: "PCB Manufacturing", href: "/pcb-manufacturing-ahmedabad" },
+    { label: "PCB Assembly", href: "/pcb-assembly-ahmedabad" },
     { label: "PCB Developing Services", href: "/pcb-developing-services-ahmedabad" },
     { label: "PCB Fabrication", href: "/pcb-fabrication-ahmedabad" },
     { label: "DFM Support", href: "/design-for-manufacturability-dfm-support" },
@@ -113,25 +114,22 @@ export function Header() {
             <div className="h-16 sm:h-20 transition-all duration-300" />
 
             <header
-                className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                    isScrolled
-                        ? "py-2 sm:py-3 px-4 sm:px-6 lg:px-8"
-                        : "py-0 px-0"
-                }`}
+                className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
+                    ? "py-2 sm:py-3 px-4 sm:px-6 lg:px-8"
+                    : "py-0 px-0"
+                    }`}
             >
                 <div
-                    className={`mx-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                        isScrolled
-                            ? "max-w-7xl"
-                            : "w-full"
-                    }`}
+                    className={`mx-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
+                        ? "max-w-7xl"
+                        : "w-full"
+                        }`}
                 >
                     <div
-                        className={`flex items-center justify-between gap-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                            isScrolled
-                                ? "h-12 sm:h-14 px-4 sm:px-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl border border-gray-200/80 dark:border-zinc-800 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/30 ring-1 ring-black/5 dark:ring-white/10"
-                                : "h-16 sm:h-20 px-4 sm:px-6 lg:px-8 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-zinc-800 shadow-xs rounded-none"
-                        }`}
+                        className={`flex items-center justify-between gap-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
+                            ? "h-12 sm:h-14 px-4 sm:px-6 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl border border-gray-200/80 dark:border-zinc-800 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/30 ring-1 ring-black/5 dark:ring-white/10"
+                            : "h-16 sm:h-20 px-4 sm:px-6 lg:px-8 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-gray-200/60 dark:border-zinc-800 shadow-xs rounded-none"
+                            }`}
                     >
                         {/* Logo */}
                         <Link href="/" className="flex items-center shrink-0 group">
@@ -140,9 +138,8 @@ export function Header() {
                                 alt="MegaByte's Circuits"
                                 width={240}
                                 height={72}
-                                className={`w-auto object-contain transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] dark:brightness-0 dark:invert ${
-                                    isScrolled ? "h-7 sm:h-8 scale-95" : "h-9 sm:h-11 md:h-12 scale-100"
-                                }`}
+                                className={`w-auto object-contain transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] dark:brightness-0 dark:invert ${isScrolled ? "h-7 sm:h-8 scale-95" : "h-9 sm:h-11 md:h-12 scale-100"
+                                    }`}
                                 priority
                             />
                         </Link>
