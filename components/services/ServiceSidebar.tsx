@@ -29,6 +29,7 @@ export function ServiceSidebar({ currentSlug }: ServiceSidebarProps) {
         { slug: "prototype-pcb", label: "Prototype PCB" },
         { slug: "pcb-design", label: "PCB Design" },
         { slug: "pcb-manufacturing", label: "PCB Manufacturing" },
+        { slug: "pcb-assembly", label: "PCB Assembly" },
         { slug: "pcb-developing-services", label: "PCB Developing Services" },
         { slug: "pcb-fabrication", label: "PCB Fabrication" },
         { slug: "design-for-manufacturability-dfm-support", label: "DFM Support" },
