@@ -1,254 +1,571 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { ServiceHeader } from "@/components/services/ServiceHeader";
+import { ServiceSidebar } from "@/components/services/ServiceSidebar";
 import {
-  CheckCircle2, Cpu, Wrench, Package, Truck,
-  Activity, ArrowRight, Settings, Zap, Shield, Eye,
+    CheckCircle2, ChevronDown, Check, Cpu, Wrench, Package,
+    Truck, ShieldCheck, MapPin, Zap, Settings, Eye, Activity
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-const C = "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
+export default function Page() {
+    const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 36 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
-};
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
+    const breadcrumbs = [
+        { label: "Home", href: "/" },
+        { label: "Services", href: "/services" },
+        { label: "PCB Assembly" }
+    ];
 
-function InView({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  return (
-    <motion.div ref={ref} initial="hidden" animate={inView ? "visible" : "hidden"} className={className}>
-      {children}
-    </motion.div>
-  );
-}
+    const smtFeatures = [
+        "Automated pick-and-place machines",
+        "Reflow soldering with precise thermal profiles",
+        "Capable of handling 0201 packages and micro BGAs"
+    ];
 
-const SERVICES = [
-  {
-    icon: Cpu,
-    title: "SMT Assembly",
-    desc: "High-speed automated Surface Mount Technology lines capable of placing components down to 01005 packages, BGAs, and fine-pitch QFPs with 100% AOI inspection.",
-    features: ["BGA & Micro-BGA Placement", "01005, 0201 Ultra-Fine Components", "Double-sided SMT Lines", "Lead-free & leaded reflow"],
-  },
-  {
-    icon: Wrench,
-    title: "Through-Hole & Mixed",
-    desc: "Precision wave soldering and selective soldering for through-hole components, combined with manual stations for specialized connectors and heavy parts.",
-    features: ["Wave & Selective Soldering", "Mixed Technology (SMT + THT)", "Hand soldering by IPC-certified staff", "Connector & press-fit assembly"],
-  },
-  {
-    icon: Package,
-    title: "Turnkey & Box Build",
-    desc: "Full-service solution: we manufacture the PCB, source all components, assemble the board, burn firmware, run functional tests, and build the final enclosure.",
-    features: ["Global Component Sourcing", "Firmware Flashing & Programming", "Functional & ICT Testing", "Final Enclosure Assembly"],
-  },
-];
+    const thtApplications = [
+        "Automotive systems",
+        "Power supplies",
+        "Heavy industrial controllers"
+    ];
 
-const PROCESS_STEPS = [
-  { icon: Truck, title: "Procurement", desc: "Source authentic components globally, checking for end-of-life and alternates." },
-  { icon: Cpu, title: "PCB Fabrication", desc: "Bare boards manufactured to exact DFM specifications in-house." },
-  { icon: Settings, title: "SMT / THT Assembly", desc: "Automated placement, reflow soldering, and wave / selective soldering." },
-  { icon: Eye, title: "AOI & X-Ray", desc: "100% automated optical inspection and X-ray for BGA components." },
-  { icon: Activity, title: "Functional Testing", desc: "In-circuit and functional test to verify every board performs to spec." },
-  { icon: Package, title: "Packaging", desc: "ESD-safe packaging and worldwide shipping via trusted logistics partners." },
-];
+    const doubleSidedApplications = [
+        "Industrial Automation",
+        "High-Speed Communication Devices",
+        "Medical Monitoring Equipment"
+    ];
 
-const CAPABILITIES_TABLE = [
-  ["Min Component Size", "01005 (0.4mm × 0.2mm)"],
-  ["BGA Pitch", "Down to 0.3mm"],
-  ["Placement Accuracy", "±25μm (3σ)"],
-  ["Solder Paste", "Lead-free & leaded options"],
-  ["Reflow Profiles", "SAC305, SnPb, Low-temp"],
-  ["Testing", "AOI, X-Ray, Flying Probe, Functional ICT"],
-  ["Certifications", "IPC-A-610 Class 2 & 3, J-STD-001"],
-  ["Min MOQ", "1 board (prototype)"],
-];
+    const processSteps = [
+        {
+            step: "Step 1",
+            title: "PCB Board Preparation",
+            items: [
+                "Incoming boards are inspected visually and dimensionally",
+                "Cleaning to remove dust, oils, or contaminants"
+            ]
+        },
+        {
+            step: "Step 2",
+            title: "Solder Paste Printing",
+            items: [
+                "Solder paste accurately applied using stainless steel stencils",
+                "Advanced solder paste inspection (SPI) to catch early defects"
+            ]
+        },
+        {
+            step: "Step 3",
+            title: "Automated Component Placement",
+            items: [
+                "Pick-and-place machines position components at lightning speed",
+                "Vision systems verify component orientation and alignment"
+            ]
+        },
+        {
+            step: "Step 4",
+            title: "Reflow Soldering",
+            items: [
+                "Boards pass through controlled temperature zones",
+                "Solder paste melts and solidifies, securing the components"
+            ]
+        },
+        {
+            step: "Step 5",
+            title: "Through-Hole Component Insertion",
+            items: [
+                "Hand or machine insertion depending on volume",
+                "Lead-free wave soldering for RoHS-compliant boards"
+            ]
+        },
+        {
+            step: "Step 6",
+            title: "Inspection and Testing",
+            items: [
+                "AOI (Automated Optical Inspection) for solder joint quality",
+                "X-Ray inspection for BGA and hidden joints",
+                "Functional testing and In-circuit testing (ICT)"
+            ]
+        },
+        {
+            step: "Step 7",
+            title: "Final Quality Control",
+            items: [
+                "Full assembly validation",
+                "Packaging under anti-static conditions"
+            ]
+        }
+    ];
 
-export default function Assembly() {
-  return (
-    <div className="min-h-screen bg-white">
+    const smtCapabilitiesList = [
+        "Fine pitch ICs (0.3mm and below)",
+        "Passive components (0201/01005)",
+        "BGAs, micro-BGAs, and CSPs",
+        "Lead-free and leaded assembly options",
+        "High-frequency, low-loss board assemblies"
+    ];
 
-      {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="bg-secondary text-white pt-36 pb-24 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,#0B7A33_25%,transparent_25%,transparent_75%,#0B7A33_75%),linear-gradient(45deg,#0B7A33_25%,transparent_25%,transparent_75%,#0B7A33_75%)] [background-size:20px_20px] [background-position:0_0,10px_10px]" />
-        <div className={`${C} relative z-10`}>
-          <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-3xl">
-            <motion.p variants={fadeUp} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary mb-4">
-              <span className="w-6 h-0.5 bg-primary" /> PCB Assembly
-            </motion.p>
-            <motion.h1 variants={fadeUp} className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight mb-6">
-              Complete PCB<br />
-              <span className="text-primary">Assembly Services</span>
-            </motion.h1>
-            <motion.p variants={fadeUp} className="text-lg text-white/65 mb-10 leading-relaxed max-w-xl">
-              End-to-end PCBA solutions — from component procurement and SMT assembly to testing and box build. We act as your extended manufacturing arm.
-            </motion.p>
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/25">
-                <Link href="/contact">Get Assembly Quote</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 font-semibold">
-                <a href="#process">View Process</a>
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
+    const doubleSidedFeatures = [
+        "Symmetrical Layer Stacking",
+        "Advanced Vias Technology (Blind, Buried)",
+        "Design for Manufacturability (DFM) support",
+        "Solder Mask Defined Pads for High-Density Components"
+    ];
 
-      {/* ── Assembly Services ─────────────────────────────────── */}
-      <section className="py-24 bg-gray-50">
-        <div className={C}>
-          <InView>
-            <motion.div variants={stagger}>
-              <motion.p variants={fadeUp} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary mb-3">
-                <span className="w-6 h-0.5 bg-primary" /> Our Services
-              </motion.p>
-              <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-display font-bold text-secondary mb-3">
-                Assembly Capabilities
-              </motion.h2>
-              <motion.p variants={fadeUp} className="text-muted-foreground mb-12 max-w-2xl">
-                Advanced surface-mount and through-hole technology, with full turnkey options for complex assemblies.
-              </motion.p>
+    const applications = [
+        { label: "Medical Devices", desc: "Patient monitors, diagnostic equipment" },
+        { label: "Automotive", desc: "Engine control units (ECUs), infotainment systems" },
+        { label: "Telecom", desc: "Routers, switches, 5G modules" },
+        { label: "Industrial Automation", desc: "Robotics, PLCs, HMIs" },
+        { label: "Consumer Electronics", desc: "Smart home devices, wearables" },
+        { label: "Defense and Aerospace", desc: "Avionics systems, ruggedized electronics" }
+    ];
 
-              <div className="grid lg:grid-cols-3 gap-8">
-                {SERVICES.map((service, i) => (
-                  <motion.div key={i} variants={fadeUp} className="bg-white rounded-2xl border border-gray-100 p-8 hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div className="w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/15 transition-colors">
-                      <service.icon className="w-7 h-7 text-primary" />
+    const chooseUsItems = [
+        {
+            title: "1. Location Advantage",
+            desc: "Operating from Ahmedabad — a rising industrial hub — gives us logistical advantages to deliver your projects faster across India and internationally."
+        },
+        {
+            title: "2. Customized Solutions",
+            desc: "From Double-sided PCB Assembly to complex Surface Mount Assembly, we offer custom solutions that reduce costs and improve efficiency."
+        },
+        {
+            title: "3. Fast Turnarounds",
+            desc: "With optimized processes and ready material sourcing, we meet urgent deadlines without cutting corners."
+        },
+        {
+            title: "4. Global Quality Standards",
+            desc: "We comply with IPC-A-610 Class 2 and Class 3 standards, ISO 9001:2015 QMS Certification, and RoHS and REACH Environmental Regulations."
+        },
+        {
+            title: "5. Full-Service Provider",
+            desc: "From design advice to final assembly and testing — we provide full-spectrum services under one roof, simplifying your supply chain."
+        }
+    ];
+
+    const technologies = [
+        "Fuji and Yamaha High-Speed Pick-and-Place Lines",
+        "Omron and Koh Young AOI Inspection Systems",
+        "Selective Wave Soldering Machines",
+        "Automated Stencil Printers with SPI Feedback",
+        "BGA Rework Stations",
+        "Climate-Controlled ESD Assembly Areas"
+    ];
+
+    const faqs = [
+        {
+            question: "What is the difference between PCB Fabrication and PCB Assembly?",
+            answer: "PCB Fabrication is the process of manufacturing the bare board, while PCB Assembly involves soldering components onto that board to make a functional circuit."
+        },
+        {
+            question: "Do you offer RoHS-compliant assembly?",
+            answer: "Yes. All our processes, including soldering and materials, are fully RoHS compliant unless specified otherwise by the client."
+        },
+        {
+            question: "What file formats do you accept for PCB Assembly?",
+            answer: "We accept Gerber Files, BOM (Bill of Materials), Pick & Place Files, and Assembly Drawings in standard formats like RS-274X, ODB++, and IPC-2581."
+        },
+        {
+            question: "Can you handle small batch production?",
+            answer: "Absolutely! We specialize in both prototyping (small batch) and mass production (high volume)."
+        },
+        {
+            question: "What is the typical turnaround time?",
+            answer: "Turnaround depends on project complexity but typically ranges from 7-15 working days post final BOM and file approvals."
+        }
+    ];
+
+    const internalLinksCol1 = [
+        { title: "PCB Assembly in Delhi", href: "https://www.megabytecircuit.com/blog/pcb-assembly-delhi/" },
+        { title: "PCB Assembly in Mumbai", href: "https://www.megabytecircuit.com/blog/mumbai-pcb-assembly-services/" },
+        { title: "PCB Assembly in kolkata", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-kolkata/" },
+        { title: "PCB Assembly in Kanpur", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-kanpur/" },
+        { title: "PCB Assembly in Gandhinagar", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-gandhinagar/" }
+    ];
+
+    const internalLinksCol2 = [
+        { title: "PCB Assembly in Banglore", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-bangalore/" },
+        { title: "PCB Assembly in chennai", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-chennai/" },
+        { title: "PCB Assembly in Hyderabad", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-hyderabad/" },
+        { title: "PCB Assembly in Noida", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-noida/" },
+        { title: "PCB Assembly in Rajkot", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-rajkot/" }
+    ];
+
+    const internalLinksCol3 = [
+        { title: "PCB Assembly in Pune", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-pune/" },
+        { title: "PCB Assembly in Surat", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-surat/" },
+        { title: "PCB Assembly in Jaipur", href: "https://www.megabytecircuit.com/blog/pcb-assembly-services-jaipur/" },
+        { title: "PCB Assembly in Vadodra", href: "https://www.megabytecircuit.com/blog/pcb-assembly-vadodara/" }
+    ];
+
+    return (
+        <div className="flex flex-col min-h-screen bg-slate-50/50">
+            <ServiceHeader
+                title="Top PCB Assembly Services in Ahmedabad"
+                subtitle="Precision-driven PCB Assembly in Ahmedabad and across India by MEGABYTES CIRCUIT SYSTEMS"
+                badge="Our Services"
+                breadcrumbs={breadcrumbs}
+            />
+
+            {/* ─── Main Content & Sidebar ─────────────────────────────────────────── */}
+            <section className="py-16 md:py-24">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid lg:grid-cols-12 gap-12 items-start">
+
+                        {/* Left Column: Content */}
+                        <div className="lg:col-span-8 space-y-12">
+
+                            {/* H1 & Intro Section / Why Choose Our PCB Assembly Services */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
+                                <h1 className="text-2xl md:text-4xl font-display font-bold text-secondary leading-tight">
+                                    Premium PCB Assembly Services in Ahmedabad, <br />
+                                    <span className="text-primary">India MEGABYTES CIRCUIT SYSTEMS</span>
+                                </h1>
+
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary pt-2">
+                                    Why Choose Our PCB <span className="text-primary">Assembly Services in Ahmedabad?</span>
+                                </h2>
+
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    In an era where electronics dominate every sector — from healthcare to smart homes — PCB Assembly stands at the heart of technological innovation.
+                                </p>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    At <Link href="/" className="text-primary font-bold hover:underline">MEGABYTES CIRCUIT SYSTEMS</Link>, we bring your electronic visions to life through precision-driven PCB Assembly in Ahmedabad and all over India.
+                                </p>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    As an experienced <strong>PCB assembly manufacturer</strong>, we blend technology, expertise, and dedication to deliver seamless <strong>PCB assembly services</strong> for a diverse set of industries.
+                                </p>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    Whether you require Surface Mount Assembly, Double-sided PCB Assembly, or complex multilayer prototypes, we are your trusted <strong>PCB assembly company</strong> ensuring faster turnarounds, competitive pricing, and uncompromised quality.
+                                </p>
+                            </div>
+
+                            {/* What is PCB Assembly */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                    What is <span className="text-primary">PCB Assembly</span>
+                                </h2>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    PCB Assembly refers to the method of soldering and mounting electronic components onto a fabricated printed circuit board (PCB) to create functional circuits. The process involves:
+                                </p>
+
+                                <ul className="space-y-3">
+                                    <li className="flex items-center gap-3 text-sm text-slate-800">
+                                        <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                                        <span>Accurate placement of tiny components</span>
+                                    </li>
+                                    <li className="flex items-center gap-3 text-sm text-slate-800">
+                                        <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                                        <span>Strong soldering for reliable conductivity</span>
+                                    </li>
+                                    <li className="flex items-center gap-3 text-sm text-slate-800">
+                                        <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                                        <span>Testing to ensure functionality and longevity</span>
+                                    </li>
+                                </ul>
+
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    <strong>At MEGABYTES CIRCUIT SYSTEMS</strong>, we combine traditional expertise with automated technology, offering cutting-edge solutions like Surface Mount Technology PCB assembly and through-hole techniques to meet modern electronic demands.
+                                </p>
+                            </div>
+
+                            {/* Types of PCB Assembly Services We Offer */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                    Types of PCB Assembly <span className="text-primary">Services We Offer</span>
+                                </h2>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    Our full range of <strong>PCB assembly services</strong> are engineered to match every stage of product development — from prototyping to full-scale production.
+                                </p>
+
+                                <div className="space-y-6 pt-2">
+                                    {/* 1. Surface Mount Assembly (SMT) */}
+                                    <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-4">
+                                        <h3 className="text-lg font-display font-bold text-secondary">
+                                            1. Surface Mount <span className="text-primary">Assembly (SMT)</span>
+                                        </h3>
+                                        <p className="text-sm text-slate-700 leading-relaxed">
+                                            <strong>Surface Mount Assembly</strong> is ideal for creating compact, high-performance electronics. SMT enables mounting components directly onto the PCB surface, reducing size and improving signal transmission speed.
+                                        </p>
+                                        <ul className="space-y-2">
+                                            {smtFeatures.map((feat, idx) => (
+                                                <li key={idx} className="flex items-center gap-2.5 text-xs font-medium text-slate-800">
+                                                    <Check className="w-4 h-4 text-primary shrink-0" />
+                                                    {feat}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <p className="text-sm text-slate-700 leading-relaxed">
+                                            Whether you need mobile circuits, industrial sensors, or consumer gadgets — we deliver Surface Mount Technology PCB solutions with precision and speed.
+                                        </p>
+                                    </div>
+
+                                    {/* 2. Through-Hole Assembly (THT) */}
+                                    <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-4">
+                                        <h3 className="text-lg font-display font-bold text-secondary">
+                                            2. Through-Hole <span className="text-primary">Assembly (THT)</span>
+                                        </h3>
+                                        <p className="text-sm text-slate-700 leading-relaxed">
+                                            For devices exposed to mechanical stress or harsh environments, <strong>Through-Hole Assembly</strong> is indispensable. We offer manual soldering for delicate assemblies and wave soldering for high-volume production, ensuring durability and strength for applications like:
+                                        </p>
+                                        <ul className="space-y-2">
+                                            {thtApplications.map((app, idx) => (
+                                                <li key={idx} className="flex items-center gap-2.5 text-xs font-medium text-slate-800">
+                                                    <Check className="w-4 h-4 text-primary shrink-0" />
+                                                    {app}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* 3. Mixed Technology PCB Assembly */}
+                                    <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
+                                        <h3 className="text-lg font-display font-bold text-secondary">
+                                            3. Mixed Technology <span className="text-primary">PCB Assembly</span>
+                                        </h3>
+                                        <p className="text-sm text-slate-700 leading-relaxed">
+                                            Often, electronic designs require both surface mount and through-hole components. Our team specializes in <strong>mixed assembly</strong>, blending techniques to create robust hybrid boards fit for real-world conditions.
+                                        </p>
+                                    </div>
+
+                                    {/* 4. Double-sided PCB Assembly */}
+                                    <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-4">
+                                        <h3 className="text-lg font-display font-bold text-secondary">
+                                            4. Double-sided <span className="text-primary">PCB Assembly</span>
+                                        </h3>
+                                        <p className="text-sm text-slate-700 leading-relaxed">
+                                            Need higher circuit density without increasing the board size? We offer advanced Double-sided PCB Assembly, utilizing <Link href="/products/double-layer-pcb" className="text-primary font-bold hover:underline">2 layer PCB manufacturing machines</Link> that allow efficient component mounting on both board surfaces.
+                                        </p>
+                                        <p className="text-sm font-semibold text-slate-800">Applications include:</p>
+                                        <ul className="space-y-2">
+                                            {doubleSidedApplications.map((app, idx) => (
+                                                <li key={idx} className="flex items-center gap-2.5 text-xs font-medium text-slate-800">
+                                                    <Check className="w-4 h-4 text-primary shrink-0" />
+                                                    {app}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Our Detailed PCB Assembly Process */}
+                            <div className="space-y-6">
+                                <h2 className="text-2xl font-display font-bold text-secondary text-center md:text-left">
+                                    Our Detailed PCB <span className="text-primary">Assembly Process</span>
+                                </h2>
+                                <p className="text-sm text-slate-700">
+                                    At <strong>MEGABYTES CIRCUIT SYSTEMS</strong>, the PCB assembly process is refined to ensure world-class reliability and quality.
+                                </p>
+
+                                <div className="space-y-4">
+                                    {processSteps.map((step, idx) => (
+                                        <div key={idx} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-md hover:border-primary/20 transition-all duration-300">
+                                            <h3 className="font-display font-bold text-secondary text-base mb-3">
+                                                {step.step}: <span className="text-primary">{step.title}</span>
+                                            </h3>
+                                            <ul className="space-y-2">
+                                                {step.items.map((item, i) => (
+                                                    <li key={i} className="flex items-start gap-2.5 text-xs text-slate-600 leading-relaxed">
+                                                        <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                                                        <span>{item}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Surface Mount Technology (SMT) Capabilities */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                    Surface Mount Technology <span className="text-primary">(SMT) Capabilities</span>
+                                </h2>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    As demand for miniaturized, high-functionality electronics rises, <strong>Surface Mount Technology PCB</strong> has become the gold standard.
+                                </p>
+                                <p className="text-sm font-semibold text-slate-800">We handle:</p>
+                                <ul className="grid sm:grid-cols-2 gap-3">
+                                    {smtCapabilitiesList.map((item, idx) => (
+                                        <li key={idx} className="flex items-center gap-2.5 text-xs text-slate-800 font-medium">
+                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="text-sm text-slate-800 leading-relaxed pt-2">
+                                    Our high-speed SMT lines ensure you meet aggressive time-to-market demands without sacrificing quality.
+                                </p>
+                            </div>
+
+                            {/* Double-Sided PCB Assembly Expertise */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                    Double-Sided PCB <span className="text-primary">Assembly Expertise</span>
+                                </h2>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    With increasing product complexity, Double-sided PCB Assembly has become critical for achieving performance within compact devices.
+                                </p>
+                                <p className="text-sm font-semibold text-slate-800">Our double-sided capabilities feature:</p>
+                                <ul className="grid sm:grid-cols-2 gap-3">
+                                    {doubleSidedFeatures.map((item, idx) => (
+                                        <li key={idx} className="flex items-center gap-2.5 text-xs text-slate-800 font-medium">
+                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="text-sm text-slate-800 leading-relaxed pt-2">
+                                    Thanks to our investment in the latest <strong>2 layer PCB manufacturing machines</strong>, we handle projects that require intricate designs and strict tolerance control.
+                                </p>
+                            </div>
+
+                            {/* Applications of Our PCB Assembly Services */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                    Applications of Our <span className="text-primary">PCB Assembly Services</span>
+                                </h2>
+                                <p className="text-sm text-slate-700">
+                                    Our PCB assemblies power devices across the world, finding applications in:
+                                </p>
+                                <ul className="grid sm:grid-cols-2 gap-4">
+                                    {applications.map((item, index) => (
+                                        <li key={index} className="flex items-start gap-3">
+                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                                            <span className="text-xs text-slate-700">
+                                                <strong className="text-slate-900">{item.label}:</strong> {item.desc}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="text-sm text-slate-700 pt-2">
+                                    No matter your industry, we tailor our <a href="https://en.wikipedia.org/wiki/Printed_circuit_board" target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">PCB assembly services</a> to meet your specific operational and environmental requirements.
+                                </p>
+                            </div>
+
+                            {/* Why Choose MEGABYTES CIRCUIT SYSTEMS? (Styled Dark Box) */}
+                            <div className="bg-gradient-to-br from-secondary to-slate-950 text-white rounded-3xl p-8 md:p-10 border border-white/10 shadow-2xl relative overflow-hidden">
+                                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+                                <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+                                <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+
+                                <div className="relative z-10 space-y-6">
+                                    <h2 className="text-2xl md:text-3xl font-display font-extrabold uppercase tracking-wide leading-tight text-white/95">
+                                        Why Choose <span className="text-primary">MEGABYTES CIRCUIT SYSTEMS?</span>
+                                    </h2>
+
+                                    <div className="grid md:grid-cols-2 gap-6 pt-2">
+                                        {chooseUsItems.map((item, index) => (
+                                            <div key={index} className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-white/10 transition-all duration-300 group">
+                                                <h3 className="font-display font-bold text-base text-white group-hover:text-primary transition-colors mb-2">
+                                                    {item.title}
+                                                </h3>
+                                                <p className="text-xs text-white/70 leading-relaxed">{item.desc}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Technologies We Support */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                    Technologies <span className="text-primary">We Support</span>
+                                </h2>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    We constantly invest in state-of-the-art infrastructure:
+                                </p>
+                                <ul className="grid sm:grid-cols-2 gap-3">
+                                    {technologies.map((tech, idx) => (
+                                        <li key={idx} className="flex items-center gap-2.5 text-xs text-slate-800 font-medium">
+                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                            <span>{tech}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Frequently Asked Questions (FAQs) */}
+                            <div className="space-y-6">
+                                <h2 className="text-2xl font-display font-bold text-secondary text-center md:text-left">
+                                    Frequently Asked <span className="text-primary">Questions (FAQs)</span>
+                                </h2>
+                                <div className="space-y-4">
+                                    {faqs.map((faq, idx) => {
+                                        const isOpen = activeFaq === idx;
+                                        return (
+                                            <div key={idx} className="border border-slate-100 rounded-2xl bg-white overflow-hidden shadow-sm">
+                                                <button
+                                                    onClick={() => setActiveFaq(isOpen ? null : idx)}
+                                                    className="w-full flex items-center justify-between px-6 py-5 text-left font-display font-bold text-secondary hover:text-primary transition-colors"
+                                                >
+                                                    <span>{faq.question}</span>
+                                                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? "rotate-180 text-primary" : ""}`} />
+                                                </button>
+                                                {isOpen && (
+                                                    <div className="px-6 pb-5 pt-1 text-sm text-slate-600 leading-relaxed border-t border-slate-50">
+                                                        {faq.answer}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Partner with a Trusted PCB Assembly Company in Ahmedabad */}
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/50 space-y-4">
+                                <h2 className="text-xl md:text-2xl font-display font-bold text-secondary">
+                                    Partner with a Trusted PCB <span className="text-primary">Assembly Company in Ahmedabad</span>
+                                </h2>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    When your product’s success depends on the quality of your PCB assembly, trust only the experts.
+                                </p>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    At <strong>MEGABYTES CIRCUIT SYSTEMS</strong>, we bring together technology, experience, and dedication to deliver unmatched <strong>PCB Assembly in Ahmedabad</strong> and across India.
+                                </p>
+                                <p className="text-sm text-slate-800 leading-relaxed">
+                                    Whether it's a startup prototype or a mass production run, we are equipped to scale with your needs.
+                                </p>
+
+                                {/* Internal links grid */}
+                                <div className="pt-6 border-t border-slate-100 grid md:grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        {internalLinksCol1.map((link, idx) => (
+                                            <a key={idx} href={link.href} className="block text-xs font-bold text-slate-700 hover:text-primary transition-colors">
+                                                {link.title}
+                                            </a>
+                                        ))}
+                                    </div>
+                                    <div className="space-y-2">
+                                        {internalLinksCol2.map((link, idx) => (
+                                            <a key={idx} href={link.href} className="block text-xs font-bold text-slate-700 hover:text-primary transition-colors">
+                                                {link.title}
+                                            </a>
+                                        ))}
+                                    </div>
+                                    <div className="space-y-2">
+                                        {internalLinksCol3.map((link, idx) => (
+                                            <a key={idx} href={link.href} className="block text-xs font-bold text-slate-700 hover:text-primary transition-colors">
+                                                {link.title}
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {/* Right Column: Sidebar */}
+                        <div className="lg:col-span-4 lg:sticky lg:top-28">
+                            <ServiceSidebar currentSlug="pcb-assembly" />
+                        </div>
+
                     </div>
-                    <h3 className="text-xl font-display font-bold text-secondary mb-3">{service.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">{service.desc}</p>
-                    <ul className="space-y-2.5">
-                      {service.features.map((feat) => (
-                        <li key={feat} className="flex items-center gap-2.5 text-sm text-secondary font-medium">
-                          <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                          {feat}
-                        </li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </InView>
-        </div>
-      </section>
-
-      {/* ── Process ───────────────────────────────────────────── */}
-      <section id="process" className="py-24 bg-secondary text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#22C55E_1px,transparent_1px)] [background-size:24px_24px]" />
-        <div className={`${C} relative z-10`}>
-          <InView>
-            <motion.div variants={stagger}>
-              <motion.p variants={fadeUp} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary mb-3">
-                <span className="w-6 h-0.5 bg-primary" /> Process
-              </motion.p>
-              <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-display font-bold text-white mb-12">
-                The Turnkey Assembly Process
-              </motion.h2>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {PROCESS_STEPS.map((step, i) => (
-                  <motion.div key={i} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 hover:border-primary/30 transition-all duration-300 group">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-primary/30 transition-colors">
-                        <step.icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Step {String(i + 1).padStart(2, "0")}</div>
-                        <h4 className="font-display font-bold text-white text-base mb-2">{step.title}</h4>
-                        <p className="text-white/55 text-sm leading-relaxed">{step.desc}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </InView>
-        </div>
-      </section>
-
-      {/* ── Capabilities Table ────────────────────────────────── */}
-      <section className="py-24 bg-white">
-        <div className={C}>
-          <InView>
-            <motion.div variants={stagger} className="grid lg:grid-cols-2 gap-16 items-start">
-              <motion.div variants={fadeUp}>
-                <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary mb-3">
-                  <span className="w-6 h-0.5 bg-primary" /> Assembly Specs
-                </p>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary mb-5">
-                  Assembly Specifications
-                </h2>
-                <p className="text-muted-foreground leading-relaxed mb-8">
-                  Our assembly lines handle the full spectrum of component packages — from massive heat-sink connectors down to the smallest 01005 passives.
-                </p>
-                <div className="space-y-3">
-                  {[
-                    { icon: Zap, text: "No minimum order quantity for prototypes" },
-                    { icon: Shield, text: "IPC-certified assembly technicians" },
-                    { icon: CheckCircle2, text: "Full DFM and DFA review included" },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 text-secondary">
-                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                        <item.icon className="w-4 h-4 text-primary" />
-                      </div>
-                      <span className="text-sm font-medium">{item.text}</span>
-                    </div>
-                  ))}
                 </div>
-              </motion.div>
-
-              <motion.div variants={fadeUp}>
-                <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-lg">
-                  <div className="bg-secondary px-6 py-4">
-                    <h3 className="font-display font-bold text-white">Assembly Capability Data</h3>
-                    <p className="text-sm text-white/50 mt-0.5">Standard specifications for SMT and THT lines</p>
-                  </div>
-                  <table className="w-full text-sm">
-                    <tbody>
-                      {CAPABILITIES_TABLE.map((row, i) => (
-                        <tr key={i} className={`border-b border-gray-50 ${i % 2 === 0 ? "bg-white" : "bg-gray-50/60"} hover:bg-primary/3 transition-colors`}>
-                          <td className="px-5 py-4 font-semibold text-secondary">{row[0]}</td>
-                          <td className="px-5 py-4 text-muted-foreground">{row[1]}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </motion.div>
-            </motion.div>
-          </InView>
+            </section>
         </div>
-      </section>
-
-      {/* ── CTA ───────────────────────────────────────────────── */}
-      <section className="py-20 bg-gray-50 border-t border-gray-100">
-        <div className={C}>
-          <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-3xl font-display font-bold text-secondary mb-4">Ready to Assemble Your Board?</h2>
-            <p className="text-muted-foreground mb-8">
-              Upload your Gerber files and BOM — we'll get back with a detailed assembly quote within 2 hours.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90 font-semibold shadow-md shadow-primary/20">
-                <Link href="/contact">Request Assembly Quote <ArrowRight className="w-4 h-4 ml-2" /></Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-secondary/20 text-secondary hover:bg-secondary hover:text-white font-semibold">
-                <Link href="/contact">Talk to an Engineer</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </div>
-  );
+    );
 }
