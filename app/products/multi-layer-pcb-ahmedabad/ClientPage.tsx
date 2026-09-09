@@ -59,16 +59,15 @@ export default function MultiLayerPCBPage() {
             <ServiceHeader
                 title="Multi Layer PCB Manufacturer in Ahmedabad: Megabyte Circuit Systems"
                 subtitle="Advanced multi layer PCB manufacturing delivering high-density, reliable circuit boards for cutting-edge electronics across India."
-                badge="Product Range"
                 breadcrumbs={breadcrumbs}
             />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
                 <div className="grid lg:grid-cols-12 gap-8 items-start">
-                    
+
                     {/* Left Column: Details */}
                     <div className="lg:col-span-8 space-y-12 bg-white rounded-3xl p-6 md:p-10 border border-slate-100 shadow-sm">
-                        
+
                         {/* Intro / Main Overview */}
                         <div className="space-y-4">
                             <p className="text-slate-600 leading-relaxed">

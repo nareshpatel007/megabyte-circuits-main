@@ -16,7 +16,7 @@ interface ServiceHeaderProps {
     breadcrumbs: BreadcrumbItem[];
 }
 
-export function ServiceHeader({ title, subtitle, badge = "Our Services", breadcrumbs }: ServiceHeaderProps) {
+export function ServiceHeader({ title, subtitle, breadcrumbs }: ServiceHeaderProps) {
     return (
         <section className="relative py-10 md:py-14 overflow-hidden bg-secondary">
             {/* Grid pattern background */}
@@ -57,10 +57,6 @@ export function ServiceHeader({ title, subtitle, badge = "Our Services", breadcr
                 </nav>
 
                 <div className="max-w-4xl mx-auto flex flex-col items-center">
-                    <span className="inline-flex items-center gap-1.5 bg-primary/15 border border-primary/25 text-primary text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        {badge}
-                    </span>
                     <h1 className="text-2xl md:text-3xl font-display font-bold text-white mb-2 leading-tight">
                         {title}
                     </h1>
