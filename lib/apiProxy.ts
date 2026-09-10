@@ -81,7 +81,10 @@ export async function handleApiProxy(
         }
 
         // Call backend API
-        let apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://localhost/megabyte-circuits-api/public";
+        let apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+        if (apiUrl.includes("localhost/megabyte-circuits-api")) {
+            apiUrl = "http://127.0.0.1:8000/api";
+        }
         if (apiUrl.endsWith("/")) {
             apiUrl = apiUrl.slice(0, -1);
         }
