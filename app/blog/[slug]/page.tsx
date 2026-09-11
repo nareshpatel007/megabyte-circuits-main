@@ -1,20 +1,16 @@
-import React from "react";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useParams, notFound } from "next/navigation";
 import { BlogDetailClient } from "@/components/blog/BlogDetailClient";
 import { BLOG_POSTS } from "@/lib/blog";
+import { Loader2 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
-interface Props {
-    params: Promise<{ slug: string }>;
-}
-
-async function getBlogData(slug: string) {
+async function fetchBlogData(slug: string) {
     try {
-        const res = await fetch(`${API_BASE}/api/blogs/${slug}`, {
-            next: { revalidate: 60 },
-        });
+        const res = await fetch(`${API_BASE}/api/blogs/${slug}`);
         if (res.ok) {
             const data = await res.json();
             if (data.status && data.blog) {
@@ -68,49 +64,55 @@ async function getBlogData(slug: string) {
     };
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const resolvedParams = await params;
-    const data = await getBlogData(resolvedParams.slug);
-    if (!data || !data.blog) return {};
+export default function SingleBlogPage() {
+    const params = useParams();
+    const slug = typeof params?.slug === "string" ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : "";
 
-    const blog = data.blog;
-    const title = blog.meta_title || `${blog.title} - MegaByte Circuits`;
-    const description = blog.meta_description || blog.excerpt;
-    const image = blog.og_image || blog.featured_image;
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState<any>(null);
+    const [isNotFound, setIsNotFound] = useState(false);
 
-    return {
-        title,
-        description,
-        keywords: blog.meta_keywords ? blog.meta_keywords.split(",") : undefined,
-        alternates: {
-            canonical: blog.canonical_url || `https://megabytecircuits.com/blog/${blog.slug}`,
-        },
-        robots: {
-            index: blog.robots_index !== false,
-            follow: blog.robots_follow !== false,
-        },
-        openGraph: {
-            title: blog.og_title || title,
-            description: blog.og_description || description,
-            images: image ? [{ url: image }] : undefined,
-            type: "article",
-            publishedTime: blog.published_at,
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: blog.twitter_title || title,
-            description: blog.twitter_description || description,
-            images: blog.twitter_image ? [blog.twitter_image] : image ? [image] : undefined,
-        },
-    };
-}
+    useEffect(() => {
+        if (!slug) return;
 
-export default async function SingleBlogPage({ params }: Props) {
-    const resolvedParams = await params;
-    const data = await getBlogData(resolvedParams.slug);
+        let isMounted = true;
+        setLoading(true);
 
-    if (!data || !data.blog) {
+        fetchBlogData(slug)
+            .then((result) => {
+                if (!isMounted) return;
+                if (!result || !result.blog) {
+                    setIsNotFound(true);
+                } else {
+                    setData(result);
+                }
+            })
+            .catch((err) => {
+                console.error("Error fetching blog data:", err);
+                if (isMounted) setIsNotFound(true);
+            })
+            .finally(() => {
+                if (isMounted) setLoading(false);
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [slug]);
+
+    if (isNotFound) {
         notFound();
+    }
+
+    if (loading || !data) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-20 px-4">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                    <p className="text-sm font-semibold text-gray-600">Loading blog post...</p>
+                </div>
+            </div>
+        );
     }
 
     const jsonLd = {
@@ -157,3 +159,4 @@ export default async function SingleBlogPage({ params }: Props) {
         </>
     );
 }
+
