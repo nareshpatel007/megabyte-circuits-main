@@ -6,11 +6,9 @@ import { BlogDetailClient } from "@/components/blog/BlogDetailClient";
 import { BLOG_POSTS } from "@/lib/blog";
 import { Loader2 } from "lucide-react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-
 async function fetchBlogData(slug: string) {
     try {
-        const res = await fetch(`${API_BASE}/api/blogs/${slug}`);
+        const res = await fetch(`/api/blogs/${slug}`);
         if (res.ok) {
             const data = await res.json();
             if (data.status && data.blog) {

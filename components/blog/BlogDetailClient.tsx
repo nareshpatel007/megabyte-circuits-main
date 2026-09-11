@@ -23,7 +23,7 @@ import { BlogImage } from "@/components/blog/BlogImage";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
 
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE = "";
 
 interface BlogDetailProps {
     blog: any;
