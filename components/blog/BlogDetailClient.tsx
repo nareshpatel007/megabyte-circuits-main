@@ -18,6 +18,8 @@ import {
     Instagram,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { BlogImage } from "@/components/blog/BlogImage";
+
 import { ServiceHeader } from "@/components/services/ServiceHeader";
 
 
@@ -202,15 +204,15 @@ export function BlogDetailClient({
 
 
                 {/* Featured Image */}
-                {/* {blog.featured_image && (
+                {(blog.featured_image || blog.image) && (
                     <div className="mb-10 rounded-2xl overflow-hidden shadow-md border border-gray-200 max-h-[460px] bg-gray-100">
-                        <img
-                            src={blog.featured_image}
+                        <BlogImage
+                            src={blog.featured_image || blog.image}
                             alt={blog.title}
                             className="w-full h-full object-cover"
                         />
                     </div>
-                )} */}
+                )}
 
                 {/* Article HTML Content */}
                 <article className="bg-white rounded-2xl p-8 md:p-12 border border-gray-200 shadow-sm mb-10 prose prose-emerald max-w-none">

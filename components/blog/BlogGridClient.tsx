@@ -8,6 +8,8 @@ import { BLOG_POSTS } from "@/lib/blog";
 import { Badge } from "@/components/ui/badge";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BlogImage } from "@/components/blog/BlogImage";
+
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -224,8 +226,8 @@ export function BlogGridClient() {
                                     <Link href={`/blog/${post.slug}`} className="flex flex-col h-full">
                                         {/* Card Visual Image */}
                                         <div className="relative h-48 overflow-hidden bg-gray-100 border-b border-gray-100">
-                                            <img
-                                                src={post.featured_image || post.image || "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop"}
+                                            <BlogImage
+                                                src={post.featured_image || post.image}
                                                 alt={post.title}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                             />
