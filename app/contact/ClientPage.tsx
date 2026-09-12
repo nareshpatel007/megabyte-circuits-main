@@ -43,18 +43,18 @@ export default function Contact() {
         submitContact.mutate(
             { data: values },
             {
-                onSuccess: () => {
+                onSuccess: (res: any) => {
                     setSubmitted(true);
                     toast({
                         title: "Message Sent Successfully",
-                        description: "Our engineering team will contact you within 24 hours.",
+                        description: res?.message || "Our engineering team will contact you within 24 hours.",
                     });
                     form.reset();
                 },
-                onError: () => {
+                onError: (error: Error) => {
                     toast({
                         title: "Error Sending Message",
-                        description: "Something went wrong. Please try again.",
+                        description: error.message || "Something went wrong. Please try again.",
                         variant: "destructive",
                     });
                 },
