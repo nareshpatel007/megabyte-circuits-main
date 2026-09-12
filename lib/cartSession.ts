@@ -161,15 +161,6 @@ export function calculatePartPrice(
         if (applicableTier) {
             unitPrice = applicableTier.UnitPrice;
         }
-    } else {
-        // Fallback proportional tier discount if no StandardPricing array present
-        let multiplier = 1;
-        if (qty >= 500) multiplier = 0.62;
-        else if (qty >= 100) multiplier = 0.70;
-        else if (qty >= 50) multiplier = 0.78;
-        else if (qty >= 25) multiplier = 0.85;
-        else if (qty >= 10) multiplier = 0.92;
-        unitPrice = baseUnitPrice * multiplier;
     }
 
     const price = Math.round(unitPrice * qty * 100) / 100;

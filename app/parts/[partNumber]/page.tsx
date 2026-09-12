@@ -170,10 +170,10 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
         }
     };
 
-    // Standard Pricing & Price Breaks Structure
+    // Standard Pricing & Price Breaks Structure from API response
     const finalPriceINR = product?.UnitPrice ? Number(product.UnitPrice) : 10;
 
-    // Get StandardPricing price break tiers from API response if available
+    // Get StandardPricing price break tiers from API response
     const rawStandardPricing: Array<{ BreakQuantity: number; UnitPrice: number; TotalPrice?: number }> =
         product?.StandardPricing || product?.ProductVariations?.[0]?.StandardPricing || [];
 
@@ -184,12 +184,7 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
             totalPrice: Number(st.TotalPrice || (st.UnitPrice * st.BreakQuantity)),
         }))
         : [
-            { qty: "1 - 9", unitPrice: finalPriceINR, totalPrice: finalPriceINR * 1 },
-            { qty: "10 - 24", unitPrice: finalPriceINR * 0.92, totalPrice: finalPriceINR * 0.92 * 10 },
-            { qty: "25 - 49", unitPrice: finalPriceINR * 0.85, totalPrice: finalPriceINR * 0.85 * 25 },
-            { qty: "50 - 99", unitPrice: finalPriceINR * 0.78, totalPrice: finalPriceINR * 0.78 * 50 },
-            { qty: "100 - 499", unitPrice: finalPriceINR * 0.70, totalPrice: finalPriceINR * 0.70 * 100 },
-            { qty: "500+", unitPrice: finalPriceINR * 0.62, totalPrice: finalPriceINR * 0.62 * 500 },
+            { qty: "1+", unitPrice: finalPriceINR, totalPrice: finalPriceINR * 1 },
         ];
 
     const { unitPrice: currentUnitPrice, price: calculatedTotalPrice } = calculatePartPrice(
