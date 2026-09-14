@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ServiceHeader } from "@/components/services/ServiceHeader";
-import { Search, Loader2, ExternalLink, ShoppingCart, Info, CheckCircle2, ChevronRight, Layers, X } from "lucide-react";
+import { Search, Loader2, ExternalLink, ShoppingCart, Info, CheckCircle2, ChevronRight, Layers, X, ChevronLeft, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DigiKeyProduct } from "@/lib/digikey";
@@ -22,6 +22,7 @@ export default function PartsPage() {
 
     const [products, setProducts] = useState<DigiKeyProduct[]>([]);
     const [categories, setCategories] = useState<CategoryCount[]>([]);
+    const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
     const [categorySearch, setCategorySearch] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [loading, setLoading] = useState<boolean>(true);
@@ -29,9 +30,16 @@ export default function PartsPage() {
     const [activeQuery, setActiveQuery] = useState<string>("");
     const [addedCartIds, setAddedCartIds] = useState<Record<string, boolean>>({});
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [totalProductCount, setTotalProductCount] = useState<number>(0);
+    const [perPage, setPerPage] = useState<number>(12);
+
     useEffect(() => {
         let isMounted = true;
         async function loadCategories() {
+            setCategoriesLoading(true);
             try {
                 const res = await fetch("/api/digikey/categories");
                 if (res.ok) {
@@ -42,6 +50,8 @@ export default function PartsPage() {
                 }
             } catch (err) {
                 console.error("Failed to load categories:", err);
+            } finally {
+                if (isMounted) setCategoriesLoading(false);
             }
         }
         loadCategories();
@@ -50,14 +60,18 @@ export default function PartsPage() {
         };
     }, []);
 
-    async function loadData(keyword: string, category: string) {
+    async function loadData(keyword: string, category: string, page: number, countPerPage: number) {
         setLoading(true);
         try {
             const catParam = category === "All" ? "" : category;
-            const res = await fetch(`/api/digikey/products?keywords=${encodeURIComponent(keyword)}&category=${encodeURIComponent(catParam)}&count=100`);
+            const res = await fetch(
+                `/api/digikey/products?keywords=${encodeURIComponent(keyword)}&category=${encodeURIComponent(catParam)}&count=${countPerPage}&page=${page}`
+            );
             if (res.ok) {
                 const data = await res.json();
                 setProducts(data.Products || []);
+                setTotalProductCount(data.ProductsCount || (data.Products || []).length);
+                setTotalPages(data.TotalPages || Math.ceil((data.ProductsCount || 1) / countPerPage));
             }
         } catch (err) {
             console.error("Error loading parts:", err);
@@ -66,12 +80,13 @@ export default function PartsPage() {
     }
 
     useEffect(() => {
-        loadData(activeQuery, selectedCategory);
-    }, [activeQuery, selectedCategory]);
+        loadData(activeQuery, selectedCategory, currentPage, perPage);
+    }, [activeQuery, selectedCategory, currentPage, perPage]);
 
     // Live search debounce effect as user types
     useEffect(() => {
         const handler = setTimeout(() => {
+            setCurrentPage(1);
             setActiveQuery(searchQuery.trim());
         }, 300);
 
@@ -79,6 +94,13 @@ export default function PartsPage() {
             clearTimeout(handler);
         };
     }, [searchQuery]);
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+            window.scrollTo({ top: 300, behavior: "smooth" });
+        }
+    };
 
     const handleAddToCart = async (product: DigiKeyProduct) => {
         // Check product status - only allow adding if Active
@@ -144,8 +166,6 @@ export default function PartsPage() {
         }
     };
 
-
-    const totalProductCount = products.length;
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50/60">
@@ -252,13 +272,40 @@ export default function PartsPage() {
 
                     {/* RIGHT CENTER: Parts List Grid */}
                     <div className="lg:col-span-3">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                             <p className="text-xs md:text-sm text-slate-500 font-medium">
                                 Showing <span className="font-bold text-slate-800">{totalProductCount}</span> parts
                                 {selectedCategory !== "All" && (
                                     <span> in <span className="text-primary font-bold capitalize">{selectedCategory}</span></span>
                                 )}
                             </p>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1.5">
+                                    <label htmlFor="per-page-products-top" className="text-xs font-semibold text-slate-600">
+                                        Per Page:
+                                    </label>
+                                    <select
+                                        id="per-page-products-top"
+                                        value={perPage}
+                                        onChange={(e) => {
+                                            const val = Math.min(100, Math.max(1, parseInt(e.target.value) || 12));
+                                            setPerPage(val);
+                                            setCurrentPage(1);
+                                        }}
+                                        className="h-8 text-xs font-bold bg-white border border-slate-200 rounded-xl px-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm"
+                                    >
+                                        <option value={12}>12</option>
+                                        <option value={24}>24</option>
+                                        <option value={48}>48</option>
+                                        <option value={100}>100 (Max)</option>
+                                    </select>
+                                </div>
+                                {totalPages > 1 && (
+                                    <span className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-xl shadow-sm">
+                                        Page {currentPage} of {totalPages}
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
                         {loading ? (
@@ -333,16 +380,18 @@ export default function PartsPage() {
                                                         <p className="text-xs text-slate-500 line-clamp-3 leading-snug mb-2">
                                                             {desc}
                                                         </p>
-                                                        <p className="text-xs font-semibold text-slate-700">
-                                                            Price: <span className="font-extrabold text-slate-900">{price}</span>
-                                                        </p>
-                                                        <div className="mt-1 flex items-center justify-between text-xs">
-                                                            <span className="font-semibold text-slate-600">Qty:</span>
-                                                            {isActive ? (
-                                                                <span className="font-extrabold text-emerald-700">{qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock"}</span>
-                                                            ) : (
-                                                                <span className="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 text-[11px]">{statusStr}</span>
-                                                            )}
+                                                        <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+                                                            <p className="font-semibold text-slate-700">
+                                                                Price: <span className="font-extrabold text-slate-900">{price}</span>
+                                                            </p>
+                                                            <div className="flex items-center gap-1 font-semibold text-slate-700">
+                                                                <span>Qty:</span>
+                                                                {isActive ? (
+                                                                    <span className="font-extrabold text-emerald-700">{qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock"}</span>
+                                                                ) : (
+                                                                    <span className="font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 text-[11px]">{statusStr}</span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -402,6 +451,110 @@ export default function PartsPage() {
                                         </div>
                                     );
                                 })}
+                            </div>
+                        )}
+
+                        {/* PAGINATION CONTROLS */}
+                        {totalPages > 1 && (
+                            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+                                <div className="flex items-center gap-4">
+                                    <p className="text-xs text-slate-500 font-medium">
+                                        Page <span className="font-bold text-slate-800">{currentPage}</span> of{" "}
+                                        <span className="font-bold text-slate-800">{totalPages}</span>
+                                    </p>
+                                    <div className="flex items-center gap-1.5 border-l border-slate-200 pl-3">
+                                        <label htmlFor="per-page-products-bottom" className="text-xs font-semibold text-slate-600">
+                                            Per Page:
+                                        </label>
+                                        <select
+                                            id="per-page-products-bottom"
+                                            value={perPage}
+                                            onChange={(e) => {
+                                                const val = Math.min(100, Math.max(1, parseInt(e.target.value) || 12));
+                                                setPerPage(val);
+                                                setCurrentPage(1);
+                                            }}
+                                            className="h-8 text-xs font-bold bg-white border border-slate-200 rounded-xl px-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm"
+                                        >
+                                            <option value={12}>12</option>
+                                            <option value={24}>24</option>
+                                            <option value={48}>48</option>
+                                            <option value={100}>100 (Max)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(1)}
+                                        disabled={currentPage === 1}
+                                        className="h-9 w-9 p-0 rounded-xl cursor-pointer disabled:cursor-not-allowed"
+                                        title="First Page"
+                                    >
+                                        <ChevronsLeft className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="h-9 px-3 rounded-xl text-xs font-semibold cursor-pointer disabled:cursor-not-allowed"
+                                    >
+                                        <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+                                    </Button>
+
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                        .filter(
+                                            (p) =>
+                                                p === 1 ||
+                                                p === totalPages ||
+                                                (p >= currentPage - 2 && p <= currentPage + 2)
+                                        )
+                                        .map((p, idx, arr) => {
+                                            const prev = arr[idx - 1];
+                                            const showEllipsis = prev && p - prev > 1;
+
+                                            return (
+                                                <React.Fragment key={p}>
+                                                    {showEllipsis && (
+                                                        <span className="px-1 text-slate-400 text-xs font-bold">...</span>
+                                                    )}
+                                                    <Button
+                                                        variant={currentPage === p ? "default" : "outline"}
+                                                        size="sm"
+                                                        onClick={() => handlePageChange(p)}
+                                                        className={`h-9 w-9 p-0 rounded-xl text-xs font-bold cursor-pointer ${currentPage === p
+                                                            ? "bg-primary text-white"
+                                                            : "text-slate-700 hover:bg-slate-50"
+                                                            }`}
+                                                    >
+                                                        {p}
+                                                    </Button>
+                                                </React.Fragment>
+                                            );
+                                        })}
+
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                        className="h-9 px-3 rounded-xl text-xs font-semibold cursor-pointer disabled:cursor-not-allowed"
+                                    >
+                                        Next <ChevronRight className="w-4 h-4 ml-1" />
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handlePageChange(totalPages)}
+                                        disabled={currentPage === totalPages}
+                                        className="h-9 w-9 p-0 rounded-xl cursor-pointer disabled:cursor-not-allowed"
+                                        title="Last Page"
+                                    >
+                                        <ChevronsRight className="w-4 h-4" />
+                                    </Button>
+                                </div>
                             </div>
                         )}
                     </div>

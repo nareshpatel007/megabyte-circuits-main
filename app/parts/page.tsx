@@ -47,7 +47,7 @@ export default function PartsPage() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [totalProductCount, setTotalProductCount] = useState<number>(0);
-    const perPage = 12;
+    const [perPage, setPerPage] = useState<number>(12);
 
     useEffect(() => {
         let isMounted = true;
@@ -73,18 +73,18 @@ export default function PartsPage() {
         };
     }, []);
 
-    async function loadData(keyword: string, category: string, page: number) {
+    async function loadData(keyword: string, category: string, page: number, countPerPage: number) {
         setLoading(true);
         try {
             const catParam = category === "All" ? "" : category;
             const res = await fetch(
-                `/api/digikey/products?keywords=${encodeURIComponent(keyword)}&category=${encodeURIComponent(catParam)}&count=${perPage}&page=${page}`
+                `/api/digikey/products?keywords=${encodeURIComponent(keyword)}&category=${encodeURIComponent(catParam)}&count=${countPerPage}&page=${page}`
             );
             if (res.ok) {
                 const data = await res.json();
                 setProducts(data.Products || []);
                 setTotalProductCount(data.ProductsCount || (data.Products || []).length);
-                setTotalPages(data.TotalPages || Math.ceil((data.ProductsCount || 1) / perPage));
+                setTotalPages(data.TotalPages || Math.ceil((data.ProductsCount || 1) / countPerPage));
             }
         } catch (err) {
             console.error("Error loading parts:", err);
@@ -93,8 +93,8 @@ export default function PartsPage() {
     }
 
     useEffect(() => {
-        loadData(activeQuery, selectedCategory, currentPage);
-    }, [activeQuery, selectedCategory, currentPage]);
+        loadData(activeQuery, selectedCategory, currentPage, perPage);
+    }, [activeQuery, selectedCategory, currentPage, perPage]);
 
     // Live search debounce effect as user types
     useEffect(() => {
@@ -337,18 +337,40 @@ export default function PartsPage() {
 
                     {/* RIGHT CENTER: Parts List Grid */}
                     <div className="lg:col-span-3">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                             <p className="text-xs md:text-sm text-slate-500 font-medium">
                                 Showing <span className="font-bold text-slate-800">{totalProductCount}</span> parts
                                 {selectedCategory !== "All" && (
                                     <span> in <span className="text-primary font-bold capitalize">{selectedCategory}</span></span>
                                 )}
                             </p>
-                            {totalPages > 1 && (
-                                <span className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-lg">
-                                    Page {currentPage} of {totalPages}
-                                </span>
-                            )}
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1.5">
+                                    <label htmlFor="per-page-top" className="text-xs font-semibold text-slate-600">
+                                        Per Page:
+                                    </label>
+                                    <select
+                                        id="per-page-top"
+                                        value={perPage}
+                                        onChange={(e) => {
+                                            const val = Math.min(100, Math.max(1, parseInt(e.target.value) || 12));
+                                            setPerPage(val);
+                                            setCurrentPage(1);
+                                        }}
+                                        className="h-8 text-xs font-bold bg-white border border-slate-200 rounded-xl px-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm"
+                                    >
+                                        <option value={12}>12</option>
+                                        <option value={24}>24</option>
+                                        <option value={48}>48</option>
+                                        <option value={100}>100 (Max)</option>
+                                    </select>
+                                </div>
+                                {totalPages > 1 && (
+                                    <span className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-xl shadow-sm">
+                                        Page {currentPage} of {totalPages}
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
                         {loading ? (
@@ -437,16 +459,18 @@ export default function PartsPage() {
                                                             <p className="text-xs text-slate-500 line-clamp-3 leading-snug mb-2">
                                                                 {desc}
                                                             </p>
-                                                            <p className="text-xs font-semibold text-slate-700">
-                                                                Price: <span className="font-extrabold text-slate-900">{priceStr}</span>
-                                                            </p>
-                                                            <div className="mt-1 flex items-center justify-between text-xs">
-                                                                <span className="font-semibold text-slate-600">Qty:</span>
-                                                                {isActive ? (
-                                                                    <span className="font-extrabold text-emerald-700">{qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock"}</span>
-                                                                ) : (
-                                                                    <span className="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 text-[11px]">{statusStr}</span>
-                                                                )}
+                                                            <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+                                                                <p className="font-semibold text-slate-700">
+                                                                    Price: <span className="font-extrabold text-slate-900">{priceStr}</span>
+                                                                </p>
+                                                                <div className="flex items-center gap-1 font-semibold text-slate-700">
+                                                                    <span>Qty:</span>
+                                                                    {isActive ? (
+                                                                        <span className="font-extrabold text-emerald-700">{qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock"}</span>
+                                                                    ) : (
+                                                                        <span className="font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 text-[11px]">{statusStr}</span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -511,10 +535,33 @@ export default function PartsPage() {
                                 {/* PAGINATION CONTROLS */}
                                 {totalPages > 1 && (
                                     <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
-                                        <p className="text-xs text-slate-500 font-medium">
-                                            Page <span className="font-bold text-slate-800">{currentPage}</span> of{" "}
-                                            <span className="font-bold text-slate-800">{totalPages}</span>
-                                        </p>                                         <div className="flex items-center gap-1.5">
+                                         <div className="flex items-center gap-4">
+                                             <p className="text-xs text-slate-500 font-medium">
+                                                 Page <span className="font-bold text-slate-800">{currentPage}</span> of{" "}
+                                                 <span className="font-bold text-slate-800">{totalPages}</span>
+                                             </p>
+                                             <div className="flex items-center gap-1.5 border-l border-slate-200 pl-3">
+                                                 <label htmlFor="per-page-bottom" className="text-xs font-semibold text-slate-600">
+                                                     Per Page:
+                                                 </label>
+                                                 <select
+                                                     id="per-page-bottom"
+                                                     value={perPage}
+                                                     onChange={(e) => {
+                                                         const val = Math.min(100, Math.max(1, parseInt(e.target.value) || 12));
+                                                         setPerPage(val);
+                                                         setCurrentPage(1);
+                                                     }}
+                                                     className="h-8 text-xs font-bold bg-white border border-slate-200 rounded-xl px-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm"
+                                                 >
+                                                     <option value={12}>12</option>
+                                                     <option value={24}>24</option>
+                                                     <option value={48}>48</option>
+                                                     <option value={100}>100 (Max)</option>
+                                                 </select>
+                                             </div>
+                                         </div>
+                                         <div className="flex items-center gap-1.5">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
