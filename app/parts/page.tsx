@@ -227,7 +227,7 @@ export default function PartsPage() {
                     <Search className="w-5 h-5 text-slate-400 dark:text-zinc-500 absolute left-4 pointer-events-none group-focus-within:text-primary transition-colors z-10" />
                     <input
                         type="text"
-                        placeholder="Type to search by part number, description, manufacturer, keyword..."
+                        placeholder="Type to search by DigiKey part number, manufacturer part number, manufacturer name, description..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-12 pr-12 h-14 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/80 dark:border-zinc-800 shadow-sm text-sm font-medium text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-primary/60 focus:ring-4 focus:ring-primary/10 transition-all"
