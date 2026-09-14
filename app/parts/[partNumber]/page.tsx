@@ -111,6 +111,13 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
             return;
         }
 
+        const rawQtyAvailable = product?.QuantityAvailable ?? product?.quantity_available;
+        const availableStock = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : 0;
+        if (availableStock <= 0) {
+            alert("This item is currently out of stock and cannot be added to cart.");
+            return;
+        }
+
         const partNum = mfgNumber;
         const imageUrl = product?.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
         const minOrderQty = product?.MinimumOrderQuantity || product?.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
@@ -396,7 +403,6 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
 
                             {/* 3. RIGHT COLUMN: Add to Cart Options & Separate Total Pricing */}
                             <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between h-full">
-                                <div>
                                      {/* Starting Price & Stock Badge Header Block */}
                                      <div className="mb-5 border-b border-slate-100 pb-4">
                                          <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -404,10 +410,12 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                              {(() => {
                                                  const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString();
                                                  const isActive = statusStr.toLowerCase() === "active";
-                                                 const qtyAvailable = product?.QuantityAvailable ?? product?.quantity_available ?? 0;
+                                                 const rawQty = product?.QuantityAvailable ?? product?.quantity_available;
+                                                 const qtyAvailable = rawQty !== undefined && rawQty !== null ? Number(rawQty) : 0;
+                                                 const isOutOfStock = !isActive || qtyAvailable <= 0;
                                                  return (
-                                                     <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${isActive ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" : "bg-rose-50 text-rose-700 border border-rose-200/60"}`}>
-                                                         {isActive ? `In-Stock: ${qtyAvailable}` : `Status: ${statusStr}`}
+                                                     <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${isOutOfStock ? "bg-rose-50 text-rose-700 border border-rose-200/60" : "bg-emerald-50 text-emerald-700 border border-emerald-200/60"}`}>
+                                                         {!isActive ? `Status: ${statusStr}` : `In-Stock: ${qtyAvailable}`}
                                                      </span>
                                                  );
                                              })()}
@@ -420,109 +428,135 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                          </div>
                                      </div>
 
-                                    {/* Quantity Input */}
-                                    <div className="mb-5">
-                                        <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                                            Quantity:
-                                        </label>
-                                        {(() => {
-                                            const minOrderQty = product?.MinimumOrderQuantity || product?.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
-                                            const maxStock = (product?.QuantityAvailable ?? product?.quantity_available) ? Number(product?.QuantityAvailable ?? product?.quantity_available) : undefined;
-                                            return (
-                                                <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setQuantity(Math.max(minOrderQty, quantity - 1))}
-                                                        className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer"
-                                                        title="Decrease quantity"
-                                                    >
-                                                        <Minus className="w-4 h-4" />
-                                                    </button>
-                                                    <Input
-                                                        type="number"
-                                                        min={minOrderQty}
-                                                        max={maxStock}
-                                                        value={quantity}
-                                                        onChange={(e) => {
-                                                            const val = parseInt(e.target.value) || minOrderQty;
-                                                            if (maxStock !== undefined && val > maxStock) {
-                                                                setQuantity(maxStock);
-                                                            } else {
-                                                                setQuantity(Math.max(minOrderQty, val));
-                                                            }
-                                                        }}
-                                                        className="h-full border-0 focus-visible:ring-0 rounded-none text-center font-extrabold text-slate-800 bg-transparent text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                    />
+                                    {/* Quantity Input / Obsolete Notice */}
+                                    {(() => {
+                                        const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString();
+                                        const isActive = statusStr.toLowerCase() === "active";
+                                        const isObsolete = statusStr.toLowerCase().includes("obsolete");
+                                        const rawQty = product?.QuantityAvailable ?? product?.quantity_available;
+                                        const qtyAvailable = rawQty !== undefined && rawQty !== null ? Number(rawQty) : 0;
+                                        const isOutOfStock = !isActive || qtyAvailable <= 0;
+                                        const minOrderQty = product?.MinimumOrderQuantity || product?.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
+                                        const maxStock = (product?.QuantityAvailable ?? product?.quantity_available) ? Number(product?.QuantityAvailable ?? product?.quantity_available) : undefined;
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            if (maxStock !== undefined && quantity >= maxStock) {
-                                                                return;
-                                                            }
-                                                            setQuantity(quantity + 1);
-                                                        }}
-                                                        disabled={maxStock !== undefined && quantity >= maxStock}
-                                                        className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                                                        title="Increase quantity"
-                                                    >
-                                                        <Plus className="w-4 h-4" />
-                                                    </button>
+                                        if (isObsolete) {
+                                            return (
+                                                <div className="p-6 border border-slate-300 rounded-xl bg-white my-3 space-y-2">
+                                                    <h3 className="font-bold text-slate-900 text-lg">Obsolete</h3>
+                                                    <p className="text-sm italic text-slate-700">This product is no longer manufactured.</p>
                                                 </div>
                                             );
-                                        })()}
-                                    </div>
+                                        }
 
-                                    {/* Add to Cart Button */}
-                                    <Button
-                                        onClick={handleAddToCart}
-                                        className={`w-full h-12 rounded-xl text-sm font-extrabold transition-all duration-200 shadow-md ${isAdded
-                                            ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                                            : "bg-primary hover:bg-primary/90 text-white"
-                                            }`}
-                                    >
-                                        {isAdded ? (
-                                            <span className="flex items-center justify-center gap-2">
-                                                <CheckCircle2 className="w-4 h-4" /> Added to Cart
-                                            </span>
-                                        ) : (
-                                            <span className="flex items-center justify-center gap-2">
-                                                <ShoppingCart className="w-4 h-4" /> Add to Cart
-                                            </span>
-                                        )}
-                                    </Button>
+                                        return (
+                                            <>
+                                                <div className="mb-5">
+                                                    <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                                                        Quantity:
+                                                    </label>
+                                                    <div className={`flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11 ${isOutOfStock ? "opacity-50 bg-slate-100" : ""}`}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setQuantity(Math.max(minOrderQty, quantity - 1))}
+                                                            disabled={isOutOfStock || quantity <= minOrderQty}
+                                                            className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                                            title="Decrease quantity"
+                                                        >
+                                                            <Minus className="w-4 h-4" />
+                                                        </button>
+                                                        <Input
+                                                            type="number"
+                                                            min={minOrderQty}
+                                                            max={maxStock}
+                                                            value={isOutOfStock ? 0 : quantity}
+                                                            disabled={isOutOfStock}
+                                                            onChange={(e) => {
+                                                                const val = parseInt(e.target.value) || minOrderQty;
+                                                                if (maxStock !== undefined && val > maxStock) {
+                                                                    setQuantity(maxStock);
+                                                                } else {
+                                                                    setQuantity(Math.max(minOrderQty, val));
+                                                                }
+                                                            }}
+                                                            className="h-full border-0 focus-visible:ring-0 rounded-none text-center font-extrabold text-slate-800 bg-transparent text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:bg-transparent disabled:opacity-100"
+                                                        />
 
-                                    {/* SEPARATE TOTAL PRICING & TIER BREAKDOWN UNDER ADD TO CART BUTTON */}
-                                    <div className="mt-5 p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-3">
-                                        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                                            <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pricing Breakdown</span>
-                                            <span className="text-[11px] font-semibold text-slate-500">{quantity} {quantity === 1 ? 'unit' : 'units'}</span>
-                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (maxStock !== undefined && quantity >= maxStock) {
+                                                                    return;
+                                                                }
+                                                                setQuantity(quantity + 1);
+                                                            }}
+                                                            disabled={isOutOfStock || (maxStock !== undefined && quantity >= maxStock)}
+                                                            className="w-11 h-full flex items-center justify-center text-slate-600 hover:bg-slate-200/80 active:bg-slate-300 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                                            title="Increase quantity"
+                                                        >
+                                                            <Plus className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
 
-                                        {/* Tier rate & unit calculation from API StandardPricing */}
-                                        <div className="space-y-1.5 text-xs text-slate-600">
-                                            <div className="flex justify-between items-center text-[11px]">
-                                                <span className="text-slate-600">Unit Price ({quantity} {quantity === 1 ? 'unit' : 'units'})</span>
-                                                <span className="font-semibold text-slate-800">₹{currentUnitPrice.toFixed(2)}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-[11px]">
-                                                <span className="text-slate-600">Calculation ({quantity} × ₹{currentUnitPrice.toFixed(2)})</span>
-                                                <span className="font-semibold text-slate-800">₹{calculatedTotalPrice.toFixed(2)}</span>
-                                            </div>
-                                        </div>
+                                                {/* Add to Cart Button */}
+                                                <Button
+                                                    onClick={handleAddToCart}
+                                                    disabled={isOutOfStock || isAdded}
+                                                    className={`w-full h-12 rounded-xl text-sm font-extrabold transition-all duration-200 shadow-md ${
+                                                        isOutOfStock
+                                                            ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none border border-slate-300/60"
+                                                            : isAdded
+                                                            ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                                            : "bg-primary hover:bg-primary/90 text-white"
+                                                    }`}
+                                                >
+                                                    {isOutOfStock ? (
+                                                        <span className="flex items-center justify-center gap-2">
+                                                            <ShoppingCart className="w-4 h-4" /> Out of Stock
+                                                        </span>
+                                                    ) : isAdded ? (
+                                                        <span className="flex items-center justify-center gap-2">
+                                                            <CheckCircle2 className="w-4 h-4" /> Added to Cart
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center justify-center gap-2">
+                                                            <ShoppingCart className="w-4 h-4" /> Add to Cart
+                                                        </span>
+                                                    )}
+                                                </Button>
 
-                                        {/* Final Calculated Total */}
-                                        <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                                            <span className="text-xs font-black text-slate-900">Total Calculation:</span>
-                                            <span className="text-base font-black text-primary">
-                                                ₹{calculatedTotalPrice.toFixed(2)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                                {/* SEPARATE TOTAL PRICING & TIER BREAKDOWN UNDER ADD TO CART BUTTON */}
+                                                <div className="mt-5 p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-3">
+                                                    <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                                                        <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pricing Breakdown</span>
+                                                        <span className="text-[11px] font-semibold text-slate-500">{quantity} {quantity === 1 ? 'unit' : 'units'}</span>
+                                                    </div>
 
-                        </div>
+                                                    {/* Tier rate & unit calculation from API StandardPricing */}
+                                                    <div className="space-y-1.5 text-xs text-slate-600">
+                                                        <div className="flex justify-between items-center text-[11px]">
+                                                            <span className="text-slate-600">Unit Price ({quantity} {quantity === 1 ? 'unit' : 'units'})</span>
+                                                            <span className="font-semibold text-slate-800">₹{currentUnitPrice.toFixed(2)}</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center text-[11px]">
+                                                            <span className="text-slate-600">Calculation ({quantity} × ₹{currentUnitPrice.toFixed(2)})</span>
+                                                            <span className="font-semibold text-slate-800">₹{calculatedTotalPrice.toFixed(2)}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Final Calculated Total */}
+                                                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                                                        <span className="text-xs font-black text-slate-900">Total Calculation:</span>
+                                                        <span className="text-base font-black text-primary">
+                                                            ₹{calculatedTotalPrice.toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                 </div>
+                             </div>
 
                         {/* PRODUCT ATTRIBUTES TABLE (Matching screenshot layout) */}
                         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">

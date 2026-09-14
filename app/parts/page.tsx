@@ -490,15 +490,13 @@ export default function PartsPage() {
                                         <p className="text-xs text-slate-500 font-medium">
                                             Page <span className="font-bold text-slate-800">{currentPage}</span> of{" "}
                                             <span className="font-bold text-slate-800">{totalPages}</span>
-                                        </p>
-
-                                        <div className="flex items-center gap-1.5">
+                                        </p>                                         <div className="flex items-center gap-1.5">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => handlePageChange(1)}
                                                 disabled={currentPage === 1}
-                                                className="h-9 w-9 p-0 rounded-xl"
+                                                className="h-9 w-9 p-0 rounded-xl cursor-pointer disabled:cursor-not-allowed"
                                                 title="First Page"
                                             >
                                                 <ChevronsLeft className="w-4 h-4" />
@@ -508,7 +506,7 @@ export default function PartsPage() {
                                                 size="sm"
                                                 onClick={() => handlePageChange(currentPage - 1)}
                                                 disabled={currentPage === 1}
-                                                className="h-9 px-3 rounded-xl text-xs font-semibold"
+                                                className="h-9 px-3 rounded-xl text-xs font-semibold cursor-pointer disabled:cursor-not-allowed"
                                             >
                                                 <ChevronLeft className="w-4 h-4 mr-1" /> Previous
                                             </Button>
@@ -534,7 +532,7 @@ export default function PartsPage() {
                                                                 variant={currentPage === p ? "default" : "outline"}
                                                                 size="sm"
                                                                 onClick={() => handlePageChange(p)}
-                                                                className={`h-9 w-9 p-0 rounded-xl text-xs font-bold ${currentPage === p
+                                                                className={`h-9 w-9 p-0 rounded-xl text-xs font-bold cursor-pointer ${currentPage === p
                                                                     ? "bg-primary text-white"
                                                                     : "text-slate-700 hover:bg-slate-50"
                                                                     }`}
@@ -550,7 +548,7 @@ export default function PartsPage() {
                                                 size="sm"
                                                 onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === totalPages}
-                                                className="h-9 px-3 rounded-xl text-xs font-semibold"
+                                                className="h-9 px-3 rounded-xl text-xs font-semibold cursor-pointer disabled:cursor-not-allowed"
                                             >
                                                 Next <ChevronRight className="w-4 h-4 ml-1" />
                                             </Button>
@@ -559,7 +557,7 @@ export default function PartsPage() {
                                                 size="sm"
                                                 onClick={() => handlePageChange(totalPages)}
                                                 disabled={currentPage === totalPages}
-                                                className="h-9 w-9 p-0 rounded-xl"
+                                                className="h-9 w-9 p-0 rounded-xl cursor-pointer disabled:cursor-not-allowed"
                                                 title="Last Page"
                                             >
                                                 <ChevronsRight className="w-4 h-4" />
