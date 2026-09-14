@@ -81,6 +81,13 @@ export default function PartsPage() {
     }, [searchQuery]);
 
     const handleAddToCart = async (product: DigiKeyProduct) => {
+        // Check product status - only allow adding if Active
+        const status = typeof product.ProductStatus === "object" ? product.ProductStatus?.Status : product.ProductStatus;
+        if (status && status.toString().trim().toLowerCase() !== "active") {
+            alert("This item is currently not active and cannot be added to cart.");
+            return;
+        }
+
         const partNum = product.ManufacturerProductNumber || "Part";
         const desc = product.Description?.DetailedDescription || product.Description?.ProductDescription || "High quality component";
         const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
@@ -285,6 +292,11 @@ export default function PartsPage() {
                                     const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
                                     const isAdded = addedCartIds[partNum];
 
+                                    const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || "Active").toString().trim();
+                                    const isActive = statusStr.toLowerCase() === "active";
+                                    const rawQtyAvailable = product?.QuantityAvailable;
+                                    const qtyAvailable = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : null;
+
                                     return (
                                         <div
                                             key={idx}
@@ -324,6 +336,14 @@ export default function PartsPage() {
                                                         <p className="text-xs font-semibold text-slate-700">
                                                             Price: <span className="font-extrabold text-slate-900">{price}</span>
                                                         </p>
+                                                        <div className="mt-1 flex items-center justify-between text-xs">
+                                                            <span className="font-semibold text-slate-600">Qty:</span>
+                                                            {isActive ? (
+                                                                <span className="font-extrabold text-emerald-700">{qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock"}</span>
+                                                            ) : (
+                                                                <span className="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 text-[11px]">{statusStr}</span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -346,24 +366,38 @@ export default function PartsPage() {
                                                     </a>
                                                 </Button>
 
-                                                <Button
-                                                    onClick={() => handleAddToCart(product)}
-                                                    size="sm"
-                                                    className={`w-full text-xs font-bold h-9 transition-colors ${isAdded
-                                                        ? "bg-green-600 text-white hover:bg-green-700"
-                                                        : "bg-primary text-white hover:bg-primary/90"
-                                                        }`}
-                                                >
-                                                    {isAdded ? (
+                                                {!isActive ? (
+                                                    <Button
+                                                        disabled
+                                                        size="sm"
+                                                        className="w-full text-xs font-bold h-9 bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-80"
+                                                        title={`Status: ${statusStr}`}
+                                                    >
+                                                        <span className="flex items-center gap-1 truncate">
+                                                            <ShoppingCart className="w-3.5 h-3.5 shrink-0" /> {statusStr}
+                                                        </span>
+                                                    </Button>
+                                                ) : isAdded ? (
+                                                    <Button
+                                                        disabled
+                                                        size="sm"
+                                                        className="w-full text-xs font-bold h-9 bg-green-600 text-white cursor-default opacity-100"
+                                                    >
                                                         <span className="flex items-center gap-1">
                                                             <CheckCircle2 className="w-3.5 h-3.5" /> Added
                                                         </span>
-                                                    ) : (
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        onClick={() => handleAddToCart(product)}
+                                                        size="sm"
+                                                        className="w-full text-xs font-bold h-9 bg-primary text-white hover:bg-primary/90 transition-colors"
+                                                    >
                                                         <span className="flex items-center gap-1">
                                                             <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
                                                         </span>
-                                                    )}
-                                                </Button>
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
                                     );

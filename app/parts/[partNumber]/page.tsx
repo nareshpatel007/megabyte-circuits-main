@@ -428,32 +428,29 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                          </div>
                                      </div>
 
-                                    {/* Quantity Input / Obsolete Notice */}
+                                    {/* Quantity Input / Status Info */}
                                     {(() => {
-                                        const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString();
+                                        const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString().trim();
                                         const isActive = statusStr.toLowerCase() === "active";
-                                        const isObsolete = statusStr.toLowerCase().includes("obsolete");
                                         const rawQty = product?.QuantityAvailable ?? product?.quantity_available;
                                         const qtyAvailable = rawQty !== undefined && rawQty !== null ? Number(rawQty) : 0;
                                         const isOutOfStock = !isActive || qtyAvailable <= 0;
                                         const minOrderQty = product?.MinimumOrderQuantity || product?.ProductVariations?.[0]?.MinimumOrderQuantity || getMinCartQuantity();
                                         const maxStock = (product?.QuantityAvailable ?? product?.quantity_available) ? Number(product?.QuantityAvailable ?? product?.quantity_available) : undefined;
 
-                                        if (isObsolete) {
-                                            return (
-                                                <div className="p-6 border border-slate-300 rounded-xl bg-white my-3 space-y-2">
-                                                    <h3 className="font-bold text-slate-900 text-lg">Obsolete</h3>
-                                                    <p className="text-sm italic text-slate-700">This product is no longer manufactured.</p>
-                                                </div>
-                                            );
-                                        }
-
                                         return (
                                             <>
                                                 <div className="mb-5">
-                                                    <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                                                        Quantity:
-                                                    </label>
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <label className="text-xs font-bold text-slate-700">
+                                                            Quantity:
+                                                        </label>
+                                                        {!isActive && (
+                                                            <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
+                                                                {statusStr}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <div className={`flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 h-11 ${isOutOfStock ? "opacity-50 bg-slate-100" : ""}`}>
                                                         <button
                                                             type="button"
@@ -503,14 +500,20 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                                     onClick={handleAddToCart}
                                                     disabled={isOutOfStock || isAdded}
                                                     className={`w-full h-12 rounded-xl text-sm font-extrabold transition-all duration-200 shadow-md ${
-                                                        isOutOfStock
+                                                        !isActive
+                                                            ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none border border-slate-300/60"
+                                                            : isOutOfStock
                                                             ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none border border-slate-300/60"
                                                             : isAdded
                                                             ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                                                             : "bg-primary hover:bg-primary/90 text-white"
                                                     }`}
                                                 >
-                                                    {isOutOfStock ? (
+                                                    {!isActive ? (
+                                                        <span className="flex items-center justify-center gap-2">
+                                                            <ShoppingCart className="w-4 h-4" /> {statusStr}
+                                                        </span>
+                                                    ) : isOutOfStock ? (
                                                         <span className="flex items-center justify-center gap-2">
                                                             <ShoppingCart className="w-4 h-4" /> Out of Stock
                                                         </span>
