@@ -459,19 +459,23 @@ export default function PartsPage() {
                                                             <p className="text-xs text-slate-500 line-clamp-3 leading-snug mb-2">
                                                                 {desc}
                                                             </p>
-                                                            <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-                                                                <p className="font-semibold text-slate-700">
-                                                                    Price: <span className="font-extrabold text-slate-900">{priceStr}</span>
-                                                                </p>
-                                                                <div className="flex items-center gap-1 font-semibold text-slate-700">
-                                                                    <span>Qty:</span>
-                                                                    {isActive ? (
-                                                                        <span className="font-extrabold text-emerald-700">{qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock"}</span>
-                                                                    ) : (
-                                                                        <span className="font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 text-[11px]">{statusStr}</span>
-                                                                    )}
+                                                            <p className="text-xs font-semibold text-slate-700 mt-2">
+                                                                Price: <span className="font-extrabold text-slate-900">{priceStr}</span>
+                                                            </p>
+                                                            <p className="text-xs font-semibold text-slate-700 mt-1 flex items-center gap-1">
+                                                                <span>Qty:</span>
+                                                                <span className={isActive ? "font-extrabold text-emerald-700" : "font-extrabold text-slate-800"}>
+                                                                    {isActive ? (qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock") : 0}
+                                                                </span>
+                                                            </p>
+                                                            {!isActive && (
+                                                                <div className="text-xs font-semibold text-slate-700 mt-1 flex items-center gap-1">
+                                                                    <span>Status:</span>
+                                                                    <span className="font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 text-[11px]">
+                                                                        {statusStr}
+                                                                    </span>
                                                                 </div>
-                                                            </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
