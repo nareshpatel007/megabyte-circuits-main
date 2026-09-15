@@ -408,7 +408,8 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
                                          <div className="flex items-center justify-between gap-2 mb-1.5">
                                              <span className="text-xs text-slate-500 font-semibold tracking-wide">Starting Price</span>
                                              {(() => {
-                                                 const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString();
+                                                 let statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString().trim();
+                                                 if (statusStr === "Discontinued at DigiKey") statusStr = "Discontinued";
                                                  const isActive = statusStr.toLowerCase() === "active";
                                                  const rawQty = product?.QuantityAvailable ?? product?.quantity_available;
                                                  const qtyAvailable = rawQty !== undefined && rawQty !== null ? Number(rawQty) : 0;
@@ -430,7 +431,8 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
 
                                     {/* Quantity Input / Status Info */}
                                     {(() => {
-                                        const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString().trim();
+                                        let statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status || "Active").toString().trim();
+                                        if (statusStr === "Discontinued at DigiKey") statusStr = "Discontinued";
                                         const isActive = statusStr.toLowerCase() === "active";
                                         const rawQty = product?.QuantityAvailable ?? product?.quantity_available;
                                         const qtyAvailable = rawQty !== undefined && rawQty !== null ? Number(rawQty) : 0;
