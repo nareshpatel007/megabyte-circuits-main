@@ -444,6 +444,8 @@ export function BlogDetailClient({
                                 <Link
                                     key={rel.slug}
                                     href={`/blog/${rel.slug}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="group bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col h-full"
                                 >
                                     <div className="h-36 bg-gray-100 overflow-hidden">

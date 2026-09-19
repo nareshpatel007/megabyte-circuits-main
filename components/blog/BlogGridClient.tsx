@@ -223,7 +223,7 @@ export function BlogGridClient() {
                                     variants={cardVariants}
                                     className="group flex flex-col bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 hover:-translate-y-1 h-full"
                                 >
-                                    <Link href={`/blog/${post.slug}`} className="flex flex-col h-full">
+                                    <Link href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="flex flex-col h-full">
                                         {/* Card Visual Image */}
                                         <div className="relative h-48 overflow-hidden bg-gray-100 border-b border-gray-100">
                                             <BlogImage
