@@ -28,6 +28,8 @@ const QUICK_LINKS = [
     { label: "PCB Calculator", href: "/pcb-calculator" },
     { label: "Components", href: "/parts" },
     { label: "Contact Support", href: "/contact" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Service", href: "/terms-of-service" },
 ];
 
 const SOCIAL = [
