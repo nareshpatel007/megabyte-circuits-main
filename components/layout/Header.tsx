@@ -23,10 +23,7 @@ const ABOUT_LINKS = [
     { label: "FAQs", href: "/faq" },
 ];
 
-const LEGAL_LINKS = [
-    { label: "Privacy Policy", href: "/privacy-policy" },
-    { label: "Terms of Service", href: "/terms-of-service" },
-];
+
 
 const PRODUCTS_LINKS = [
     { label: "Single Layer PCB", href: "/products/single-layer-pcb-ahmedabad" },
@@ -54,7 +51,6 @@ export function Header() {
     const [servicesOpen, setServicesOpen] = React.useState(false);
 
     const [aboutHover, setAboutHover] = React.useState(false);
-    const [legalHover, setLegalHover] = React.useState(false);
     const [productsHover, setProductsHover] = React.useState(false);
     const [servicesHover, setServicesHover] = React.useState(false);
     const [isCartOpen, setIsCartOpen] = React.useState(false);
@@ -183,29 +179,7 @@ export function Header() {
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
-                            <DropdownMenu open={legalHover} onOpenChange={setLegalHover} modal={false}>
-                                <DropdownMenuTrigger
-                                    onMouseEnter={() => setLegalHover(true)}
-                                    onMouseLeave={() => setLegalHover(false)}
-                                    className={`flex items-center gap-1 text-xs xl:text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-zinc-800 outline-none ${navText}`}
-                                >
-                                    Policies <ChevronDown className="w-3.5 h-3.5 opacity-60" />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    onMouseEnter={() => setLegalHover(true)}
-                                    onMouseLeave={() => setLegalHover(false)}
-                                    align="start"
-                                    className="w-48 dark:bg-zinc-900 dark:border-zinc-800"
-                                >
-                                    {LEGAL_LINKS.map((l) => (
-                                        <Link key={l.label} href={l.href}>
-                                            <DropdownMenuItem className="cursor-pointer text-xs font-medium dark:text-zinc-200 dark:focus:bg-zinc-800">
-                                                {l.label}
-                                            </DropdownMenuItem>
-                                        </Link>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+
 
                             <Link
                                 href="/pcb-calculator"
