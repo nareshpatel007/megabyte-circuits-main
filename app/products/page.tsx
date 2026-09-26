@@ -106,14 +106,12 @@ export default function PartsPage() {
         // Check product status - only allow adding if Active
         const status = typeof product.ProductStatus === "object" ? product.ProductStatus?.Status : product.ProductStatus;
         if (status && status.toString().trim().toLowerCase() !== "active") {
-            alert("This item is currently not active and cannot be added to cart.");
             return;
         }
 
-        const rawQtyAvailable = product?.QuantityAvailable;
+        const rawQtyAvailable = product?.QuantityAvailable ?? (product as any)?.quantity_available ?? (product as any)?.Quantity ?? (product as any)?.available_quantity ?? (product as any)?.stock;
         const qtyAvailable = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : null;
         if (qtyAvailable !== null && qtyAvailable <= 0) {
-            alert("This item is out of stock (Qty: 0) and cannot be added to cart.");
             return;
         }
 
@@ -348,7 +346,7 @@ export default function PartsPage() {
 
                                     const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || "Active").toString().trim();
                                     const isActive = statusStr.toLowerCase() === "active";
-                                    const rawQtyAvailable = product?.QuantityAvailable;
+                                    const rawQtyAvailable = product?.QuantityAvailable ?? (product as any)?.quantity_available ?? (product as any)?.Quantity ?? (product as any)?.available_quantity ?? (product as any)?.stock;
                                     const qtyAvailable = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : null;
                                     const isZeroQty = qtyAvailable !== null && qtyAvailable <= 0;
 

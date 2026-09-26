@@ -107,14 +107,12 @@ export default function SingleProductPage({ params }: SingleProductPageProps) {
         // Product Status Check
         const status = typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || product?.product_status;
         if (status && status.toLowerCase() !== "active") {
-            alert("This item is currently not active and cannot be added to cart.");
             return;
         }
 
-        const rawQtyAvailable = product?.QuantityAvailable ?? product?.quantity_available;
+        const rawQtyAvailable = product?.QuantityAvailable ?? product?.quantity_available ?? (product as any)?.Quantity ?? (product as any)?.available_quantity ?? (product as any)?.stock;
         const availableStock = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : 0;
         if (availableStock <= 0) {
-            alert("This item is currently out of stock and cannot be added to cart.");
             return;
         }
 

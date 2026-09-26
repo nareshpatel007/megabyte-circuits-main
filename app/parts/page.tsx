@@ -154,14 +154,12 @@ export default function PartsPage() {
         // Check product status - only allow adding if Active
         const status = typeof product.ProductStatus === "object" ? product.ProductStatus?.Status : product.ProductStatus;
         if (status && status.toLowerCase() !== "active") {
-            alert("This item is currently not active and cannot be added to cart.");
             return;
         }
 
-        const rawQtyAvailable = product?.QuantityAvailable;
+        const rawQtyAvailable = product?.QuantityAvailable ?? (product as any)?.quantity_available ?? (product as any)?.Quantity ?? (product as any)?.available_quantity ?? (product as any)?.stock;
         const qtyAvailable = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : null;
         if (qtyAvailable !== null && qtyAvailable <= 0) {
-            alert("This item is out of stock (Qty: 0) and cannot be added to cart.");
             return;
         }
 
@@ -435,7 +433,7 @@ export default function PartsPage() {
 
                                         const statusStr = (typeof product?.ProductStatus === "object" ? product?.ProductStatus?.Status : product?.ProductStatus || "Active").toString().trim();
                                         const isActive = statusStr.toLowerCase() === "active";
-                                        const rawQtyAvailable = product?.QuantityAvailable;
+                                        const rawQtyAvailable = product?.QuantityAvailable ?? (product as any)?.quantity_available ?? (product as any)?.Quantity ?? (product as any)?.available_quantity ?? (product as any)?.stock;
                                         const qtyAvailable = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : null;
                                         const isZeroQty = qtyAvailable !== null && qtyAvailable <= 0;
 
@@ -515,6 +513,17 @@ export default function PartsPage() {
                                                         >
                                                             <span className="flex items-center gap-1 truncate">
                                                                 <ShoppingCart className="w-3.5 h-3.5 shrink-0" /> {statusStr}
+                                                            </span>
+                                                        </Button>
+                                                    ) : isZeroQty ? (
+                                                        <Button
+                                                            disabled
+                                                            size="sm"
+                                                            className="w-full text-xs font-bold h-9 bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-80"
+                                                            title="Out of Stock (Qty: 0)"
+                                                        >
+                                                            <span className="flex items-center gap-1 truncate">
+                                                                <ShoppingCart className="w-3.5 h-3.5 shrink-0" /> Out of Stock
                                                             </span>
                                                         </Button>
                                                     ) : isAdded ? (
