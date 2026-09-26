@@ -158,6 +158,13 @@ export default function PartsPage() {
             return;
         }
 
+        const rawQtyAvailable = product?.QuantityAvailable;
+        const qtyAvailable = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : null;
+        if (qtyAvailable !== null && qtyAvailable <= 0) {
+            alert("This item is out of stock (Qty: 0) and cannot be added to cart.");
+            return;
+        }
+
         const partNum = product.ManufacturerProductNumber || "Part";
         const desc = product.Description?.DetailedDescription || product.Description?.ProductDescription || "High quality component";
         const imageUrl = product.PhotoUrl || "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/7182/MFG_RMCF_series.jpg";
@@ -430,6 +437,7 @@ export default function PartsPage() {
                                         const isActive = statusStr.toLowerCase() === "active";
                                         const rawQtyAvailable = product?.QuantityAvailable;
                                         const qtyAvailable = rawQtyAvailable !== undefined && rawQtyAvailable !== null ? Number(rawQtyAvailable) : null;
+                                        const isZeroQty = qtyAvailable !== null && qtyAvailable <= 0;
 
                                         return (
                                             <div
@@ -464,7 +472,7 @@ export default function PartsPage() {
                                                             </p>
                                                             <p className="text-xs font-semibold text-slate-700 mt-1 flex items-center gap-1">
                                                                 <span>Qty:</span>
-                                                                <span className={isActive ? "font-extrabold text-emerald-700" : "font-extrabold text-slate-800"}>
+                                                                <span className={isActive && !isZeroQty ? "font-extrabold text-emerald-700" : "font-extrabold text-slate-800"}>
                                                                     {isActive ? (qtyAvailable !== null ? qtyAvailable.toLocaleString() : "In Stock") : 0}
                                                                 </span>
                                                             </p>
