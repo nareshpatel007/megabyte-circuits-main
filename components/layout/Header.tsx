@@ -183,6 +183,7 @@ export function Header() {
 
                             <Link
                                 href="/pcb-calculator"
+                                prefetch={false}
                                 className={`text-xs xl:text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-zinc-800 ${navText}`}
                             >
                                 PCB Calculator
@@ -190,6 +191,7 @@ export function Header() {
 
                             <Link
                                 href="/parts"
+                                prefetch={false}
                                 className={`text-xs xl:text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-zinc-800 ${navText}`}
                             >
                                 Components
@@ -375,6 +377,7 @@ export function Header() {
                             {/* PCB Calculator page link */}
                             <Link
                                 href="/pcb-calculator"
+                                prefetch={false}
                                 className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
                                 onClick={() => setMobileOpen(false)}
                             >
@@ -384,6 +387,7 @@ export function Header() {
                             {/* Components page link */}
                             <Link
                                 href="/parts"
+                                prefetch={false}
                                 className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-800 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
                                 onClick={() => setMobileOpen(false)}
                             >

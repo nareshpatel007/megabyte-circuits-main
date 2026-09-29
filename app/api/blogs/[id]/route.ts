@@ -6,9 +6,9 @@ export const revalidate = 0;
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        let envUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
-        if (envUrl.includes("localhost/megabyte-circuits-api")) {
-            envUrl = "http://127.0.0.1:8000/api";
+        let envUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.megabytecircuit.com/api";
+        if (envUrl.includes("127.0.0.1:8000")) {
+            envUrl = "https://api.megabytecircuit.com/api";
         }
         if (!envUrl.endsWith("/api")) {
             envUrl = `${envUrl.replace(/\/$/, "")}/api`;
@@ -21,11 +21,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                 "Accept": "application/json",
                 "X-Api-Token": process.env.NEXT_PUBLIC_API_TOKEN || "",
             },
+            signal: AbortSignal.timeout(6000),
             cache: "no-store"
         });
 
         if (response.ok) {
             const data = await response.json();
+            // Sanitize oversized base64 images from related blogs
+            if (data && data.status && Array.isArray(data.related)) {
+                data.related = data.related.map((r: any) => {
+                    if (typeof r.featured_image === "string" && r.featured_image.startsWith("data:image/") && r.featured_image.length > 500) {
+                        return { ...r, featured_image: null };
+                    }
+                    return r;
+                });
+            }
             return NextResponse.json(data);
         }
 

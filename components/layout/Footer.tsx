@@ -124,6 +124,7 @@ export function Footer() {
                                 <li key={l.label}>
                                     <Link
                                         href={l.href}
+                                        prefetch={false}
                                         className="text-sm text-white/50 hover:text-primary transition-colors flex items-center gap-1.5 group"
                                     >
                                         <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-primary transition-colors shrink-0" />

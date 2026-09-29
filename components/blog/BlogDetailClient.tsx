@@ -72,14 +72,28 @@ export function BlogDetailClient({
 
                 if (!hasViewedInTab) {
                     sessionStorage.setItem(storageKey, "true");
-                    fetch(`${API_BASE}/api/blogs/${blogIdentifier}/view`, { method: "POST" })
-                        .then((res) => res.json())
-                        .then((data) => {
-                            if (data.status && typeof data.views === "number") {
-                                setViews(data.views);
-                            }
+                    // Defer view count to idle time after initial render settles
+                    const triggerViewCount = () => {
+                        fetch(`${API_BASE}/api/blogs/${blogIdentifier}/view`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({}),
+                            keepalive: true,
                         })
-                        .catch((e) => console.error("View increment error:", e));
+                            .then((res) => res.json())
+                            .then((data) => {
+                                if (data?.status && typeof data?.views === "number") {
+                                    setViews(data.views);
+                                }
+                            })
+                            .catch((e) => console.error("View increment error:", e));
+                    };
+
+                    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+                        (window as any).requestIdleCallback(triggerViewCount, { timeout: 3000 });
+                    } else {
+                        setTimeout(triggerViewCount, 1500);
+                    }
                 }
             }
         }
@@ -452,6 +466,8 @@ export function BlogDetailClient({
                                         <img
                                             src={rel.featured_image || "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop"}
                                             alt={rel.title}
+                                            loading="lazy"
+                                            decoding="async"
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         />
                                     </div>

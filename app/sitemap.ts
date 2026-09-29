@@ -1,13 +1,19 @@
 import { MetadataRoute } from 'next';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+let API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://api.megabytecircuit.com";
+if (API_BASE.includes("127.0.0.1:8000")) {
+    API_BASE = "https://api.megabytecircuit.com";
+}
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://megabytecircuits.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     let blogEntries: MetadataRoute.Sitemap = [];
 
     try {
-        const res = await fetch(`${API_BASE}/api/blogs?limit=1000`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${API_BASE}/api/blogs?limit=1000`, {
+            next: { revalidate: 3600 },
+            signal: AbortSignal.timeout(5000),
+        });
         if (res.ok) {
             const data = await res.json();
             if (data.status && data.blogs?.data) {

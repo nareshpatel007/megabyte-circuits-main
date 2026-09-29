@@ -1,22 +1,53 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { useParams, notFound } from "next/navigation";
+import React, { cache } from "react";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { BlogDetailClient } from "@/components/blog/BlogDetailClient";
 import { BLOG_POSTS } from "@/lib/blog";
-import { Skeleton } from "@/components/ui/skeleton";
 
-async function fetchBlogData(slug: string) {
+// Incremental Static Regeneration: Full Route Cache revalidates every 5 minutes (300 seconds)
+export const revalidate = 300;
+
+interface PageProps {
+    params: Promise<{ slug: string }>;
+}
+
+const fetchBlogData = cache(async (slug: string) => {
     try {
-        const res = await fetch(`/api/blogs/${slug}`);
+        let envUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.megabytecircuit.com/api";
+        if (envUrl.includes("127.0.0.1:8000")) {
+            envUrl = "https://api.megabytecircuit.com/api";
+        }
+        if (!envUrl.endsWith("/api")) {
+            envUrl = `${envUrl.replace(/\/$/, "")}/api`;
+        }
+
+        const backendUrl = `${envUrl}/blogs/${encodeURIComponent(slug)}`;
+        const res = await fetch(backendUrl, {
+            headers: {
+                "Accept": "application/json",
+                "X-Api-Token": process.env.NEXT_PUBLIC_API_TOKEN || "",
+            },
+            cache: "no-store",
+            signal: AbortSignal.timeout(8000),
+        });
+
         if (res.ok) {
             const data = await res.json();
-            if (data.status && data.blog) {
+            if (data && data.status && data.blog) {
+                // Sanitize oversized base64 images in related blogs to maintain lightweight payload
+                if (Array.isArray(data.related)) {
+                    data.related = data.related.map((r: any) => {
+                        if (typeof r.featured_image === "string" && r.featured_image.startsWith("data:image/") && r.featured_image.length > 500) {
+                            return { ...r, featured_image: null };
+                        }
+                        return r;
+                    });
+                }
                 return data;
             }
         }
     } catch (e) {
-        console.error("API blog fetch error:", e);
+        console.error("Server blog fetch error:", e);
     }
 
     // Fallback to static lib/blog.ts if DB item is missing
@@ -60,98 +91,61 @@ async function fetchBlogData(slug: string) {
         has_liked: false,
         related: [],
     };
-}
+});
 
-export default function SingleBlogPage() {
-    const params = useParams();
-    const slug = typeof params?.slug === "string" ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : "";
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const data = await fetchBlogData(slug);
 
-    const [loading, setLoading] = useState(true);
-    const [data, setData] = useState<any>(null);
-    const [isNotFound, setIsNotFound] = useState(false);
-
-    useEffect(() => {
-        if (!slug) return;
-
-        let isMounted = true;
-        setLoading(true);
-
-        fetchBlogData(slug)
-            .then((result) => {
-                if (!isMounted) return;
-                if (!result || !result.blog) {
-                    setIsNotFound(true);
-                } else {
-                    setData(result);
-                }
-            })
-            .catch((err) => {
-                console.error("Error fetching blog data:", err);
-                if (isMounted) setIsNotFound(true);
-            })
-            .finally(() => {
-                if (isMounted) setLoading(false);
-            });
-
-        return () => {
-            isMounted = false;
+    if (!data?.blog) {
+        return {
+            title: "Blog Post Not Found - MegaByte Circuits",
+            description: "The requested blog article could not be found.",
         };
-    }, [slug]);
-
-    if (isNotFound) {
-        notFound();
     }
 
-    if (loading || !data) {
-        return (
-            <div className="w-full bg-gray-50 min-h-screen pb-20">
-                {/* Hero / Header Skeleton */}
-                <div className="bg-secondary text-white py-16 px-4">
-                    <div className="max-w-4xl mx-auto space-y-4">
-                        <Skeleton className="h-6 w-32 bg-gray-700/50 rounded-full" />
-                        <Skeleton className="h-10 w-3/4 bg-gray-700/50 rounded-lg" />
-                        <Skeleton className="h-6 w-1/2 bg-gray-700/50 rounded-lg" />
-                    </div>
-                </div>
+    const { blog, author } = data;
+    const title = blog.meta_title || `${blog.title} - MegaByte Circuits`;
+    const description = blog.meta_description || blog.excerpt || "";
+    const canonical = blog.canonical_url || `https://megabytecircuit.com/blog/${blog.slug}`;
+    const ogImage = blog.og_image || blog.featured_image || "https://megabytecircuit.com/images/logo.png";
 
-                {/* Article Content Skeleton Container */}
-                <div className="section-container py-12 max-w-4xl mx-auto px-4">
-                    {/* Back link & Meta header skeleton */}
-                    <div className="mb-8 space-y-6">
-                        <Skeleton className="h-4 w-36 bg-gray-200" />
+    return {
+        title,
+        description,
+        alternates: {
+            canonical,
+        },
+        openGraph: {
+            title: blog.og_title || title,
+            description: blog.og_description || description,
+            url: canonical,
+            siteName: "MegaByte Circuits",
+            type: "article",
+            publishedTime: blog.published_at || undefined,
+            modifiedTime: blog.updated_at || blog.published_at || undefined,
+            authors: author?.name ? [author.name] : ["MegaByte Circuits Team"],
+            images: ogImage ? [{ url: ogImage }] : [],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: blog.twitter_title || title,
+            description: blog.twitter_description || description,
+            images: blog.twitter_image || ogImage ? [blog.twitter_image || ogImage] : [],
+        },
+        robots: {
+            index: blog.robots_index !== false,
+            follow: blog.robots_follow !== false,
+        },
+    };
+}
 
-                        <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-gray-200">
-                            <div className="flex items-center gap-3">
-                                <Skeleton className="w-10 h-10 rounded-full bg-gray-200" />
-                                <div className="space-y-1">
-                                    <Skeleton className="h-4 w-28 bg-gray-200" />
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-6">
-                                <Skeleton className="h-4 w-24 bg-gray-200" />
-                                <Skeleton className="h-4 w-20 bg-gray-200" />
-                                <Skeleton className="h-4 w-16 bg-gray-200" />
-                            </div>
-                        </div>
-                    </div>
+export default async function SingleBlogPage({ params }: PageProps) {
+    const { slug } = await params;
+    const data = await fetchBlogData(slug);
 
-                    {/* Featured Image Skeleton */}
-                    <Skeleton className="mb-10 w-full h-80 md:h-[420px] rounded-2xl bg-gray-200" />
-
-                    {/* Content Skeleton Card */}
-                    <div className="bg-white rounded-2xl p-8 md:p-12 border border-gray-200 shadow-sm space-y-4 mb-10">
-                        <Skeleton className="h-6 w-2/3 bg-gray-200" />
-                        <Skeleton className="h-4 w-full bg-gray-200" />
-                        <Skeleton className="h-4 w-11/12 bg-gray-200" />
-                        <Skeleton className="h-4 w-4/5 bg-gray-200" />
-                        <div className="pt-4 space-y-3">
-                            <Skeleton className="h-4 w-full bg-gray-200" />
-                            <Skeleton className="h-4 w-5/6 bg-gray-200" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+    if (!data || !data.blog) {
+        notFound();
     }
 
     const jsonLd = {
@@ -171,12 +165,12 @@ export default function SingleBlogPage() {
             "name": "MegaByte Circuits",
             "logo": {
                 "@type": "ImageObject",
-                "url": "https://megabytecircuits.com/images/logo.png",
+                "url": "https://megabytecircuit.com/images/logo.png",
             },
         },
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://megabytecircuits.com/blog/${data.blog.slug}`,
+            "@id": `https://megabytecircuit.com/blog/${data.blog.slug}`,
         },
     };
 
@@ -198,4 +192,3 @@ export default function SingleBlogPage() {
         </>
     );
 }
-

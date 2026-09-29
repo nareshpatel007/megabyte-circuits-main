@@ -68,22 +68,25 @@ export async function handleApiProxy(
                     delete headersObj["Content-Type"];
                     fetchOptions.headers = headersObj;
                 } else {
-                    // Handle JSON
-                    const requestBody = await req.json().catch(() => null);
-                    if (requestBody) {
-                        fetchOptions.body = JSON.stringify(requestBody);
-                        const headersObj = headers as Record<string, string>;
-                        headersObj["Content-Type"] = "application/json";
-                        fetchOptions.headers = headersObj;
+                    // Only attempt to parse JSON if content-length is non-zero
+                    const contentLength = req.headers.get("content-length");
+                    if (contentLength && contentLength !== "0") {
+                        const requestBody = await req.json().catch(() => null);
+                        if (requestBody) {
+                            fetchOptions.body = JSON.stringify(requestBody);
+                            const headersObj = headers as Record<string, string>;
+                            headersObj["Content-Type"] = "application/json";
+                            fetchOptions.headers = headersObj;
+                        }
                     }
                 }
             }
         }
 
         // Call backend API
-        let apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
-        if (apiUrl.includes("localhost/megabyte-circuits-api")) {
-            apiUrl = "http://127.0.0.1:8000/api";
+        let apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.megabytecircuit.com/api";
+        if (apiUrl.includes("127.0.0.1:8000")) {
+            apiUrl = "https://api.megabytecircuit.com/api";
         }
         if (apiUrl.endsWith("/")) {
             apiUrl = apiUrl.slice(0, -1);
@@ -97,6 +100,9 @@ export async function handleApiProxy(
         // Append search parameters from incoming request URL if present
         const searchParams = req.nextUrl.search;
         const targetUrl = `${apiUrl}${path}${searchParams ? searchParams : ""}`;
+
+        // Add 8s timeout to avoid any server hang
+        fetchOptions.signal = AbortSignal.timeout(8000);
 
         const apiRes = await fetch(targetUrl, fetchOptions);
         const text = await apiRes.text();

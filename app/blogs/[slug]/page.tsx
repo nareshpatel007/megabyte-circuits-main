@@ -1,4 +1,2 @@
-import SingleBlogPage from "../../blog/[slug]/page";
-
-export default SingleBlogPage;
-
+export const revalidate = 300;
+export { default, generateMetadata } from "../../blog/[slug]/page";
