@@ -21,13 +21,14 @@ import {
 } from "lucide-react";
 import { GoogleReCaptcha, GoogleReCaptchaHandle } from "@/components/ui/GoogleReCaptcha";
 
-const formSchema = z.object({
+const baseFormSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
     phone: z.string().optional(),
     company: z.string().optional(),
     serviceType: z.string().min(1, "Please select a service type"),
     message: z.string().min(10, "Message must be at least 10 characters"),
+    recaptcha: z.string().optional(),
 });
 
 export default function Contact() {
@@ -40,6 +41,8 @@ export default function Contact() {
     });
     const [recaptchaToken, setRecaptchaToken] = React.useState<string>("");
     const recaptchaRef = React.useRef<GoogleReCaptchaHandle>(null);
+    const recaptchaConfigRef = React.useRef(recaptchaConfig);
+    recaptchaConfigRef.current = recaptchaConfig;
 
     React.useEffect(() => {
         fetch("/api/recaptcha-config")
@@ -57,17 +60,40 @@ export default function Contact() {
             });
     }, []);
 
-    const form = useForm<z.infer<typeof formSchema>>({
+    const formSchema = React.useMemo(() => {
+        return baseFormSchema.superRefine((data, ctx) => {
+            if (recaptchaConfigRef.current.enabled && recaptchaConfigRef.current.site_key) {
+                if (!data.recaptcha || !data.recaptcha.trim()) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["recaptcha"],
+                        message: "Please check the \"I'm not a robot\" checkbox",
+                    });
+                }
+            }
+        });
+    }, []);
+
+    const form = useForm<z.infer<typeof baseFormSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: { name: "", email: "", phone: "", company: "", serviceType: "", message: "" },
+        defaultValues: { name: "", email: "", phone: "", company: "", serviceType: "", message: "", recaptcha: "" },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        if (recaptchaConfig.enabled && !recaptchaToken) {
-            toast({
-                title: "Verification Required",
-                description: "Please check the \"I'm not a robot\" reCAPTCHA box before sending your message.",
-                variant: "destructive",
+    const onInvalid = () => {
+        if (recaptchaConfig.enabled && recaptchaConfig.site_key && !form.getValues("recaptcha")) {
+            form.setError("recaptcha", {
+                type: "manual",
+                message: "Please check the \"I'm not a robot\" checkbox",
+            });
+        }
+    };
+
+    function onSubmit(values: z.infer<typeof baseFormSchema>) {
+        const token = values.recaptcha || recaptchaToken;
+        if (recaptchaConfig.enabled && recaptchaConfig.site_key && !token) {
+            form.setError("recaptcha", {
+                type: "manual",
+                message: "Please check the \"I'm not a robot\" checkbox",
             });
             return;
         }
@@ -76,8 +102,8 @@ export default function Contact() {
             {
                 data: {
                     ...values,
-                    recaptcha_token: recaptchaToken,
-                    recaptchaToken: recaptchaToken,
+                    recaptcha_token: token,
+                    recaptchaToken: token,
                 },
             },
             {
@@ -222,7 +248,7 @@ export default function Contact() {
                                         <h3 className="font-display font-bold text-secondary text-xl mb-6">Send Us a Message</h3>
 
                                         <Form {...form}>
-                                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                                            <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-5">
                                                 <div className="grid sm:grid-cols-2 gap-5">
                                                     <FormField control={form.control} name="name" render={({ field }) => (
                                                         <FormItem>
@@ -292,15 +318,38 @@ export default function Contact() {
                                                 )} />
 
                                                 {recaptchaConfig.enabled && recaptchaConfig.site_key && (
-                                                    <div className="pt-1">
-                                                        <GoogleReCaptcha
-                                                            ref={recaptchaRef}
-                                                            siteKey={recaptchaConfig.site_key}
-                                                            onVerify={(token) => setRecaptchaToken(token)}
-                                                            onExpire={() => setRecaptchaToken("")}
-                                                            onError={() => setRecaptchaToken("")}
-                                                        />
-                                                    </div>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="recaptcha"
+                                                        render={({ field }) => (
+                                                            <FormItem className="pt-1">
+                                                                <FormControl>
+                                                                    <GoogleReCaptcha
+                                                                        ref={recaptchaRef}
+                                                                        siteKey={recaptchaConfig.site_key}
+                                                                        onVerify={(token) => {
+                                                                            setRecaptchaToken(token);
+                                                                            form.setValue("recaptcha", token, { shouldValidate: true });
+                                                                            form.clearErrors("recaptcha");
+                                                                        }}
+                                                                        onExpire={() => {
+                                                                            setRecaptchaToken("");
+                                                                            form.setValue("recaptcha", "", { shouldValidate: true });
+                                                                            form.setError("recaptcha", {
+                                                                                type: "manual",
+                                                                                message: "reCAPTCHA expired. Please check the checkbox again.",
+                                                                            });
+                                                                        }}
+                                                                        onError={() => {
+                                                                            setRecaptchaToken("");
+                                                                            form.setValue("recaptcha", "", { shouldValidate: true });
+                                                                        }}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
                                                 )}
 
                                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between pt-2">
