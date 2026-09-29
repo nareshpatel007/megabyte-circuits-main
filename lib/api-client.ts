@@ -30,6 +30,8 @@ export interface ContactInput {
   company?: string;
   serviceType: string;
   message: string;
+  recaptcha_token?: string;
+  recaptchaToken?: string;
 }
 
 export interface SubmitResponse {

@@ -34,4 +34,6 @@ export const SubmitContactBody = z.object({
     phone: z.string().optional(),
     company: z.string().optional(),
     serviceType: z.string().optional(),
+    recaptcha_token: z.string().optional(),
+    recaptchaToken: z.string().optional(),
 });

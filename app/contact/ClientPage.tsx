@@ -19,6 +19,7 @@ import {
 import {
     MapPin, Phone, Mail, Clock, Send, CheckCircle2, User, PhoneCall
 } from "lucide-react";
+import { GoogleReCaptcha, GoogleReCaptchaHandle } from "@/components/ui/GoogleReCaptcha";
 
 const formSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -33,6 +34,28 @@ export default function Contact() {
     const { toast } = useToast();
     const submitContact = useSubmitContact();
     const [submitted, setSubmitted] = React.useState(false);
+    const [recaptchaConfig, setRecaptchaConfig] = React.useState<{ enabled: boolean; site_key: string }>({
+        enabled: false,
+        site_key: "",
+    });
+    const [recaptchaToken, setRecaptchaToken] = React.useState<string>("");
+    const recaptchaRef = React.useRef<GoogleReCaptchaHandle>(null);
+
+    React.useEffect(() => {
+        fetch("/api/recaptcha-config")
+            .then((res) => res.json())
+            .then((data) => {
+                if (data && data.success) {
+                    setRecaptchaConfig({
+                        enabled: Boolean(data.enabled),
+                        site_key: data.site_key || "",
+                    });
+                }
+            })
+            .catch((err) => {
+                console.error("Error loading reCAPTCHA configuration:", err);
+            });
+    }, []);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -40,8 +63,23 @@ export default function Contact() {
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
+        if (recaptchaConfig.enabled && !recaptchaToken) {
+            toast({
+                title: "Verification Required",
+                description: "Please check the \"I'm not a robot\" reCAPTCHA box before sending your message.",
+                variant: "destructive",
+            });
+            return;
+        }
+
         submitContact.mutate(
-            { data: values },
+            {
+                data: {
+                    ...values,
+                    recaptcha_token: recaptchaToken,
+                    recaptchaToken: recaptchaToken,
+                },
+            },
             {
                 onSuccess: (res: any) => {
                     setSubmitted(true);
@@ -50,6 +88,8 @@ export default function Contact() {
                         description: res?.message || "Our engineering team will contact you within 24 hours.",
                     });
                     form.reset();
+                    setRecaptchaToken("");
+                    recaptchaRef.current?.reset();
                 },
                 onError: (error: Error) => {
                     toast({
@@ -57,6 +97,8 @@ export default function Contact() {
                         description: error.message || "Something went wrong. Please try again.",
                         variant: "destructive",
                     });
+                    recaptchaRef.current?.reset();
+                    setRecaptchaToken("");
                 },
             }
         );
@@ -248,6 +290,18 @@ export default function Contact() {
                                                         <FormMessage />
                                                     </FormItem>
                                                 )} />
+
+                                                {recaptchaConfig.enabled && recaptchaConfig.site_key && (
+                                                    <div className="pt-1">
+                                                        <GoogleReCaptcha
+                                                            ref={recaptchaRef}
+                                                            siteKey={recaptchaConfig.site_key}
+                                                            onVerify={(token) => setRecaptchaToken(token)}
+                                                            onExpire={() => setRecaptchaToken("")}
+                                                            onError={() => setRecaptchaToken("")}
+                                                        />
+                                                    </div>
+                                                )}
 
                                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between pt-2">
                                                     <p className="text-xs text-muted-foreground">
