@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
                 "X-Api-Token": process.env.NEXT_PUBLIC_API_TOKEN || "",
             },
             signal: AbortSignal.timeout(6000),
-            cache: "no-store"
+            next: { revalidate: 1800 },
         });
 
         if (response.ok) {
@@ -35,7 +35,11 @@ export async function GET(req: NextRequest) {
                     return b;
                 });
             }
-            return NextResponse.json(data);
+            return NextResponse.json(data, {
+                headers: {
+                    "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400",
+                },
+            });
         }
 
         return NextResponse.json({

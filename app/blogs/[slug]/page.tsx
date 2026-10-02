@@ -1,2 +1,3 @@
-export const revalidate = 300;
-export { default, generateMetadata } from "../../blog/[slug]/page";
+export const revalidate = 3600;
+export const dynamicParams = true;
+export { default, generateMetadata, generateStaticParams } from "../../blog/[slug]/page";

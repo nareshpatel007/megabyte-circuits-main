@@ -9,9 +9,9 @@ export async function GET(request: Request) {
         const countParam = searchParams.get("count") || searchParams.get("per_page");
         const page = searchParams.get("page") || "1";
 
-        let envUrl = process.env.API_URL;
-        if (!envUrl || envUrl.includes("localhost/megabyte-circuits-api")) {
-            envUrl = "http://127.0.0.1:8000/api";
+        let envUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.megabytecircuit.com/api";
+        if (envUrl.includes("127.0.0.1:8000") || envUrl.includes("localhost/megabyte-circuits-api")) {
+            envUrl = "https://api.megabytecircuit.com/api";
         }
         if (!envUrl.endsWith("/api")) {
             envUrl = `${envUrl.replace(/\/$/, "")}/api`;
@@ -19,10 +19,14 @@ export async function GET(request: Request) {
         const countQuery = countParam ? `&count=${encodeURIComponent(countParam)}` : "";
         const backendUrl = `${envUrl}/digikey/products?keywords=${encodeURIComponent(keywords)}&category=${encodeURIComponent(category)}${countQuery}&page=${page}`;
 
-        const response = await fetch(backendUrl, { cache: "no-store" });
+        const response = await fetch(backendUrl, { next: { revalidate: 1800 } });
         if (response.ok) {
             const data = await response.json();
-            return NextResponse.json(data);
+            return NextResponse.json(data, {
+                headers: {
+                    "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400",
+                },
+            });
         }
 
         // Fallback: If DB server is down, search live DigiKey API directly
@@ -31,6 +35,10 @@ export async function GET(request: Request) {
             Products: fallbackData.Products || [],
             ProductsCount: fallbackData.ProductsCount || 0,
             Categories: []
+        }, {
+            headers: {
+                "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400",
+            },
         });
     } catch (error: any) {
         console.error("Error in Next DigiKey proxy:", error);

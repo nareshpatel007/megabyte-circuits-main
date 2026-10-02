@@ -101,9 +101,14 @@ export async function loadCartFromBackend(): Promise<any[]> {
 
     activeCartPromise = (async () => {
         try {
+            const existingCookie = getCookie(COOKIE_NAME);
+            const savedCart = typeof window !== "undefined" ? localStorage.getItem("megabyte_cart") : null;
+            if (!existingCookie && !savedCart) {
+                return [];
+            }
+
             const sessionId = getOrCreateCartSessionId();
             if (!sessionId) {
-                const savedCart = localStorage.getItem("megabyte_cart");
                 return savedCart ? JSON.parse(savedCart) : [];
             }
 
@@ -117,12 +122,12 @@ export async function loadCartFromBackend(): Promise<any[]> {
                 return data.items;
             }
 
-            const savedCart = localStorage.getItem("megabyte_cart");
-            return savedCart ? JSON.parse(savedCart) : [];
+            const localCart = typeof window !== "undefined" ? localStorage.getItem("megabyte_cart") : null;
+            return localCart ? JSON.parse(localCart) : [];
         } catch (err) {
             console.error("Failed to load cart from backend:", err);
-            const savedCart = localStorage.getItem("megabyte_cart");
-            return savedCart ? JSON.parse(savedCart) : [];
+            const localCart = typeof window !== "undefined" ? localStorage.getItem("megabyte_cart") : null;
+            return localCart ? JSON.parse(localCart) : [];
         } finally {
             activeCartPromise = null;
         }

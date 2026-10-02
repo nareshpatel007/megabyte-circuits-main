@@ -32,6 +32,7 @@ interface BlogDetailProps {
     likesCount: number;
     hasLiked: boolean;
     related: any[];
+    children?: React.ReactNode;
 }
 
 export function BlogDetailClient({
@@ -41,6 +42,7 @@ export function BlogDetailClient({
     likesCount: initialLikesCount,
     hasLiked: initialHasLiked,
     related,
+    children,
 }: BlogDetailProps) {
     const [views, setViews] = useState(blog.views || 0);
     const [likes, setLikes] = useState(initialLikesCount);
@@ -230,10 +232,14 @@ export function BlogDetailClient({
 
                 {/* Article HTML Content */}
                 <article className="bg-white rounded-2xl p-8 md:p-12 border border-gray-200 shadow-sm mb-10 prose prose-emerald max-w-none">
-                    <div
-                        className="leading-relaxed text-gray-700 font-sans space-y-6"
-                        dangerouslySetInnerHTML={{ __html: blog.content }}
-                    />
+                    {children ? (
+                        children
+                    ) : (
+                        <div
+                            className="leading-relaxed text-gray-700 font-sans space-y-6"
+                            dangerouslySetInnerHTML={{ __html: blog.content }}
+                        />
+                    )}
 
                     {/* Tags */}
                     {blog.tags && (
