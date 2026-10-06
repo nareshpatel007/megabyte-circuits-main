@@ -3,6 +3,15 @@
 const COOKIE_NAME = "megabyte_cart_session_id";
 const COOKIE_MAX_AGE_DAYS = 30;
 
+function getCookieDomain(): string | undefined {
+    if (typeof window === "undefined") return undefined;
+    const hostname = window.location.hostname;
+    if (hostname.includes("megabytecircuit.com")) {
+        return ".megabytecircuit.com";
+    }
+    return undefined;
+}
+
 /**
  * Helper to get a cookie value by name
  */
@@ -11,7 +20,8 @@ export function getCookie(name: string): string | null {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-        return parts.pop()?.split(';').shift() || null;
+        const item = parts.pop()?.split(';').shift();
+        return item ? decodeURIComponent(item) : null;
     }
     return null;
 }
@@ -23,22 +33,121 @@ export function setCookie(name: string, value: string, days: number = COOKIE_MAX
     if (typeof document === "undefined") return;
     const maxAgeSeconds = days * 24 * 60 * 60;
     const expires = new Date(Date.now() + days * 864e5).toUTCString();
-    document.cookie = `${name}=${encodeURIComponent(value)}; max-age=${maxAgeSeconds}; expires=${expires}; path=/; SameSite=Lax`;
+    const domainPart = getCookieDomain() ? `; domain=${getCookieDomain()}` : "";
+    document.cookie = `${name}=${encodeURIComponent(value)}; max-age=${maxAgeSeconds}; expires=${expires}; path=/; SameSite=Lax${domainPart}`;
+}
+
+export function removeCookie(name: string) {
+    if (typeof document === "undefined") return;
+    const domainPart = getCookieDomain() ? `; domain=${getCookieDomain()}` : "";
+    if (domainPart) {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainPart}`;
+    }
+    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 }
 
 /**
- * Gets existing cart session ID or generates a new unique 30-day session ID
+ * Helper to get user object from cookie if logged in
+ */
+function getAuthUserFromCookie(): any | null {
+    if (typeof document === "undefined") return null;
+    const userCookie = getCookie("megabyte_user");
+    if (userCookie) {
+        try {
+            return JSON.parse(userCookie);
+        } catch {
+            return null;
+        }
+    }
+    return null;
+}
+
+/**
+ * Canonical cart session ID for an authenticated user across all devices
+ */
+export function getUserCartSessionId(userId: string | number): string {
+    return `user_cart_${userId}`;
+}
+
+/**
+ * Sets or updates the cart session ID in cookie
+ */
+export function setCartSessionId(sessionId: string) {
+    if (!sessionId) return;
+    setCookie(COOKIE_NAME, sessionId, COOKIE_MAX_AGE_DAYS);
+}
+
+/**
+ * Gets existing cart session ID or generates a new unique 30-day session ID.
+ * When a user is logged in, this ALWAYS uses the same cart ID (user_cart_{userId}) across all devices.
  */
 export function getOrCreateCartSessionId(): string {
+    const authUser = getAuthUserFromCookie();
+    if (authUser && authUser.id) {
+        const canonicalId = getUserCartSessionId(authUser.id);
+        const currentCookie = getCookie(COOKIE_NAME);
+        if (currentCookie !== canonicalId) {
+            setCookie(COOKIE_NAME, canonicalId, COOKIE_MAX_AGE_DAYS);
+        }
+        return canonicalId;
+    }
+
     let sessionId = getCookie(COOKIE_NAME);
+    if (sessionId && sessionId.startsWith("user_cart_")) {
+        sessionId = null;
+    }
+
     if (!sessionId) {
         sessionId = `cart_sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
         setCookie(COOKIE_NAME, sessionId, COOKIE_MAX_AGE_DAYS);
     } else {
-        // Refresh expiration to 30 days
         setCookie(COOKIE_NAME, sessionId, COOKIE_MAX_AGE_DAYS);
     }
     return sessionId;
+}
+
+/**
+ * Attaches the current guest cart to the logged-in user and synchronizes across all devices
+ */
+export async function attachCartOnLogin(userId: string | number, token?: string): Promise<any[]> {
+    if (!userId) return [];
+    const canonicalSessionId = getUserCartSessionId(userId);
+    const currentSessionId = getCookie(COOKIE_NAME);
+
+    try {
+        const authToken = token || getCookie("megabyte_user_token");
+        const headers: HeadersInit = {
+            "Content-Type": "application/json",
+        };
+        if (authToken) {
+            headers["Authorization"] = `Bearer ${authToken}`;
+        }
+
+        const res = await fetch("/api/cart/attach", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+                guest_session_id: currentSessionId && currentSessionId !== canonicalSessionId ? currentSessionId : undefined,
+                user_id: userId,
+            }),
+        });
+
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.items)) {
+            setCartSessionId(data.session_id || canonicalSessionId);
+            if (typeof window !== "undefined") {
+                localStorage.setItem("megabyte_cart", JSON.stringify(data.items));
+                window.dispatchEvent(new Event("megabyte_cart_updated"));
+            }
+            return data.items;
+        }
+    } catch (err) {
+        console.error("Failed to attach cart on login in main:", err);
+    }
+
+    setCartSessionId(canonicalSessionId);
+    return await loadCartFromBackend();
 }
 
 /**
@@ -47,19 +156,27 @@ export function getOrCreateCartSessionId(): string {
 export async function saveCartToBackend(items: any[]): Promise<boolean> {
     try {
         const sessionId = getOrCreateCartSessionId();
+        const authUser = getAuthUserFromCookie();
+        const token = getCookie("megabyte_user_token");
 
         // Save to localStorage immediately
         localStorage.setItem("megabyte_cart", JSON.stringify(items));
         window.dispatchEvent(new Event("megabyte_cart_updated"));
 
+        const headers: HeadersInit = {
+            "Content-Type": "application/json",
+        };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
         // Save to backend database
         const res = await fetch("/api/cart/save", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers,
             body: JSON.stringify({
                 session_id: sessionId,
+                user_id: authUser?.id || undefined,
                 items: items,
             }),
         });
@@ -112,11 +229,21 @@ export async function loadCartFromBackend(): Promise<any[]> {
                 return savedCart ? JSON.parse(savedCart) : [];
             }
 
-            const res = await fetch(`/api/cart/get?session_id=${encodeURIComponent(sessionId)}`);
+            const token = getCookie("megabyte_user_token");
+            const headers: HeadersInit = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
+
+            const res = await fetch(`/api/cart/get?session_id=${encodeURIComponent(sessionId)}`, {
+                headers,
+            });
             const data = await res.json();
 
             if (data.success && Array.isArray(data.items)) {
-                // Always sync backend items to localStorage (even if empty array)
+                if (data.session_id && data.session_id !== sessionId) {
+                    setCartSessionId(data.session_id);
+                }
                 localStorage.setItem("megabyte_cart", JSON.stringify(data.items));
                 window.dispatchEvent(new Event("megabyte_cart_updated"));
                 return data.items;
@@ -135,7 +262,6 @@ export async function loadCartFromBackend(): Promise<any[]> {
 
     return activeCartPromise;
 }
-
 
 /**
  * Gets the minimum product quantity configured in .env (default 1)
@@ -159,7 +285,6 @@ export function calculatePartPrice(
 ) {
     let unitPrice = baseUnitPrice;
 
-    // Use actual DigiKey StandardPricing break quantities if available
     if (standardPricing && standardPricing.length > 0) {
         const sortedPricing = [...standardPricing].sort((a, b) => b.BreakQuantity - a.BreakQuantity);
         const applicableTier = sortedPricing.find((tier) => qty >= tier.BreakQuantity);
@@ -176,5 +301,3 @@ export function calculatePartPrice(
         baseUnitPrice,
     };
 }
-
-
