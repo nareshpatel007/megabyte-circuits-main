@@ -109,10 +109,29 @@ export function getOrCreateCartSessionId(): string {
 /**
  * Attaches the current guest cart to the logged-in user and synchronizes across all devices
  */
-export async function attachCartOnLogin(userId: string | number, token?: string): Promise<any[]> {
+export async function attachCartOnLogin(
+    userId: string | number,
+    token?: string,
+    guestSessionId?: string | null,
+    fallbackItems?: any[]
+): Promise<any[]> {
     if (!userId) return [];
     const canonicalSessionId = getUserCartSessionId(userId);
-    const currentSessionId = getCookie(COOKIE_NAME);
+    const currentSessionId = guestSessionId || getCookie(COOKIE_NAME);
+
+    // Read local items if not passed
+    let itemsToAttach = fallbackItems;
+    if (!itemsToAttach && typeof window !== "undefined") {
+        try {
+            const raw = localStorage.getItem("megabyte_cart");
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    itemsToAttach = parsed;
+                }
+            }
+        } catch (e) {}
+    }
 
     try {
         const authToken = token || getCookie("megabyte_user_token");
@@ -129,6 +148,7 @@ export async function attachCartOnLogin(userId: string | number, token?: string)
             body: JSON.stringify({
                 guest_session_id: currentSessionId && currentSessionId !== canonicalSessionId ? currentSessionId : undefined,
                 user_id: userId,
+                items: itemsToAttach || [],
             }),
         });
 
@@ -136,17 +156,27 @@ export async function attachCartOnLogin(userId: string | number, token?: string)
 
         if (data.success && Array.isArray(data.items)) {
             setCartSessionId(data.session_id || canonicalSessionId);
+            const finalItems = data.items.length > 0 ? data.items : (itemsToAttach && itemsToAttach.length > 0 ? itemsToAttach : []);
             if (typeof window !== "undefined") {
-                localStorage.setItem("megabyte_cart", JSON.stringify(data.items));
+                localStorage.setItem("megabyte_cart", JSON.stringify(finalItems));
                 window.dispatchEvent(new Event("megabyte_cart_updated"));
             }
-            return data.items;
+            if (data.items.length === 0 && itemsToAttach && itemsToAttach.length > 0) {
+                saveCartToBackend(itemsToAttach).catch(() => {});
+            }
+            return finalItems;
         }
     } catch (err) {
         console.error("Failed to attach cart on login in main:", err);
     }
 
+    // Fallback: set the canonical session ID and preserve local items
     setCartSessionId(canonicalSessionId);
+    if (itemsToAttach && itemsToAttach.length > 0 && typeof window !== "undefined") {
+        localStorage.setItem("megabyte_cart", JSON.stringify(itemsToAttach));
+        saveCartToBackend(itemsToAttach).catch(() => {});
+        return itemsToAttach;
+    }
     return await loadCartFromBackend();
 }
 
@@ -244,8 +274,22 @@ export async function loadCartFromBackend(): Promise<any[]> {
                 if (data.session_id && data.session_id !== sessionId) {
                     setCartSessionId(data.session_id);
                 }
-                localStorage.setItem("megabyte_cart", JSON.stringify(data.items));
-                window.dispatchEvent(new Event("megabyte_cart_updated"));
+
+                const savedCart = typeof window !== "undefined" ? localStorage.getItem("megabyte_cart") : null;
+                let localItems: any[] = [];
+                try {
+                    if (savedCart) localItems = JSON.parse(savedCart);
+                } catch (e) {}
+
+                if (data.items.length === 0 && Array.isArray(localItems) && localItems.length > 0) {
+                    saveCartToBackend(localItems).catch(() => {});
+                    return localItems;
+                }
+
+                if (typeof window !== "undefined") {
+                    localStorage.setItem("megabyte_cart", JSON.stringify(data.items));
+                    window.dispatchEvent(new Event("megabyte_cart_updated"));
+                }
                 return data.items;
             }
 
